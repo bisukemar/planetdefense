@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#030712">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="PDefense">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Planetary Defense Command</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="elements/favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" href="elements/pd_icon.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -488,6 +496,10 @@
                     <i class="fa-solid fa-book-atlas font-bold"></i> SPACE ENCYCLOPEDIA
                 </button>
 
+                <button id="open-install-options-btn" class="md:hidden w-full bg-slate-950 hover:bg-slate-800 border border-slate-700/60 text-cyan-300 font-bold py-3 px-4 rounded-xl text-xs tracking-wider active:scale-95 transition-all flex justify-center items-center gap-2 select-none pointer-events-auto">
+                    <i class="fa-solid fa-mobile-screen-button font-bold"></i> INSTALL APP
+                </button>
+
                 <div id="inline-settings-options" class="absolute inset-4 md:inset-6 z-50 bg-slate-950 border border-amber-500/40 rounded-xl p-4 flex flex-col gap-3 transition-all hidden pointer-events-auto font-bold shadow-2xl">
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                         <span class="text-amber-400 font-black text-xs tracking-widest uppercase"><i class="fa-solid fa-sliders mr-1"></i> Settings</span>
@@ -574,6 +586,37 @@
                             <h3 class="text-[10px] text-red-400 uppercase tracking-widest font-black">Hostile Ships</h3>
                             <div id="encyclopedia-ships" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
                         </section>
+                    </div>
+                </div>
+
+                <div id="inline-install-options" class="absolute inset-4 md:inset-6 z-50 bg-slate-950 border border-cyan-500/40 rounded-xl p-4 flex flex-col gap-3 transition-all hidden pointer-events-auto font-bold shadow-2xl overflow-y-auto">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-cyan-300 font-black text-xs tracking-widest uppercase"><i class="fa-solid fa-mobile-screen-button mr-1"></i> Install App</span>
+                        <button id="close-install-options-btn" class="text-slate-400 hover:text-white p-2 text-sm select-none"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-left space-y-2">
+                        <div class="flex items-center gap-3">
+                            <img src="elements/pd_icon.png" alt="PDefense app icon" class="w-12 h-12 rounded-xl border border-cyan-500/30">
+                            <div>
+                                <div class="text-cyan-300 text-xs font-black uppercase tracking-wider">Planetary Defense</div>
+                                <div id="install-status-label" class="text-[9px] text-slate-500 uppercase tracking-widest">Mobile install ready</div>
+                            </div>
+                        </div>
+                        <button id="android-install-btn" class="w-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black py-2.5 rounded-xl text-xs tracking-widest uppercase min-h-[40px] select-none pointer-events-auto">
+                            INSTALL ON ANDROID
+                        </button>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-left">
+                        <div class="text-slate-300 text-[10px] font-black uppercase tracking-widest mb-2">iPhone / Safari</div>
+                        <ol class="space-y-1.5 text-[10px] text-slate-400 leading-snug list-decimal list-inside font-semibold">
+                            <li>Open this game in Safari.</li>
+                            <li>Tap the Share button.</li>
+                            <li>Choose Add to Home Screen.</li>
+                            <li>Tap Add.</li>
+                        </ol>
+                    </div>
+                    <div class="text-[9px] text-slate-500 text-left leading-snug font-semibold">
+                        Android install prompts require the game to be served from HTTPS or localhost with the manifest and service worker available.
                     </div>
                 </div>
             </div>
@@ -682,6 +725,7 @@
 
         let audioCtx = null;
         let isAudioEnabled = true;
+        let deferredInstallPrompt = null;
 
         const PLANET_THEMES = {
             oasis: { coreStart: '#1d4ed8', coreEnd: '#0f172a', land: '#10b981', shield: 'rgba(56, 189, 248, ' },
@@ -1129,6 +1173,71 @@
             isAudioEnabled = !isAudioEnabled;
             if (isAudioEnabled) initAudio();
             syncAudioUI();
+        }
+
+        function isIosDevice() {
+            return /iphone|ipad|ipod/i.test(navigator.userAgent);
+        }
+
+        function isStandaloneDisplay() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        }
+
+        function syncInstallUI() {
+            const installBtn = document.getElementById('android-install-btn');
+            const statusLabel = document.getElementById('install-status-label');
+            if (!installBtn || !statusLabel) return;
+
+            if (isStandaloneDisplay()) {
+                installBtn.disabled = true;
+                installBtn.className = "w-full bg-slate-800 text-slate-500 cursor-not-allowed font-black py-2.5 rounded-xl text-xs tracking-widest uppercase min-h-[40px] select-none pointer-events-auto";
+                installBtn.innerText = "APP IS INSTALLED";
+                statusLabel.innerText = "Running in app mode";
+            } else if (isIosDevice()) {
+                installBtn.disabled = true;
+                installBtn.className = "w-full bg-slate-800 text-slate-500 cursor-not-allowed font-black py-2.5 rounded-xl text-xs tracking-widest uppercase min-h-[40px] select-none pointer-events-auto";
+                installBtn.innerText = "USE SAFARI SHARE MENU";
+                statusLabel.innerText = "Use iPhone instructions below";
+            } else if (deferredInstallPrompt) {
+                installBtn.disabled = false;
+                installBtn.className = "w-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black py-2.5 rounded-xl text-xs tracking-widest uppercase min-h-[40px] select-none pointer-events-auto";
+                installBtn.innerText = "INSTALL ON ANDROID";
+                statusLabel.innerText = "Android install prompt ready";
+            } else {
+                installBtn.disabled = true;
+                installBtn.className = "w-full bg-slate-800 text-slate-500 cursor-not-allowed font-black py-2.5 rounded-xl text-xs tracking-widest uppercase min-h-[40px] select-none pointer-events-auto";
+                installBtn.innerText = "INSTALL UNAVAILABLE";
+                statusLabel.innerText = "Use Chrome over HTTPS or localhost";
+            }
+        }
+
+        function registerPwaSupport() {
+            if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+                navigator.serviceWorker.register('./sw.js').catch(error => console.warn('Service worker registration failed:', error));
+            }
+
+            window.addEventListener('beforeinstallprompt', (event) => {
+                event.preventDefault();
+                deferredInstallPrompt = event;
+                syncInstallUI();
+            });
+
+            window.addEventListener('appinstalled', () => {
+                deferredInstallPrompt = null;
+                syncInstallUI();
+            });
+        }
+
+        async function triggerAndroidInstall() {
+            if (!deferredInstallPrompt) {
+                syncInstallUI();
+                return;
+            }
+
+            deferredInstallPrompt.prompt();
+            await deferredInstallPrompt.userChoice;
+            deferredInstallPrompt = null;
+            syncInstallUI();
         }
 
         function playSynthSound(type) {
@@ -2294,7 +2403,7 @@
         // 10. ACTION BINDINGS MATRIX
         // ----------------------------------------------------------------------
         function hideTitleSubpanels() {
-            ['inline-planet-options', 'inline-settings-options', 'inline-encyclopedia-options'].forEach(id => {
+            ['inline-planet-options', 'inline-settings-options', 'inline-encyclopedia-options', 'inline-install-options'].forEach(id => {
                 const panel = document.getElementById(id);
                 if (panel) panel.classList.add('hidden');
             });
@@ -2325,9 +2434,18 @@
             if (encyclopedia) encyclopedia.classList.remove('hidden');
             playSynthSound('upgrade');
         });
+        bindButton('open-install-options-btn', () => {
+            hideTitleSubpanels();
+            syncInstallUI();
+            const installPanel = document.getElementById('inline-install-options');
+            if (installPanel) installPanel.classList.remove('hidden');
+            playSynthSound('upgrade');
+        });
         bindButton('close-planet-options-btn', () => { const config = document.getElementById('inline-planet-options'); if (config) config.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('close-settings-options-btn', () => { const settings = document.getElementById('inline-settings-options'); if (settings) settings.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('close-encyclopedia-options-btn', () => { const encyclopedia = document.getElementById('inline-encyclopedia-options'); if (encyclopedia) encyclopedia.classList.add('hidden'); playSynthSound('upgrade'); });
+        bindButton('close-install-options-btn', () => { const installPanel = document.getElementById('inline-install-options'); if (installPanel) installPanel.classList.add('hidden'); playSynthSound('upgrade'); });
+        bindButton('android-install-btn', triggerAndroidInstall);
 
         bindButton('open-build-drawer-btn', toggleBlueprintDrawer);
         bindButton('settings-audio-toggle', toggleAudioState);
@@ -2608,6 +2726,8 @@
         // Run engine setup and kick off main execution pipeline
         if (planetNameInput) planetNameInput.value = "EARTH";
         syncAudioUI();
+        registerPwaSupport();
+        syncInstallUI();
         loop();
     </script>
 </body>

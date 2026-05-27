@@ -1,0 +1,19 @@
+{
+  "name": "Planetary Defense Command",
+  "short_name": "PDefense",
+  "description": "Orbital satellite defense command game.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#030712",
+  "theme_color": "#030712",
+  "icons": [
+    {
+      "src": "elements/pd_icon.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
