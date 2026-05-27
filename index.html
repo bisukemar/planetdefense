@@ -108,6 +108,9 @@
         .pb-safe {
             padding-bottom: env(safe-area-inset-bottom);
         }
+        .top-safe {
+            top: calc(env(safe-area-inset-top) + 0.75rem);
+        }
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -209,7 +212,7 @@
     </div>
 
     <!-- MOBILE VIEW SLIM HUD HEADER -->
-    <div class="flex md:hidden absolute top-3 left-3 right-3 z-10 items-center justify-between bg-slate-950/95 backdrop-blur-md p-2 rounded-xl border border-slate-800/80 shadow-lg gap-2 text-[10px] pointer-events-auto">
+    <div class="flex md:hidden absolute top-safe left-3 right-3 z-10 items-center justify-between bg-slate-950/95 backdrop-blur-md p-2 rounded-xl border border-slate-800/80 shadow-lg gap-2 text-[10px] pointer-events-auto">
         <div class="flex flex-col items-start px-1 select-none font-bold">
             <div class="font-extrabold text-emerald-400 text-glow-green text-[9px] uppercase tracking-wide font-bold">WAVE <span id="mobile-wave" class="text-white font-bold">1</span></div>
             <div class="flex items-center gap-1 mt-0.5">
