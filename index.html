@@ -521,7 +521,7 @@
                             <i class="fa-solid fa-code text-red-400 font-bold"></i> Dev Mode (+100k Credits)
                         </span>
                         <label class="relative inline-flex items-center cursor-pointer select-none pointer-events-auto">
-                            <input type="checkbox" id="dev-mode-checkbox" class="sr-only peer font-bold" checked>
+                            <input type="checkbox" id="dev-mode-checkbox" class="sr-only peer font-bold">
                             <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500 peer-checked:after:bg-slate-950 font-bold"></div>
                         </label>
                     </div>
@@ -709,7 +709,7 @@
         let ORBIT_PATHS = [];
         
         let orbitLockStates = [false, true, true]; 
-        const ORBIT_UNLOCK_COSTS = [0, 300, 600];
+        const ORBIT_UNLOCK_COSTS = [0, 3000, 9000];
         let orbitSlotCapacities = [4, 4, 4]; 
         let orbitUpgradesCount = [0, 0, 0];  
         let shieldUpgradeLevel = 0; 
