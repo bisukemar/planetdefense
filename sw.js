@@ -1,4 +1,4 @@
-const CACHE_NAME = 'planetary-defense-v1';
+const CACHE_NAME = 'planetary-defense-v2';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -12,7 +12,9 @@ const CORE_ASSETS = [
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(CORE_ASSETS))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(
+      CORE_ASSETS.map(asset => new Request(asset, { cache: 'reload' }))
+    ))
   );
   self.skipWaiting();
 });
@@ -28,7 +30,17 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
+
+  const requestUrl = new URL(event.request.url);
+  if (requestUrl.origin !== self.location.origin) return;
+
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
+    fetch(event.request)
+      .then(response => {
+        const responseCopy = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseCopy));
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
