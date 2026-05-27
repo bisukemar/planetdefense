@@ -1,7 +1,8 @@
-const CACHE_NAME = 'planetary-defense-v2';
+const CACHE_NAME = 'planetary-defense-v3';
 const CORE_ASSETS = [
   './',
   './index.html',
+  './version.json',
   './manifest.webmanifest',
   './elements/pd_icon.png',
   './elements/favicon.ico',
@@ -26,6 +27,15 @@ self.addEventListener('activate', event => {
     ))
   );
   self.clients.claim();
+});
+
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
+  if (event.data && event.data.type === 'CLEAR_CACHES') {
+    event.waitUntil(
+      caches.keys().then(keys => Promise.all(keys.map(key => caches.delete(key))))
+    );
+  }
 });
 
 self.addEventListener('fetch', event => {
