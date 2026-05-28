@@ -88,6 +88,12 @@
             animation: readyPulse 1.15s ease-in-out infinite;
             box-shadow: 0 0 18px rgba(16, 185, 129, 0.55), 0 0 0 1px rgba(190, 242, 100, 0.35);
         }
+        .boss-wave-ready {
+            background: #dc2626 !important;
+            color: #fff7ed !important;
+            border-color: rgba(248, 113, 113, 0.8) !important;
+            box-shadow: 0 0 22px rgba(239, 68, 68, 0.72), 0 0 0 1px rgba(254, 202, 202, 0.35) !important;
+        }
         .planet-texture-preview {
             background-size: auto 100%;
             background-position: 0 50%;
@@ -111,6 +117,66 @@
         .top-safe {
             top: calc(env(safe-area-inset-top) + 0.75rem);
         }
+        .notice-safe-top {
+            top: calc(env(safe-area-inset-top) + 5.8rem);
+        }
+        @media (min-width: 768px) {
+            .notice-safe-top {
+                top: 10.75rem;
+            }
+        }
+        .tech-tooltip {
+            background: rgba(2, 6, 23, 0.9);
+            border: 1px solid rgba(125, 211, 252, 0.78);
+            color: #bae6fd;
+            box-shadow: 0 0 16px rgba(56, 189, 248, 0.36), 0 0 34px rgba(16, 185, 129, 0.18), inset 0 0 18px rgba(56, 189, 248, 0.08);
+            text-shadow: 0 0 8px rgba(56, 189, 248, 0.72);
+            animation: tooltipRadiate 1.35s ease-in-out infinite;
+        }
+        .tech-notice {
+            background: rgba(69, 10, 10, 0.92);
+            border: 1px solid rgba(248, 113, 113, 0.72);
+            color: #fecaca;
+            box-shadow: 0 0 22px rgba(239, 68, 68, 0.28);
+            text-shadow: 0 0 8px rgba(248, 113, 113, 0.45);
+        }
+        .notice-pop {
+            animation: noticePop 0.18s ease-out;
+        }
+        .mode-transition-pop {
+            animation: modeTransitionPop 1.45s ease-in-out;
+        }
+        .build-tooltip-connector {
+            position: absolute;
+            left: var(--connector-left, 3rem);
+            top: 100%;
+            width: 1px;
+            height: var(--connector-height, 54px);
+            background: linear-gradient(to bottom, rgba(125, 211, 252, 0.95), rgba(16, 185, 129, 0.7));
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.85);
+        }
+        .build-tooltip-connector::after {
+            content: "";
+            position: absolute;
+            left: -3px;
+            bottom: -4px;
+            width: 7px;
+            height: 7px;
+            border-radius: 9999px;
+            background: #22d3ee;
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.7);
+        }
+        .build-tooltip-target {
+            position: absolute;
+            left: var(--connector-left, 3rem);
+            top: calc(100% + var(--connector-height, 54px) - 5px);
+            width: 10px;
+            height: 10px;
+            border-radius: 9999px;
+            border: 1px solid rgba(190, 242, 100, 0.8);
+            transform: translateX(-50%);
+            box-shadow: 0 0 14px rgba(34, 197, 94, 0.85);
+        }
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -123,12 +189,85 @@
             from { background-position: 0 50%; }
             to { background-position: 100% 50%; }
         }
+        @keyframes tooltipRadiate {
+            0%, 100% {
+                filter: brightness(1);
+                box-shadow: 0 0 16px rgba(56, 189, 248, 0.34), 0 0 34px rgba(16, 185, 129, 0.16), inset 0 0 18px rgba(56, 189, 248, 0.08);
+            }
+            50% {
+                filter: brightness(1.18);
+                box-shadow: 0 0 24px rgba(56, 189, 248, 0.68), 0 0 54px rgba(16, 185, 129, 0.32), inset 0 0 24px rgba(56, 189, 248, 0.16);
+            }
+        }
+        @keyframes noticePop {
+            from { opacity: 0; transform: translate(-50%, -12px) scale(0.96); }
+            to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        }
+        @keyframes modeTransitionPop {
+            0% { opacity: 0; transform: scale(1.04); }
+            32%, 72% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.98); }
+        }
     </style>
 </head>
 <body class="game-shell relative text-slate-100 scanline select-none font-semibold">
 
     <!-- MAIN GAME CANVAS -->
     <canvas id="gameCanvas" class="absolute inset-0 w-full h-full block z-0" style="touch-action: none;"></canvas>
+
+    <!-- RESPONSIVE GAME NOTICES / STARTER TOOLTIPS -->
+    <div id="game-notice" class="hidden fixed left-1/2 notice-safe-top z-[60] -translate-x-1/2 tech-notice notice-pop px-3 py-2 rounded-xl text-[10px] md:text-xs uppercase tracking-widest font-black text-center max-w-[88vw] pointer-events-none"></div>
+    <div id="mode-transition-overlay" class="hidden fixed inset-0 z-[68] bg-slate-950/90 backdrop-blur-sm pointer-events-none items-center justify-center">
+        <div class="text-center px-5">
+            <div class="mx-auto w-16 h-16 rounded-full border border-cyan-400/60 bg-cyan-500/10 flex items-center justify-center shadow-[0_0_30px_rgba(34,211,238,0.32)]">
+                <i id="mode-transition-icon" class="fa-solid fa-circle-nodes text-cyan-300 text-2xl animate-spin-slow"></i>
+            </div>
+            <div id="mode-transition-title" class="mt-4 text-cyan-200 text-lg md:text-3xl uppercase tracking-widest font-black text-glow-blue">Mode Transition</div>
+            <div id="mode-transition-subtitle" class="mt-2 text-slate-400 text-[10px] md:text-xs uppercase tracking-widest font-bold">Reconfiguring command systems</div>
+        </div>
+    </div>
+    <div id="planet-tutorial-tooltip" class="hidden absolute z-20 tech-tooltip px-2.5 py-1.5 rounded-lg text-[9px] md:text-[10px] uppercase tracking-wider font-black text-center max-w-[210px] pointer-events-none">
+        Click the Planet to access Master Command Center
+    </div>
+    <div id="boss-mode-hud" class="hidden fixed left-3 right-3 top-safe z-[55] pointer-events-none">
+        <div class="max-w-lg mx-auto bg-slate-950/90 border border-red-500/50 rounded-xl p-2.5 shadow-2xl">
+            <div class="flex justify-between items-center text-[9px] uppercase tracking-widest font-black">
+                <span id="boss-mode-title" class="text-red-300">Boss Intercept</span>
+                <span id="boss-mode-objective" class="text-cyan-300">Clear Assault Wing</span>
+            </div>
+            <div id="boss-health-wrap" class="hidden mt-2">
+                <div class="flex justify-between text-[8px] text-red-200 uppercase tracking-widest font-black">
+                    <span id="boss-health-name">Boss</span>
+                    <span id="boss-health-text">100%</span>
+                </div>
+                <div class="h-2 bg-slate-900 border border-red-500/30 rounded-full overflow-hidden mt-1">
+                    <div id="boss-health-bar" class="h-full bg-gradient-to-r from-red-600 to-amber-400 w-full"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="boss-card-modal" class="hidden fixed inset-0 z-[70] bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 pointer-events-auto">
+        <div class="max-w-3xl w-full bg-slate-900 border border-amber-500/50 rounded-2xl p-4 md:p-5 shadow-2xl">
+            <div class="text-center border-b border-slate-800 pb-3">
+                <h2 class="text-amber-300 text-lg md:text-2xl font-black uppercase tracking-widest">Choose Command Directive</h2>
+                <p class="text-slate-400 text-[10px] uppercase tracking-widest mt-1">Persistent upgrades for defense waves only</p>
+            </div>
+            <div id="boss-card-options" class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4"></div>
+        </div>
+    </div>
+    <div id="boss-failed-modal" class="hidden fixed inset-0 z-[70] bg-red-950/90 backdrop-blur-md flex items-center justify-center p-4 pointer-events-auto">
+        <div class="max-w-sm w-full bg-slate-900 border border-red-500/60 rounded-2xl p-5 shadow-2xl text-center">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-red-500/10 border border-red-500/40 mx-auto">
+                <i class="fa-solid fa-triangle-exclamation text-red-400 text-2xl animate-pulse"></i>
+            </div>
+            <h2 class="text-red-300 text-lg md:text-xl font-black uppercase tracking-widest mt-4">Mission Failed</h2>
+            <p class="text-slate-300 text-xs leading-relaxed mt-2 font-bold">The Boss Ship escaped the intercept zone. Returning to base for emergency repairs.</p>
+            <p class="text-slate-500 text-[9px] uppercase tracking-widest mt-3">No Command Directive recovered</p>
+            <button id="boss-failed-return-btn" class="mt-4 w-full bg-red-500 hover:bg-red-400 text-slate-950 font-black py-3 rounded-xl text-xs uppercase tracking-widest active:scale-95 transition-all pointer-events-auto">
+                <i class="fa-solid fa-shuttle-space mr-1"></i> Go Back To Base
+            </button>
+        </div>
+    </div>
 
     <!-- DESKTOP COMPACT HUD HEADER -->
     <div class="hidden md:flex absolute top-4 left-4 right-4 z-10 flex-col gap-2 pointer-events-auto">
@@ -190,7 +329,7 @@
 
             <!-- Warning Banners -->
             <div class="flex flex-col items-center gap-2 bg-transparent">
-                <div id="warning-banner" class="bg-red-950/85 border border-red-500 text-red-200 px-3 py-1.5 rounded-lg text-xs uppercase tracking-widest hidden animate-bounce font-bold">
+                <div id="warning-banner" class="fixed left-1/2 notice-safe-top z-[60] -translate-x-1/2 bg-red-950/85 border border-red-500 text-red-200 px-3 py-1.5 rounded-lg text-xs uppercase tracking-widest hidden animate-bounce font-bold pointer-events-none">
                     <i class="fa-solid fa-triangle-exclamation mr-1 animate-ping"></i> Threat Detected!
                 </div>
             </div>
@@ -352,9 +491,13 @@
             <div class="flex gap-0.5 mt-1" id="shield-cap-dots"></div>
         </div>
         
-        <div class="space-y-2.5">
-            <h3 class="text-[10px] text-purple-400 uppercase tracking-widest font-extrabold text-left"><i class="fa-solid fa-circle-dot mr-1"></i> Orbital Array Control</h3>
-            <div class="space-y-2 max-h-[30vh] overflow-y-auto pr-1">
+        <div class="space-y-2">
+            <div class="bg-slate-950/60 rounded border border-purple-500/30 overflow-hidden font-bold">
+                <button id="accordion-orbits-btn" class="w-full px-2.5 py-2 flex items-center justify-between text-[10px] text-purple-300 uppercase tracking-widest font-extrabold select-none">
+                    <span><i class="fa-solid fa-circle-dot mr-1"></i> Orbital Array Control</span>
+                    <i id="accordion-orbits-icon" class="fa-solid fa-chevron-up text-[9px]"></i>
+                </button>
+                <div id="accordion-orbits-content" class="space-y-2 max-h-[30vh] overflow-y-auto px-2 pb-2">
                 <div id="orbit-card-0" class="bg-slate-950/60 p-2 rounded border border-slate-800/80 flex flex-col gap-1.5 font-bold">
                     <div class="flex justify-between items-center text-[9px] font-bold">
                         <span class="text-sky-400 uppercase tracking-wide font-bold">Inner Path #1</span>
@@ -378,6 +521,16 @@
                     </div>
                     <div class="flex gap-0.5" id="orbit-dots-2"></div>
                     <button id="orbit-btn-2" class="w-full text-slate-950 font-black py-1.5 rounded text-[9px] uppercase transition-all select-none"></button>
+                </div>
+                </div>
+            </div>
+            <div class="bg-slate-950/60 rounded border border-amber-500/30 overflow-hidden font-bold">
+                <button id="accordion-directives-btn" class="w-full px-2.5 py-2 flex items-center justify-between text-[10px] text-amber-300 uppercase tracking-widest font-extrabold select-none">
+                    <span><i class="fa-solid fa-layer-group mr-1"></i> Command Directives</span>
+                    <span class="flex items-center gap-2"><span id="boss-card-count" class="text-slate-400 font-normal normal-case tracking-normal">0 Active</span><i id="accordion-directives-icon" class="fa-solid fa-chevron-up text-[9px]"></i></span>
+                </button>
+                <div id="accordion-directives-content" class="max-h-[30vh] overflow-y-auto px-2 pb-2">
+                    <div id="boss-card-list" class="space-y-1 text-[9px] text-slate-400">No command directives acquired.</div>
                 </div>
             </div>
         </div>
@@ -454,7 +607,12 @@
         <div class="text-center text-[9px] md:text-xs text-slate-300 bg-slate-950/90 px-3 py-1 md:py-1.5 rounded-full border border-slate-800/80 backdrop-blur max-w-full truncate shadow-md select-none font-bold">
             <span id="action-hint">Tap the planet core to open Master Command, or tap BUILD to deploy satellites!</span>
         </div>
-        <div class="w-full max-w-xs flex gap-2 md:block">
+        <div id="build-control-wrapper" class="w-full max-w-xs flex gap-2 md:block relative">
+            <div id="build-tutorial-tooltip" class="hidden absolute left-0 md:left-1/2 -top-[4.7rem] md:-top-[4.55rem] md:-translate-x-1/2 tech-tooltip px-2.5 py-1.5 rounded-lg text-[9px] md:text-[10px] uppercase tracking-wider font-black text-center whitespace-nowrap pointer-events-none">
+                <span id="build-tutorial-text">Click here to deploy satellites</span>
+                <span class="build-tooltip-connector"></span>
+                <span class="build-tooltip-target"></span>
+            </div>
             <button id="open-build-drawer-btn" class="flex-1 md:w-full bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black py-2.5 rounded-xl text-[10px] md:text-sm tracking-widest uppercase transition-all flex justify-center items-center gap-1.5 md:gap-2 select-none glow-green shadow-xl pointer-events-auto font-bold">
                 <i class="fa-solid fa-hammer font-bold"></i>
                 <span class="md:hidden">BUILD</span>
@@ -516,6 +674,14 @@
                             SYSTEM AUDIO ON
                         </button>
                     </div>
+                    <div class="flex justify-between items-center bg-slate-900 border border-slate-800 p-2.5 rounded-xl w-full select-none font-bold">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold flex items-center gap-1.5 select-none font-bold">
+                            <i class="fa-solid fa-bars-staggered text-cyan-300 font-bold"></i> Scanline Overlay
+                        </span>
+                        <button id="settings-scanlines-toggle" class="px-4 py-1.5 rounded-lg bg-emerald-500 text-slate-950 font-black hover:bg-emerald-400 transition-all flex items-center gap-2 text-[10px] md:text-xs select-none pointer-events-auto">
+                            SCANLINES ON
+                        </button>
+                    </div>
                     <div class="flex justify-between items-center bg-slate-900 border border-slate-800 p-2.5 rounded-xl w-full font-semibold select-none font-bold">
                         <span class="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold flex items-center gap-1.5 select-none font-bold">
                             <i class="fa-solid fa-code text-red-400 font-bold"></i> Dev Mode (+100k Credits)
@@ -571,23 +737,41 @@
                     </div>
                 </div>
 
-                <div id="inline-encyclopedia-options" class="absolute inset-2 md:inset-6 z-50 bg-slate-950 border border-sky-500/40 rounded-xl p-3 md:p-4 flex flex-col gap-3 transition-all hidden pointer-events-auto font-bold shadow-2xl overflow-y-auto">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-2 sticky top-0 bg-slate-950 z-10">
+                <div id="inline-encyclopedia-options" class="fixed inset-2 md:inset-4 z-50 bg-slate-950 border border-sky-500/40 rounded-xl p-3 md:p-4 flex flex-col gap-3 transition-all hidden pointer-events-auto font-bold shadow-2xl overflow-hidden max-h-[calc(100dvh-1rem)] md:max-h-[calc(100dvh-2rem)]">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2 shrink-0 bg-slate-950 z-10">
                         <span class="text-sky-400 font-black text-xs tracking-widest uppercase"><i class="fa-solid fa-book-atlas mr-1"></i> Space Encyclopedia</span>
                         <button id="close-encyclopedia-options-btn" class="text-slate-400 hover:text-white p-2 text-sm select-none"><i class="fa-solid fa-xmark"></i></button>
                     </div>
-                    <div class="space-y-3 text-left">
-                        <section class="space-y-2">
+                    <div class="shrink-0 grid grid-cols-2 md:grid-cols-4 gap-2 bg-slate-950 border-b border-slate-800 pb-2">
+                        <button id="encyclopedia-menu-satellites" class="encyclopedia-menu-btn bg-slate-900 hover:bg-slate-800 border border-emerald-500/30 text-emerald-300 rounded-lg px-2 py-2 text-[9px] uppercase tracking-widest font-black select-none">
+                            <i class="fa-solid fa-satellite mr-1"></i> Satellites
+                        </button>
+                        <button id="encyclopedia-menu-rocks" class="encyclopedia-menu-btn bg-slate-900 hover:bg-slate-800 border border-amber-500/30 text-amber-300 rounded-lg px-2 py-2 text-[9px] uppercase tracking-widest font-black select-none">
+                            <i class="fa-solid fa-meteor mr-1"></i> Rocks
+                        </button>
+                        <button id="encyclopedia-menu-ships" class="encyclopedia-menu-btn bg-slate-900 hover:bg-slate-800 border border-red-500/30 text-red-300 rounded-lg px-2 py-2 text-[9px] uppercase tracking-widest font-black select-none">
+                            <i class="fa-solid fa-jet-fighter mr-1"></i> Ships
+                        </button>
+                        <button id="encyclopedia-menu-directives" class="encyclopedia-menu-btn bg-slate-900 hover:bg-slate-800 border border-sky-500/30 text-sky-300 rounded-lg px-2 py-2 text-[9px] uppercase tracking-widest font-black select-none">
+                            <i class="fa-solid fa-layer-group mr-1"></i> Directives
+                        </button>
+                    </div>
+                    <div id="encyclopedia-scroll-body" class="space-y-3 text-left flex-1 min-h-0 overflow-y-auto pr-1 pb-safe scroll-smooth">
+                        <section id="encyclopedia-section-satellites" class="space-y-2 scroll-mt-2">
                             <h3 class="text-[10px] text-emerald-400 uppercase tracking-widest font-black">Satellite Arsenal</h3>
                             <div id="encyclopedia-satellites" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
                         </section>
-                        <section class="space-y-2">
+                        <section id="encyclopedia-section-rocks" class="space-y-2 scroll-mt-2">
                             <h3 class="text-[10px] text-amber-400 uppercase tracking-widest font-black">Rocks</h3>
                             <div id="encyclopedia-rocks" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
                         </section>
-                        <section class="space-y-2">
+                        <section id="encyclopedia-section-ships" class="space-y-2 scroll-mt-2">
                             <h3 class="text-[10px] text-red-400 uppercase tracking-widest font-black">Hostile Ships</h3>
                             <div id="encyclopedia-ships" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+                        </section>
+                        <section id="encyclopedia-section-directives" class="space-y-2 scroll-mt-2">
+                            <h3 class="text-[10px] text-amber-300 uppercase tracking-widest font-black">Command Directives</h3>
+                            <div id="encyclopedia-directives" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
                         </section>
                     </div>
                 </div>
@@ -624,7 +808,7 @@
                 </div>
             </div>
             <div class="text-center text-[10px] text-slate-500 select-none font-bold">
-                Aerospace Command System ver 2.9 — Touch & Pointer Enabled
+                Game <span id="app-version-label">Version: loading</span>
             </div>
         </div>
     </div>
@@ -702,7 +886,7 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        const APP_VERSION = '2026.05.27.1';
+        const APP_VERSION = '2026.05.28.16';
 
         let gameScale = 1;
         let rangeScale = 1;
@@ -730,13 +914,25 @@
 
         let audioCtx = null;
         let isAudioEnabled = true;
+        let bgmAudio = null;
+        let activeBgmKey = 'default';
+        let bgmUnlockListenerBound = false;
+        let isScanlinesEnabled = true;
         let deferredInstallPrompt = null;
+        let gameNoticeTimer = null;
+        let tutorialHints = { planet: false, build: false };
+        let modeTransitionActive = false;
 
         const PLANET_THEMES = {
             oasis: { coreStart: '#1d4ed8', coreEnd: '#0f172a', land: '#10b981', shield: 'rgba(56, 189, 248, ' },
             vulcan: { coreStart: '#ea580c', coreEnd: '#450a0a', land: '#7f1d1d', shield: 'rgba(239, 68, 68, ' },
             wasteland: { coreStart: '#7e22ce', coreEnd: '#1e1b4b', land: '#a3e635', shield: 'rgba(168, 85, 247, ' },
             frost: { coreStart: '#22d3ee', coreEnd: '#0f172a', land: '#f1f5f9', shield: 'rgba(165, 243, 252, ' }
+        };
+
+        const BGM_TRACKS = {
+            default: { src: 'elements/Blackout_Velocity.mp3', volume: 0.34 },
+            boss: { src: 'elements/Hull_Breach_Alarm.mp3', volume: 0.46 }
         };
 
         const PLANET_TEXTURE_FILES = {
@@ -769,6 +965,9 @@
             img.src = src;
             satelliteSprites[type] = img;
         });
+
+        const playerFighterSprite = new Image();
+        playerFighterSprite.src = 'elements/player-fighter.png';
 
         const ORBIT_COLORS = ['rgba(56, 189, 248, 0.25)', 'rgba(16, 185, 129, 0.25)', 'rgba(168, 85, 247, 0.25)'];
         const ORBIT_HOVER_COLORS = ['rgba(56, 189, 248, 0.6)', 'rgba(16, 185, 129, 0.6)', 'rgba(168, 85, 247, 0.6)'];
@@ -895,7 +1094,8 @@
             'Scout Fighter': 'elements/scout-fighter.png',
             'Void Swarmer': 'elements/void-swarmer.png',
             'Armored Cruiser': 'elements/armored-cruiser.png',
-            'Void Harvester': 'elements/void-harvester.png'
+            'Void Harvester': 'elements/void-harvester.png',
+            'Boss Ship': 'elements/void-harvester.png'
         };
 
         const enemySprites = {};
@@ -910,7 +1110,8 @@
             'Scout Fighter': 4.6,
             'Void Swarmer': 6.4,
             'Armored Cruiser': 3.8,
-            'Void Harvester': 3.6
+            'Void Harvester': 3.6,
+            'Boss Ship': 7.2
         };
 
         function drawEnemySprite(ctx, type, x, y, size, angle = 0) {
@@ -941,6 +1142,108 @@
             { type: 'Void Harvester', category: 'ship', color: '#f43f5e', size: 25, speed: 0.62, maxHp: 260, damage: 32, goldReward: 120, attackRange: 185, attackCooldown: 90 }
         ];
 
+        const BOSS_SHIPS = [
+            { name: 'Abyss Regent', color: '#f43f5e', maxHp: 900, fireRate: 48, skill: 'Crimson spread cannons', minions: 12 },
+            { name: 'Gravemind Carrier', color: '#a855f7', maxHp: 1100, fireRate: 60, skill: 'Summons extra swarmers', minions: 14 },
+            { name: 'Solar Warden', color: '#f59e0b', maxHp: 1250, fireRate: 42, skill: 'Triple thermal volleys', minions: 15 },
+            { name: 'Null Engine', color: '#38bdf8', maxHp: 1350, fireRate: 38, skill: 'Fast needle barrages', minions: 16 },
+            { name: 'Iron Basilica', color: '#94a3b8', maxHp: 1600, fireRate: 64, skill: 'Armored hull and heavy shots', minions: 17 },
+            { name: 'Dread Orchard', color: '#10b981', maxHp: 1500, fireRate: 52, skill: 'Regenerates slowly', minions: 18 },
+            { name: 'Vortex Saint', color: '#818cf8', maxHp: 1700, fireRate: 46, skill: 'Spiral projectile pattern', minions: 19 },
+            { name: 'Eclipse Foundry', color: '#fb7185', maxHp: 1900, fireRate: 58, skill: 'Deploys escort drones', minions: 20 },
+            { name: 'Omega Crucible', color: '#ef4444', maxHp: 2100, fireRate: 40, skill: 'Rage fire below half HP', minions: 22 },
+            { name: 'Chronos Devourer', color: '#facc15', maxHp: 2500, fireRate: 34, skill: 'Final boss speed storm', minions: 24 }
+        ];
+
+        const BOSS_FIRST_WAVE = 4; // Test cadence: boss mode starts after completing Wave 3.
+        const BOSS_ROUND_INTERVAL = 3;
+
+        function getBossIndexForWave(wave) {
+            if (wave < BOSS_FIRST_WAVE) return -1;
+            const bossRoundNumber = Math.floor((wave - BOSS_FIRST_WAVE) / BOSS_ROUND_INTERVAL);
+            return Math.min(BOSS_SHIPS.length - 1, bossRoundNumber);
+        }
+
+        function isBossWave(wave) {
+            return wave >= BOSS_FIRST_WAVE && (wave - BOSS_FIRST_WAVE) % BOSS_ROUND_INTERVAL === 0;
+        }
+
+        const DIRECTIVE_RARITY_COLORS = {
+            Common: '#94a3b8',
+            Uncommon: '#34d399',
+            Rare: '#38bdf8',
+            Epic: '#c084fc',
+            Legendary: '#fbbf24'
+        };
+
+        const DIRECTIVE_RARITY_WEIGHTS = {
+            Common: 36,
+            Uncommon: 28,
+            Rare: 22,
+            Epic: 11,
+            Legendary: 3
+        };
+
+        const COMMAND_DIRECTIVES = [
+            { id: 'overclocked_satellites', name: 'Overclocked Satellites', rarity: 'Rare', tier: 'A', effect: 'fireRate', values: [0.12, 0.20, 0.30, 0.42, 0.55], levels: ['Fire rate +12%', '+20%', '+30%', '+42%', '+55%'] },
+            { id: 'focused_targeting_ai', name: 'Focused Targeting AI', rarity: 'Rare', tier: 'A', effect: 'damage', values: [0.18, 0.30, 0.45, 0.65, 0.90], levels: ['Damage +18%', '+30%', '+45%', '+65%', '+90%'] },
+            { id: 'extended_sensor_grid', name: 'Extended Sensor Grid', rarity: 'Uncommon', tier: 'B', effect: 'range', values: [0.15, 0.25, 0.35, 0.50, 0.70], levels: ['Range +15%', '+25%', '+35%', '+50%', '+70%'] },
+            { id: 'shield_leech_protocol', name: 'Shield Leech Protocol', rarity: 'Epic', tier: 'A', effect: 'shieldPerKill', values: [2, 3, 4, 5, 7], levels: ['+2 shield per kill', '+3 shield', '+4 shield', '+5 shield', '+7 shield'] },
+            { id: 'emergency_funding', name: 'Emergency Funding', rarity: 'Common', tier: 'B', effect: 'grantGold', values: [300, 500, 750, 1100, 1600], levels: ['+300 credits', '+500', '+750', '+1,100', '+1,600'] },
+            { id: 'risk_contract', name: 'Risk Contract', rarity: 'Epic', tier: 'A', effect: 'riskContract', values: [{ enemy: 0.25, reward: 0.40 }, { enemy: 0.35, reward: 0.65 }, { enemy: 0.50, reward: 1.00 }, { enemy: 0.65, reward: 1.40 }, { enemy: 0.80, reward: 1.90 }], levels: ['Next wave +25% enemies, rewards +40%', '+35% enemies, +65% rewards', '+50% enemies, +100% rewards', '+65% enemies, +140% rewards', '+80% enemies, +190% rewards'] },
+            { id: 'magnet_amplifier', name: 'Magnet Amplifier', rarity: 'Rare', tier: 'B', effect: 'magnetSlowTo', values: [0.65, 0.58, 0.52, 0.47, 0.42], levels: ['Enemy speed reduced to 65%', '58%', '52%', '47%', '42%'] },
+            { id: 'laser_calibration', name: 'Laser Calibration', rarity: 'Rare', tier: 'A', effect: 'laserRamp', values: [0.35, 0.65, 1.00, 1.45, 2.00], levels: ['Laser ramp +35% faster', '+65%', '+100%', '+145%', '+200%'] },
+            { id: 'orbital_recycling_doctrine', name: 'Orbital Recycling Doctrine', rarity: 'Uncommon', tier: 'B', effect: 'salvage', values: [0.25, 0.45, 0.70, 1.00, 1.40], levels: ['Salvage value +25%', '+45%', '+70%', '+100%', '+140%'] },
+            { id: 'rapid_deployment_protocol', name: 'Rapid Deployment Protocol', rarity: 'Rare', tier: 'A', effect: 'buildDiscount', values: [0.12, 0.20, 0.30, 0.40, 0.50], levels: ['New satellites cost 12% less', '20% less', '30% less', '40% less', '50% less'] },
+            { id: 'reinforced_satellite_hulls', name: 'Reinforced Satellite Hulls', rarity: 'Uncommon', tier: 'B', effect: 'satelliteHp', values: [0.35, 0.60, 0.90, 1.25, 1.65], levels: ['Satellite HP +35%', '+60%', '+90%', '+125%', '+165%'] },
+            { id: 'auto_repair_nanobots', name: 'Auto-Repair Nanobots', rarity: 'Rare', tier: 'A', effect: 'waveRepair', values: [0.10, 0.18, 0.28, 0.40, 0.55], levels: ['Satellites recover 10% HP between waves', '18%', '28%', '40%', '55%'] },
+            { id: 'emergency_repair_crew', name: 'Emergency Repair Crew', rarity: 'Common', tier: 'B', effect: 'repairAll', values: [0.40, 0.60, 0.80, 1.00, 1.20], levels: ['Repair all satellites by 40%', '60%', '80%', '100%', '100% + temporary HP shield'] },
+            { id: 'planetary_fortification', name: 'Planetary Fortification', rarity: 'Common', tier: 'B', effect: 'coreMaxHp', values: [30, 60, 100, 150, 220], levels: ['Planet core max HP +30', '+60', '+100', '+150', '+220'] },
+            { id: 'shield_capacitor_bank', name: 'Shield Capacitor Bank', rarity: 'Common', tier: 'B', effect: 'maxShield', values: [25, 50, 85, 130, 190], levels: ['Max shield +25', '+50', '+85', '+130', '+190'] },
+            { id: 'reactive_shielding', name: 'Reactive Shielding', rarity: 'Epic', tier: 'A', effect: 'shieldBreakDamage', values: [80, 140, 220, 320, 460], levels: ['Shield break shockwave: 80 damage', '140 damage', '220 damage', '320 damage + brief slow', '460 damage + stronger slow'] },
+            { id: 'last_stand_matrix', name: 'Last Stand Matrix', rarity: 'Rare', tier: 'A', effect: 'lastStandRate', values: [0.25, 0.40, 0.60, 0.85, 1.20], levels: ['Below 30% core HP, fire rate +25%', '+40%', '+60%', '+85%', '+120%'] },
+            { id: 'core_stabilizer', name: 'Core Stabilizer', rarity: 'Rare', tier: 'A', effect: 'coreDamageReduction', values: [0.15, 0.25, 0.35, 0.45, 0.55], levels: ['Planet takes 15% less direct damage', '25% less', '35% less', '45% less', '55% less'] },
+            { id: 'bounty_targeting_system', name: 'Bounty Targeting System', rarity: 'Uncommon', tier: 'B', effect: 'shipReward', values: [0.50, 0.85, 1.25, 1.75, 2.40], levels: ['Elite rewards +50%', '+85%', '+125%', '+175%', '+240%'] },
+            { id: 'scrap_collector_drones', name: 'Scrap Collector Drones', rarity: 'Rare', tier: 'A', effect: 'scrapEveryKills', values: [{ kills: 10, gold: 80 }, { kills: 9, gold: 100 }, { kills: 8, gold: 130 }, { kills: 7, gold: 170 }, { kills: 6, gold: 230 }], levels: ['Every 10 kills: +80 credits', 'Every 9 kills: +100', 'Every 8 kills: +130', 'Every 7 kills: +170', 'Every 6 kills: +230'] },
+            { id: 'wave_completion_bonus', name: 'Wave Completion Bonus', rarity: 'Rare', tier: 'A', effect: 'waveGold', values: [150, 275, 450, 700, 1050], levels: ['+150 credits after each wave', '+275', '+450', '+700', '+1,050'] },
+            { id: 'interest_protocol', name: 'Interest Protocol', rarity: 'Legendary', tier: 'S', effect: 'interest', values: [{ rate: 0.08, cap: 400 }, { rate: 0.10, cap: 600 }, { rate: 0.12, cap: 900 }, { rate: 0.14, cap: 1300 }, { rate: 0.16, cap: 1800 }], levels: ['+8% of current credits after wave, cap 400', '+10%, cap 600', '+12%, cap 900', '+14%, cap 1,300', '+16%, cap 1,800'] },
+            { id: 'high_risk_funding', name: 'High-Risk Funding', rarity: 'Epic', tier: 'A', effect: 'shieldForGold', values: [{ shield: 20, gold: 600 }, { shield: 25, gold: 1000 }, { shield: 35, gold: 1600 }, { shield: 45, gold: 2400 }, { shield: 60, gold: 3500 }], levels: ['Lose 20 shield, gain +600 credits', 'Lose 25, gain +1,000', 'Lose 35, gain +1,600', 'Lose 45, gain +2,400', 'Lose 60, gain +3,500'] },
+            { id: 'inner_orbit_mastery', name: 'Inner Orbit Mastery', rarity: 'Rare', tier: 'A', effect: 'innerRate', values: [0.25, 0.40, 0.60, 0.85, 1.20], levels: ['Inner orbit fire rate +25%', '+40%', '+60%', '+85%', '+120%'] },
+            { id: 'middle_orbit_calibration', name: 'Middle Orbit Calibration', rarity: 'Rare', tier: 'A', effect: 'middleDamage', values: [0.20, 0.35, 0.55, 0.80, 1.15], levels: ['Middle orbit damage +20%', '+35%', '+55%', '+80%', '+115%'] },
+            { id: 'outer_orbit_longshot', name: 'Outer Orbit Longshot', rarity: 'Uncommon', tier: 'B', effect: 'outerRange', values: [0.25, 0.40, 0.60, 0.85, 1.20], levels: ['Outer orbit range +25%', '+40%', '+60%', '+85%', '+120%'] },
+            { id: 'orbital_expansion_grant', name: 'Orbital Expansion Grant', rarity: 'Legendary', tier: 'S', effect: 'grantSlots', values: [{ slots: 1, gold: 0 }, { slots: 1, gold: 300 }, { slots: 2, gold: 0 }, { slots: 2, gold: 700 }, { slots: 3, gold: 0 }], levels: ['Unlock +1 random slot', '+1 slot + 300 credits', '+2 slots', '+2 slots + 700 credits', '+3 slots'] },
+            { id: 'turret_armor_piercer', name: 'Turret Armor Piercer', rarity: 'Uncommon', tier: 'B', effect: 'laserDamage', values: [0.20, 0.35, 0.50, 0.65, 0.80], levels: ['Turret damage +20%', '+35%', '+50%', '+65%', '+80%'] },
+            { id: 'plasma_burn_residue', name: 'Plasma Burn Residue', rarity: 'Rare', tier: 'A', effect: 'plasmaDamage', values: [0.20, 0.35, 0.55, 0.80, 1.15], levels: ['Plasma damage +20%', '+35%', '+55%', '+80%', '+115%'] },
+            { id: 'missile_cluster_payload', name: 'Missile Cluster Payload', rarity: 'Epic', tier: 'S', effect: 'missileBlast', values: [2, 3, 4, 5, 6], levels: ['Missiles create 2 mini-blasts', '3 mini-blasts', '4 mini-blasts', '5 mini-blasts', '6 mini-blasts + larger radius'] },
+            { id: 'railgun_overpenetration', name: 'Railgun Overpenetration', rarity: 'Epic', tier: 'A', effect: 'railgunDamage', values: [0.25, 0.45, 0.70, 1.00, 1.35], levels: ['Railgun damage +25%', '+45%', '+70%', '+100%', '+135%'] },
+            { id: 'lightning_chain_relay', name: 'Lightning Chain Relay', rarity: 'Epic', tier: 'S', effect: 'lightningChains', values: [1, 2, 3, 4, 5], levels: ['Lightning chains to +1 enemy', '+2', '+3', '+4', '+5'] },
+            { id: 'laser_focus_lens', name: 'Laser Focus Lens', rarity: 'Rare', tier: 'A', effect: 'laserFocus', values: [0.30, 0.50, 0.80, 1.15, 1.60], levels: ['Laser damage +30% after 2s on same target', '+50%', '+80%', '+115%', '+160%'] },
+            { id: 'magnetic_trap_field', name: 'Magnetic Trap Field', rarity: 'Rare', tier: 'A', effect: 'slowedDamage', values: [0.12, 0.20, 0.32, 0.48, 0.70], levels: ['Slowed enemies take +12% damage', '+20%', '+32%', '+48%', '+70%'] },
+            { id: 'anti_cruiser_targeting', name: 'Anti-Cruiser Targeting', rarity: 'Uncommon', tier: 'B', effect: 'shipDamage', values: [0.25, 0.40, 0.60, 0.85, 1.20], levels: ['+25% damage to enemy ships', '+40%', '+60%', '+85%', '+120%'] },
+            { id: 'meteor_shatter_rounds', name: 'Meteor Shatter Rounds', rarity: 'Uncommon', tier: 'B', effect: 'rockDamage', values: [0.20, 0.35, 0.55, 0.80, 1.15], levels: ['Rocks take +20% damage', '+35%', '+55%', '+80%', '+115%'] },
+            { id: 'boss_hunter_directive', name: 'Boss Hunter Directive', rarity: 'Epic', tier: 'A', effect: 'strongestDamage', values: [0.30, 0.50, 0.75, 1.05, 1.45], levels: ['Every 5th wave, +30% damage to strongest enemy', '+50%', '+75%', '+105%', '+145%'] },
+            { id: 'glass_cannon_protocol', name: 'Glass Cannon Protocol', rarity: 'Epic', tier: 'S', effect: 'glassCannon', values: [{ dmg: 0.35, hp: 0.20 }, { dmg: 0.50, hp: 0.25 }, { dmg: 0.70, hp: 0.30 }, { dmg: 0.95, hp: 0.35 }, { dmg: 1.30, hp: 0.45 }], levels: ['Damage +35%, satellite HP -20%', '+50%, HP -25%', '+70%, HP -30%', '+95%, HP -35%', '+130%, HP -45%'] },
+            { id: 'overdrive_cooling_bypass', name: 'Overdrive Cooling Bypass', rarity: 'Epic', tier: 'A', effect: 'overdriveRepair', values: [{ rate: 0.25, repair: 0.40 }, { rate: 0.40, repair: 0.55 }, { rate: 0.60, repair: 0.75 }, { rate: 0.85, repair: 1.00 }, { rate: 1.20, repair: 1.40 }], levels: ['Fire rate +25%, repair cost +40%', '+40%, repair +55%', '+60%, repair +75%', '+85%, repair +100%', '+120%, repair +140%'] },
+            { id: 'expanded_sensor_grid_ii', name: 'Expanded Sensor Grid II', rarity: 'Rare', tier: 'A', effect: 'rangeDamageTradeoff', values: [{ range: 0.30, dmg: 0.10 }, { range: 0.50, dmg: 0.12 }, { range: 0.75, dmg: 0.15 }, { range: 1.05, dmg: 0.18 }, { range: 1.45, dmg: 0.22 }], levels: ['Range +30%, damage -10%', '+50%, damage -12%', '+75%, damage -15%', '+105%, damage -18%', '+145%, damage -22%'] },
+            { id: 'unstable_plasma_core', name: 'Unstable Plasma Core', rarity: 'Rare', tier: 'A', effect: 'plasmaTradeoff', values: [{ dmg: 0.50, cd: 0.20 }, { dmg: 0.80, cd: 0.25 }, { dmg: 1.20, cd: 0.35 }, { dmg: 1.70, cd: 0.45 }, { dmg: 2.40, cd: 0.60 }], levels: ['Plasma damage +50%, cooldown 20% slower', '+80%, 25% slower', '+120%, 35% slower', '+170%, 45% slower', '+240%, 60% slower'] },
+            { id: 'volatile_missile_payload', name: 'Volatile Missile Payload', rarity: 'Epic', tier: 'A', effect: 'missileTradeoff', values: [{ blast: 0.40, rate: 0.25 }, { blast: 0.65, rate: 0.30 }, { blast: 1.00, rate: 0.40 }, { blast: 1.45, rate: 0.50 }, { blast: 2.10, rate: 0.65 }], levels: ['Missile blast +40%, fire rate -25%', '+65%, fire rate -30%', '+100%, fire rate -40%', '+145%, fire rate -50%', '+210%, fire rate -65%'] },
+            { id: 'railgun_power_surge', name: 'Railgun Power Surge', rarity: 'Epic', tier: 'A', effect: 'railgunUpgradeTradeoff', values: [{ dmg: 0.30, cost: 0.30 }, { dmg: 0.50, cost: 0.40 }, { dmg: 0.75, cost: 0.55 }, { dmg: 1.05, cost: 0.70 }, { dmg: 1.40, cost: 0.90 }], levels: ['Railgun pierces +2, upgrade cost +30%', '+3, cost +40%', '+4, cost +55%', '+5, cost +70%', '+6, cost +90%'] },
+            { id: 'laser_overfocus', name: 'Laser Overfocus', rarity: 'Rare', tier: 'B', effect: 'laserOverfocus', values: [{ ramp: 0.50, retarget: 0.15 }, { ramp: 0.85, retarget: 0.20 }, { ramp: 1.30, retarget: 0.25 }, { ramp: 1.90, retarget: 0.35 }, { ramp: 2.70, retarget: 0.45 }], levels: ['Laser ramp +50%', '+85%', '+130%', '+190%', '+270%'] },
+            { id: 'magnetic_singularity_field', name: 'Magnetic Singularity Field', rarity: 'Rare', tier: 'A', effect: 'magnetTradeoff', values: [{ slow: 0.55, range: 0.20 }, { slow: 0.48, range: 0.25 }, { slow: 0.40, range: 0.30 }, { slow: 0.32, range: 0.35 }, { slow: 0.22, range: 0.45 }], levels: ['Stronger slow, Magnet range -20%', 'Stronger slow, range -25%', 'Very strong slow, range -30%', 'Extreme slow, range -35%', 'Near-stop slow, range -45%'] },
+            { id: 'lightning_storm_relay', name: 'Lightning Storm Relay', rarity: 'Epic', tier: 'A', effect: 'lightningTradeoff', values: [{ chains: 2, dmg: 0.15 }, { chains: 3, dmg: 0.18 }, { chains: 4, dmg: 0.22 }, { chains: 5, dmg: 0.26 }, { chains: 6, dmg: 0.30 }], levels: ['Lightning chains +2, damage -15%', '+3, damage -18%', '+4, damage -22%', '+5, damage -26%', '+6, damage -30%'] },
+            { id: 'emergency_war_budget', name: 'Emergency War Budget', rarity: 'Epic', tier: 'A', effect: 'warBudget', values: [{ gold: 1000, enemy: 0.40 }, { gold: 1700, enemy: 0.55 }, { gold: 2700, enemy: 0.75 }, { gold: 4000, enemy: 1.00 }, { gold: 6000, enemy: 1.35 }], levels: ['+1,000 credits, next wave +40% enemies', '+1,700, +55% enemies', '+2,700, +75% enemies', '+4,000, +100% enemies', '+6,000, +135% enemies'] },
+            { id: 'debt_financing', name: 'Debt Financing', rarity: 'Rare', tier: 'A', effect: 'debtFinancing', values: [{ discount: 0.35, loss: 0.10 }, { discount: 0.45, loss: 0.12 }, { discount: 0.60, loss: 0.15 }, { discount: 0.70, loss: 0.18 }, { discount: 0.80, loss: 0.22 }], levels: ['Satellite costs -35%, lose 10% credits each wave', '-45%, lose 12%', '-60%, lose 15%', '-70%, lose 18%', '-80%, lose 22%'] },
+            { id: 'reckless_expansion', name: 'Reckless Expansion', rarity: 'Legendary', tier: 'S', effect: 'recklessExpansion', values: [{ slots: 2, hp: 30 }, { slots: 3, hp: 45 }, { slots: 4, hp: 65 }, { slots: 5, hp: 90 }, { slots: 6, hp: 125 }], levels: ['Unlock +2 random slots, core max HP -30', '+3 slots, HP -45', '+4 slots, HP -65', '+5 slots, HP -90', '+6 slots, HP -125'] },
+            { id: 'shield_to_weapon_converter', name: 'Shield-to-Weapon Converter', rarity: 'Epic', tier: 'A', effect: 'shieldWeapon', values: [{ dmg: 0.25, shield: 35 }, { dmg: 0.40, shield: 50 }, { dmg: 0.60, shield: 75 }, { dmg: 0.85, shield: 105 }, { dmg: 1.20, shield: 145 }], levels: ['Damage +25%, max shield -35', '+40%, shield -50', '+60%, shield -75', '+85%, shield -105', '+120%, shield -145'] },
+            { id: 'core_powered_defense_grid', name: 'Core-Powered Defense Grid', rarity: 'Legendary', tier: 'S', effect: 'corePowered', values: [{ dmg: 0.20, rate: 0.20, taken: 0.20 }, { dmg: 0.35, rate: 0.30, taken: 0.25 }, { dmg: 0.55, rate: 0.45, taken: 0.35 }, { dmg: 0.80, rate: 0.65, taken: 0.45 }, { dmg: 1.15, rate: 0.90, taken: 0.60 }], levels: ['Damage +20%, fire rate +20%, planet takes +20% direct damage', '+35%, +30%, damage taken +25%', '+55%, +45%, damage taken +35%', '+80%, +65%, damage taken +45%', '+115%, +90%, damage taken +60%'] },
+            { id: 'fragile_shield_matrix', name: 'Fragile Shield Matrix', rarity: 'Epic', tier: 'A', effect: 'fragileShield', values: [{ shieldKill: 5, maxLoss: 0.25 }, { shieldKill: 8, maxLoss: 0.30 }, { shieldKill: 12, maxLoss: 0.35 }, { shieldKill: 17, maxLoss: 0.40 }, { shieldKill: 24, maxLoss: 0.50 }], levels: ['+5 shield per kill, max shield -25%', '+8, max shield -30%', '+12, max shield -35%', '+17, max shield -40%', '+24, max shield -50%'] },
+            { id: 'bounty_hunter_contract', name: 'Bounty Hunter Contract', rarity: 'Legendary', tier: 'S', effect: 'rewardHpTradeoff', values: [{ reward: 0.60, hp: 0.20 }, { reward: 0.90, hp: 0.30 }, { reward: 1.30, hp: 0.45 }, { reward: 1.80, hp: 0.65 }, { reward: 2.50, hp: 0.90 }], levels: ['Enemy rewards +60%, enemy HP +20%', '+90%, HP +30%', '+130%, HP +45%', '+180%, HP +65%', '+250%, HP +90%'] },
+            { id: 'elite_threat_incentive', name: 'Elite Threat Incentive', rarity: 'Epic', tier: 'A', effect: 'eliteIncentive', values: [{ reward: 3, spawn: 0.30 }, { reward: 4, spawn: 0.40 }, { reward: 5, spawn: 0.55 }, { reward: 6, spawn: 0.75 }, { reward: 8, spawn: 1.00 }], levels: ['Elite rewards x3, elite spawns +30%', 'x4, spawns +40%', 'x5, spawns +55%', 'x6, spawns +75%', 'x8, spawns +100%'] },
+            { id: 'meteor_harvest_protocol', name: 'Meteor Harvest Protocol', rarity: 'Rare', tier: 'B', effect: 'rockRewardSpeed', values: [{ reward: 0.50, speed: 0.25 }, { reward: 0.80, speed: 0.35 }, { reward: 1.20, speed: 0.45 }, { reward: 1.70, speed: 0.60 }, { reward: 2.40, speed: 0.80 }], levels: ['Rock rewards +50%, rock speed +25%', '+80%, speed +35%', '+120%, speed +45%', '+170%, speed +60%', '+240%, speed +80%'] },
+            { id: 'orbital_compression_strategy', name: 'Orbital Compression Strategy', rarity: 'Rare', tier: 'B', effect: 'orbitCompression', values: [{ rate: 0.40, range: 0.20 }, { rate: 0.60, range: 0.25 }, { rate: 0.85, range: 0.35 }, { rate: 1.15, range: 0.45 }, { rate: 1.55, range: 0.60 }], levels: ['Inner orbit fire rate +40%, outer range -20%', '+60%, range -25%', '+85%, range -35%', '+115%, range -45%', '+155%, range -60%'] },
+            { id: 'final_stand_doctrine', name: 'Final Stand Doctrine', rarity: 'Epic', tier: 'A', effect: 'finalStand', values: [{ threshold: 0.40, low: 0.60, high: 0.10 }, { threshold: 0.45, low: 0.85, high: 0.12 }, { threshold: 0.50, low: 1.20, high: 0.15 }, { threshold: 0.55, low: 1.65, high: 0.18 }, { threshold: 0.60, low: 2.30, high: 0.22 }], levels: ['Below 40% planet HP: damage +60%; above 40%: damage -10%', 'Below 45%: +85%; above: -12%', 'Below 50%: +120%; above: -15%', 'Below 55%: +165%; above: -18%', 'Below 60%: +230%; above: -22%'] }
+        ].map(directive => ({ ...directive, color: DIRECTIVE_RARITY_COLORS[directive.rarity] || '#fbbf24' }));
+
         const SATELLITE_DESCRIPTIONS = {
             laser: 'Reliable starter cannon with balanced range, damage, and firing cadence.',
             plasma: 'Area blast weapon that punishes clustered targets with splash damage.',
@@ -960,6 +1263,66 @@
             'Void Swarmer': 'Small assault craft with rapid movement and quick attack cycles.',
             'Armored Cruiser': 'Durable gunship that advances slowly and pressures satellites.',
             'Void Harvester': 'Capital-grade ship with extreme durability and heavy satellite attacks.'
+        };
+
+        const DIRECTIVE_EFFECT_CONTEXT = {
+            fireRate: 'Global weapon cadence directive. It shortens satellite cooldowns during normal defense waves so existing arrays fire more often.',
+            damage: 'Global damage directive. It improves direct satellite damage output against rocks and hostile ships in defense waves.',
+            range: 'Sensor coverage directive. It expands acquisition radius so satellites can engage threats earlier and hold targets longer.',
+            shieldPerKill: 'Shield economy directive. Every enemy destroyed during defense waves restores shield integrity, rewarding high kill tempo.',
+            grantGold: 'Immediate funding directive. Credits are deposited as soon as the directive is selected, helping recover or expand quickly.',
+            riskContract: 'Risk-reward directive. Future defense waves become larger, but every kill pays more credits if the defense survives.',
+            magnetSlowTo: 'Magnet sentry directive. It strengthens gravitational slow fields, making enemies spend more time inside weapon range.',
+            laserRamp: 'Laser sentry directive. Continuous beam weapons reach their high-damage state faster when they stay locked on a target.',
+            salvage: 'Logistics directive. Recycling satellites returns more of their invested value, making rebuilds less punishing.',
+            buildDiscount: 'Deployment directive. New satellites cost less, allowing faster orbit filling and easier weapon specialization.',
+            satelliteHp: 'Durability directive. Satellites gain more hull integrity against ship attacks and rock collisions.',
+            waveRepair: 'Maintenance directive. Damaged satellites automatically recover health after each completed defense wave.',
+            repairAll: 'Instant repair directive. Existing satellites are repaired when the directive is selected.',
+            coreMaxHp: 'Planetary defense directive. It increases core integrity, improving survival after shields collapse.',
+            maxShield: 'Shield engineering directive. It increases maximum shield capacity for larger pre-impact protection.',
+            shieldBreakDamage: 'Reactive shield directive. When shields collapse, nearby enemies are hit by a defensive shockwave.',
+            lastStandRate: 'Emergency combat directive. Satellite fire rate increases only while the planet core is critically damaged.',
+            coreDamageReduction: 'Core armor directive. Direct impact damage against the planet is reduced after shields fail.',
+            shipReward: 'Bounty directive. Enemy ships pay more credits, prioritizing anti-ship defenses.',
+            scrapEveryKills: 'Scrap recovery directive. Kill streak milestones trigger extra credit income.',
+            waveGold: 'Operations funding directive. Completing each defense wave grants additional credits.',
+            interest: 'Treasury directive. Holding credits between waves generates bonus funding up to a cap.',
+            shieldForGold: 'Emergency treasury directive. Converts shield integrity into immediate credits.',
+            innerRate: 'Orbit specialization directive. Satellites mounted on the inner orbit gain faster fire rates.',
+            middleDamage: 'Orbit specialization directive. Satellites mounted on the middle orbit gain stronger damage.',
+            outerRange: 'Orbit specialization directive. Satellites mounted on the outer orbit gain longer range.',
+            grantSlots: 'Orbital construction directive. It unlocks extra satellite slots without using the normal orbit expansion purchase.',
+            laserDamage: 'Turret weapon directive. Standard turret shots receive a direct damage bonus.',
+            plasmaDamage: 'Plasma weapon directive. Plasma projectiles and splash damage receive a direct damage bonus.',
+            missileBlast: 'Missile weapon directive. Missile impacts create secondary blasts for better area control.',
+            railgunDamage: 'Railgun weapon directive. Railgun shots receive a direct damage bonus.',
+            lightningChains: 'Lightning weapon directive. Tesla arcs jump through more enemies per strike.',
+            laserFocus: 'Laser sentry directive. Staying on one target rewards the beam with higher sustained damage.',
+            slowedDamage: 'Control synergy directive. Enemies affected by slow effects take increased damage.',
+            shipDamage: 'Targeting directive. All satellites hit hostile ships harder.',
+            rockDamage: 'Targeting directive. All satellites deal more damage to meteoroids, meteors, asteroids, and comets.',
+            strongestDamage: 'Priority targeting directive. Periodic heavy-threat waves become easier to burst down.',
+            glassCannon: 'High-risk weapon directive. Satellites deal much more damage but become easier to destroy.',
+            overdriveRepair: 'High-throughput directive. Fire rate rises, but satellite maintenance becomes more expensive.',
+            rangeDamageTradeoff: 'Sensor tradeoff directive. Range expands significantly at the cost of reduced damage.',
+            plasmaTradeoff: 'Plasma overload directive. Plasma damage rises sharply, but firing cadence slows.',
+            missileTradeoff: 'Missile payload directive. Blast power increases while reload speed suffers.',
+            railgunUpgradeTradeoff: 'Railgun surge directive. Railgun piercing improves, but future upgrades cost more.',
+            laserOverfocus: 'Laser control directive. Beam sentries build up their sustained damage ramp faster while holding a target.',
+            magnetTradeoff: 'Magnet field directive. Slow power becomes stronger while magnet range shrinks.',
+            lightningTradeoff: 'Lightning storm directive. Arcs hit more targets, but each strike deals less damage.',
+            warBudget: 'Emergency war budget directive. Grants immediate credits while increasing the next defense wave size.',
+            debtFinancing: 'Debt directive. Satellite builds become cheaper, but stored credits decay after waves.',
+            recklessExpansion: 'Reckless construction directive. Adds orbit slots immediately while reducing planet core durability.',
+            shieldWeapon: 'Conversion directive. Weapon damage rises by consuming maximum shield capacity.',
+            corePowered: 'Core overdrive directive. Weapons gain damage and speed, but direct planet damage becomes more dangerous.',
+            fragileShield: 'Fragile shield directive. Kills restore more shield, but maximum shield capacity is reduced.',
+            rewardHpTradeoff: 'Bounty contract directive. Enemy rewards rise, but enemies enter defense waves with more HP.',
+            eliteIncentive: 'Elite contract directive. Elite ships become more common and valuable.',
+            rockRewardSpeed: 'Meteor harvest directive. Rocks pay more credits but travel faster.',
+            orbitCompression: 'Orbit compression directive. Inner orbit fire rate increases while outer orbit range is reduced.',
+            finalStand: 'Final stand directive. Low core integrity grants major damage, while safer core states reduce damage.'
         };
 
         function createStatPill(label, value) {
@@ -987,11 +1350,28 @@
             </article>`;
         }
 
+        function renderDirectiveEncyclopediaCard(directive) {
+            return `<article class="bg-slate-900/85 border border-amber-500/20 rounded-lg p-2.5 min-h-[118px]">
+                <div class="flex items-start justify-between gap-2">
+                    <div>
+                        <h4 class="text-[11px] font-black uppercase tracking-wide" style="color:${directive.color}">${directive.name}</h4>
+                        <div class="text-[8px] text-slate-500 uppercase tracking-widest">${directive.rarity} Directive</div>
+                    </div>
+                    <div class="text-[8px] text-amber-300 uppercase tracking-widest font-black">Max LVL 5</div>
+                </div>
+                <p class="text-[9px] text-slate-300 leading-snug mt-2 font-semibold">${getDirectiveContext(directive)}</p>
+                <div class="grid grid-cols-1 gap-1 mt-2">
+                    ${directive.levels.map((levelText, index) => createStatPill(`LVL ${index + 1}`, levelText)).join('')}
+                </div>
+            </article>`;
+        }
+
         function populateSpaceEncyclopedia() {
             const satelliteContainer = document.getElementById('encyclopedia-satellites');
             const rocksContainer = document.getElementById('encyclopedia-rocks');
             const shipsContainer = document.getElementById('encyclopedia-ships');
-            if (!satelliteContainer || !rocksContainer || !shipsContainer) return;
+            const directivesContainer = document.getElementById('encyclopedia-directives');
+            if (!satelliteContainer || !rocksContainer || !shipsContainer || !directivesContainer) return;
 
             satelliteContainer.innerHTML = Object.entries(SATELLITE_CONFIGS).map(([type, cfg]) => {
                 const spriteSize = Math.round(14 * gameScale * 2.7);
@@ -1037,8 +1417,39 @@
                 });
             });
 
+            const bossCards = BOSS_SHIPS.map((boss, index) => renderEncyclopediaCard({
+                title: boss.name,
+                typeLabel: `Boss Ship ${index + 1}`,
+                description: boss.skill,
+                spriteSrc: ENEMY_SPRITE_FILES['Boss Ship'],
+                spriteSize: Math.round(42 * gameScale * (ENEMY_SPRITE_SCALE['Boss Ship'] || 7.2)),
+                accentColor: boss.color,
+                stats: [
+                    ['HP', boss.maxHp],
+                    ['Minions', boss.minions],
+                    ['Fire Rate', `${(boss.fireRate / 60).toFixed(2)}s`],
+                    ['Appears', `Wave ${BOSS_FIRST_WAVE + index * BOSS_ROUND_INTERVAL}`]
+                ]
+            }));
+
             rocksContainer.innerHTML = enemyCards.slice(0, 4).join('');
-            shipsContainer.innerHTML = enemyCards.slice(4).join('');
+            shipsContainer.innerHTML = enemyCards.slice(4).concat(bossCards).join('');
+            const rarityRank = { Legendary: 0, Epic: 1, Rare: 2, Uncommon: 3, Common: 4 };
+            directivesContainer.innerHTML = COMMAND_DIRECTIVES
+                .slice()
+                .sort((a, b) => (rarityRank[a.rarity] ?? 9) - (rarityRank[b.rarity] ?? 9) || a.name.localeCompare(b.name))
+                .map(renderDirectiveEncyclopediaCard)
+                .join('');
+        }
+
+        function scrollEncyclopediaTo(sectionKey) {
+            const scrollBody = document.getElementById('encyclopedia-scroll-body');
+            const section = document.getElementById(`encyclopedia-section-${sectionKey}`);
+            if (!scrollBody || !section) return;
+            scrollBody.scrollTo({
+                top: section.offsetTop - scrollBody.offsetTop,
+                behavior: 'smooth'
+            });
         }
 
         let game = {
@@ -1047,7 +1458,16 @@
             totalWaveEnemies: 10, enemiesSpawnedThisWave: 0,
             selectedShopType: null, selectedTower: null, selectedOrbitIndex: null, 
             mousePos: { x: 0, y: 0 }, hoveredOrbit: null, hoveredOrbitIndex: null, hoveredAngle: 0,
-            towers: [], enemies: [], projectiles: [], particles: [], orbitGridHighlights: false
+            towers: [], enemies: [], projectiles: [], particles: [], orbitGridHighlights: false,
+            mode: 'defense',
+            commandDirectives: {},
+            directiveKills: 0
+        };
+
+        let bossMode = {
+            active: false, phase: 'idle', wave: 0, frame: 0, spawnTimer: 0, spawned: 0, requiredKills: 0, kills: 0,
+            player: { x: 0, y: 0, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: 0, targetY: 0 },
+            enemies: [], projectiles: [], enemyProjectiles: [], boss: null, rewardOptions: []
         };
 
         // ----------------------------------------------------------------------
@@ -1158,6 +1578,77 @@
         // ----------------------------------------------------------------------
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            getBgmAudio();
+        }
+
+        function getBgmAudio() {
+            if (!bgmAudio) {
+                bgmAudio = new Audio();
+                bgmAudio.loop = true;
+                bgmAudio.preload = 'auto';
+                bgmAudio.playsInline = true;
+            }
+            return bgmAudio;
+        }
+
+        function pauseBgm() {
+            if (bgmAudio) bgmAudio.pause();
+        }
+
+        function canPlayBgm() {
+            return isAudioEnabled && (!game || !game.paused);
+        }
+
+        function bindBgmUnlockFallback() {
+            if (bgmUnlockListenerBound) return;
+            bgmUnlockListenerBound = true;
+            const unlockBgm = () => {
+                bgmUnlockListenerBound = false;
+                document.removeEventListener('pointerdown', unlockBgm);
+                document.removeEventListener('touchstart', unlockBgm);
+                document.removeEventListener('keydown', unlockBgm);
+                if (isAudioEnabled) {
+                    initAudio();
+                    switchBgm(activeBgmKey);
+                }
+            };
+            document.addEventListener('pointerdown', unlockBgm, { once: true });
+            document.addEventListener('touchstart', unlockBgm, { once: true });
+            document.addEventListener('keydown', unlockBgm, { once: true });
+        }
+
+        function switchBgm(trackKey) {
+            const track = BGM_TRACKS[trackKey] || BGM_TRACKS.default;
+            activeBgmKey = BGM_TRACKS[trackKey] ? trackKey : 'default';
+            const audio = getBgmAudio();
+            audio.volume = track.volume;
+
+            if (audio.dataset.trackKey !== activeBgmKey) {
+                audio.dataset.trackKey = activeBgmKey;
+                audio.src = track.src;
+                audio.currentTime = 0;
+                audio.load();
+            }
+
+            if (!canPlayBgm()) {
+                pauseBgm();
+                return;
+            }
+
+            audio.play().catch(() => bindBgmUnlockFallback());
+        }
+
+        function syncBgm() {
+            if (!canPlayBgm()) {
+                pauseBgm();
+                return;
+            }
+            switchBgm(activeBgmKey);
+        }
+
+        function startTitleBgm() {
+            activeBgmKey = 'default';
+            switchBgm('default');
         }
 
         function syncAudioUI() {
@@ -1174,10 +1665,24 @@
             });
         }
 
+        function syncScanlineUI() {
+            document.body.classList.toggle('scanline', isScanlinesEnabled);
+            const btn = document.getElementById('settings-scanlines-toggle');
+            if (!btn) return;
+            btn.innerHTML = isScanlinesEnabled ? 'SCANLINES ON' : 'SCANLINES OFF';
+            btn.className = `px-4 py-1.5 rounded-lg ${isScanlinesEnabled ? 'bg-emerald-500 text-slate-950' : 'bg-slate-700 text-slate-300'} font-black hover:opacity-90 transition-all flex items-center justify-center gap-2 text-[10px] md:text-xs select-none pointer-events-auto`;
+        }
+
         function toggleAudioState() {
             isAudioEnabled = !isAudioEnabled;
             if (isAudioEnabled) initAudio();
+            syncBgm();
             syncAudioUI();
+        }
+
+        function toggleScanlineState() {
+            isScanlinesEnabled = !isScanlinesEnabled;
+            syncScanlineUI();
         }
 
         function isIosDevice() {
@@ -1458,7 +1963,7 @@
                             btnEl.disabled = true; btnEl.className = "bg-slate-800 text-slate-500 cursor-not-allowed px-2 py-1.5 rounded text-[10px] min-w-[70px]";
                             costEl.innerHTML = "MAXED";
                         } else {
-                            const cost = getStatUpgradeCost(baseCost, statLvl);
+                            const cost = getStatUpgradeCost(baseCost, statLvl, tower.type);
                             btnEl.disabled = false;
                             const colors = { dmg: 'cyan', rate: 'emerald', rng: 'purple', lasersentry: 'cyan', lightningsentry: 'amber', magnetsentry: 'blue' };
                             const colorScheme = colors[tower.type] || 'cyan';
@@ -1475,7 +1980,41 @@
             }
         }
 
+        function setMasterAccordion(openPanel) {
+            const panels = {
+                orbits: {
+                    content: document.getElementById('accordion-orbits-content'),
+                    icon: document.getElementById('accordion-orbits-icon')
+                },
+                directives: {
+                    content: document.getElementById('accordion-directives-content'),
+                    icon: document.getElementById('accordion-directives-icon')
+                }
+            };
+
+            const target = panels[openPanel];
+            const shouldCloseTarget = target && target.content && !target.content.classList.contains('hidden');
+            if (shouldCloseTarget) {
+                if (target.content) target.content.classList.add('hidden');
+                if (target.icon) {
+                    target.icon.classList.remove('fa-chevron-up');
+                    target.icon.classList.add('fa-chevron-down');
+                }
+                return;
+            }
+
+            Object.entries(panels).forEach(([key, panel]) => {
+                const isOpen = key === openPanel;
+                if (panel.content) panel.content.classList.toggle('hidden', !isOpen);
+                if (panel.icon) {
+                    panel.icon.classList.toggle('fa-chevron-up', isOpen);
+                    panel.icon.classList.toggle('fa-chevron-down', !isOpen);
+                }
+            });
+        }
+
         function updateOrbitInspectorUI() {
+            updateBossCardList();
             const shieldCapLvlElement = document.getElementById('shield-cap-lvl');
             if (!shieldCapLvlElement) return;
 
@@ -1590,6 +2129,13 @@
         function setGold(amount) { game.gold = amount; updateGoldUI(); }
         function spendGold(amount) { game.gold -= amount; updateGoldUI(); }
 
+        function getSatelliteBuildCost(type) {
+            let discount = getDirectiveEffectValue('buildDiscount', 0);
+            const debt = getDirectiveEffectValue('debtFinancing');
+            if (debt) discount += debt.discount;
+            return Math.max(1, Math.floor(SATELLITE_CONFIGS[type].cost * Math.max(0.15, 1 - discount)));
+        }
+
         function updateShopAvailability() {
             const items = [
                 { id: 'shop-laser', type: 'laser', cost: 100, activeColor: 'border-cyan-400' },
@@ -1603,7 +2149,7 @@
             items.forEach(item => {
                 const el = document.getElementById(item.id);
                 if (!el) return;
-                const canAfford = game.gold >= item.cost;
+                const canAfford = game.gold >= getSatelliteBuildCost(item.type);
                 const isSelected = game.selectedShopType === item.type;
                 el.classList.remove('opacity-40', 'border-cyan-500/40', 'border-emerald-500/40', 'border-red-500/40', 'border-purple-500/40', 'border-cyan-400/40', 'border-amber-400/40', 'border-blue-400/40', 'border-emerald-400', 'border-2', 'border-red-500', 'border-purple-500', 'border-cyan-400', 'border-cyan-300', 'border-amber-400', 'border-blue-400', 'border-slate-800');
                 el.style.boxShadow = '';
@@ -1629,18 +2175,175 @@
             });
         }
 
-        function getStatUpgradeCost(baseTypeCost, currentLvl) { return Math.floor(baseTypeCost * 0.4 * currentLvl); }
+        function getStatUpgradeCost(baseTypeCost, currentLvl, towerType = null) {
+            let multiplier = 1;
+            const railTradeoff = getDirectiveEffectValue('railgunUpgradeTradeoff');
+            if (towerType === 'railgun' && railTradeoff) multiplier += railTradeoff.cost;
+            return Math.floor(baseTypeCost * 0.4 * currentLvl * multiplier);
+        }
         function getSatelliteMaxHp(type) {
-            return Math.floor(85 + SATELLITE_CONFIGS[type].cost * 0.28);
+            const baseHp = 85 + SATELLITE_CONFIGS[type].cost * 0.28;
+            let multiplier = 1 + getDirectiveEffectValue('satelliteHp', 0);
+            const glass = getDirectiveEffectValue('glassCannon');
+            if (glass) multiplier -= glass.hp;
+            return Math.max(20, Math.floor(baseHp * multiplier));
         }
         function getSatelliteRepairCost(tower) {
             if (!tower) return 0;
             const missingHp = Math.max(0, tower.maxHp - tower.hp);
-            return Math.ceil(missingHp * 1.5);
+            let multiplier = 1;
+            const overdrive = getDirectiveEffectValue('overdriveRepair');
+            if (overdrive) multiplier += overdrive.repair;
+            return Math.ceil(missingHp * 1.5 * multiplier);
         }
         function getSatelliteSalvageValue(tower) {
             if (!tower) return 0;
-            return Math.floor((tower.investedGold || SATELLITE_CONFIGS[tower.type].cost) * 0.25);
+            return Math.floor((tower.investedGold || SATELLITE_CONFIGS[tower.type].cost) * 0.25 * (1 + getDirectiveEffectValue('salvage', 0)));
+        }
+
+        function getDirectiveDefinition(id) {
+            return COMMAND_DIRECTIVES.find(directive => directive.id === id);
+        }
+
+        function getDirectiveLevel(id) {
+            return game.commandDirectives[id] || 0;
+        }
+
+        function getDirectiveEffectValue(effect, fallback = null) {
+            const directive = COMMAND_DIRECTIVES.find(item => item.effect === effect);
+            if (!directive) return fallback;
+            const level = getDirectiveLevel(directive.id);
+            return level > 0 ? directive.values[level - 1] : fallback;
+        }
+
+        function getDirectiveEffectValueById(id, fallback = null) {
+            const directive = getDirectiveDefinition(id);
+            const level = getDirectiveLevel(id);
+            return directive && level > 0 ? directive.values[level - 1] : fallback;
+        }
+
+        function getDirectiveContext(directive) {
+            return DIRECTIVE_EFFECT_CONTEXT[directive.effect] || 'Command directive. It changes the tactical rules for future defense waves and does not affect boss intercept missions.';
+        }
+
+        function getDirectiveDescription(directive, nextLevel = null) {
+            const level = nextLevel || getDirectiveLevel(directive.id) || 1;
+            const levelText = directive.levels[Math.max(0, Math.min(4, level - 1))];
+            return `${levelText}. ${getDirectiveContext(directive)}`;
+        }
+
+        function syncPlanetBars() {
+            game.earthHealth = Math.min(game.earthHealth, game.earthMaxHealth);
+            game.earthShield = Math.min(game.earthShield, game.earthMaxShield);
+            const healthWPercent = `${(game.earthHealth / game.earthMaxHealth) * 100}%`;
+            const shieldWPercent = `${(game.earthShield / game.earthMaxShield) * 100}%`;
+            const healthText = document.getElementById('health-text');
+            const mobileHealthText = document.getElementById('mobile-health-text');
+            const healthBar = document.getElementById('health-bar');
+            const mobileHealthBar = document.getElementById('mobile-health-bar');
+            const shieldText = document.getElementById('shield-text');
+            const mobileShieldText = document.getElementById('mobile-shield-text');
+            const shieldBar = document.getElementById('shield-bar');
+            const mobileShieldBar = document.getElementById('mobile-shield-bar');
+            if (healthText) healthText.innerText = `${game.earthHealth} / ${game.earthMaxHealth}`;
+            if (mobileHealthText) mobileHealthText.innerText = `${game.earthHealth}/${game.earthMaxHealth}`;
+            if (healthBar) healthBar.style.width = healthWPercent;
+            if (mobileHealthBar) mobileHealthBar.style.width = healthWPercent;
+            if (shieldText) shieldText.innerText = `${game.earthShield} / ${game.earthMaxShield}`;
+            if (mobileShieldText) mobileShieldText.innerText = `${game.earthShield}/${game.earthMaxShield}`;
+            if (shieldBar) shieldBar.style.width = shieldWPercent;
+            if (mobileShieldBar) mobileShieldBar.style.width = shieldWPercent;
+        }
+
+        function addRandomOrbitSlots(count) {
+            for (let n = 0; n < count; n++) {
+                const candidates = [0, 1, 2].filter(index => orbitSlotCapacities[index] < 10);
+                if (!candidates.length) return;
+                const orbitIndex = candidates[Math.floor(Math.random() * candidates.length)];
+                orbitLockStates[orbitIndex] = false;
+                orbitSlotCapacities[orbitIndex]++;
+                orbitUpgradesCount[orbitIndex] = Math.min(6, orbitUpgradesCount[orbitIndex] + 1);
+            }
+            for (let tower of game.towers) tower.updateCoordinates();
+            updateOrbitInspectorUI();
+        }
+
+        function applyDirectiveLevelUp(directive, previousLevel, newLevel) {
+            const previousValue = previousLevel > 0 ? directive.values[previousLevel - 1] : null;
+            const newValue = directive.values[newLevel - 1];
+            if (directive.effect === 'grantGold') {
+                addGold(newValue);
+            } else if (directive.effect === 'shieldForGold') {
+                game.earthShield = Math.max(0, game.earthShield - newValue.shield);
+                addGold(newValue.gold);
+                syncPlanetBars();
+            } else if (directive.effect === 'coreMaxHp') {
+                const delta = newValue - (previousValue || 0);
+                game.earthMaxHealth += delta;
+                game.earthHealth += Math.max(0, delta);
+                syncPlanetBars();
+            } else if (directive.effect === 'maxShield') {
+                const delta = newValue - (previousValue || 0);
+                game.earthMaxShield += delta;
+                game.earthShield += Math.max(0, delta);
+                syncPlanetBars();
+            } else if (directive.effect === 'shieldWeapon') {
+                const delta = newValue.shield - (previousValue ? previousValue.shield : 0);
+                game.earthMaxShield = Math.max(25, game.earthMaxShield - delta);
+                syncPlanetBars();
+            } else if (directive.effect === 'fragileShield') {
+                game.earthMaxShield = Math.max(25, Math.floor(100 * (1 - newValue.maxLoss)) + shieldUpgradeLevel * 25 + (getDirectiveEffectValue('maxShield', 0) || 0));
+                syncPlanetBars();
+            } else if (directive.effect === 'repairAll') {
+                for (const tower of game.towers) tower.hp = Math.min(tower.maxHp, tower.hp + tower.maxHp * newValue);
+            } else if (directive.effect === 'satelliteHp' || directive.effect === 'glassCannon') {
+                for (const tower of game.towers) {
+                    const hpPercent = tower.maxHp > 0 ? tower.hp / tower.maxHp : 1;
+                    tower.maxHp = getSatelliteMaxHp(tower.type);
+                    tower.hp = Math.max(1, Math.min(tower.maxHp, tower.maxHp * hpPercent));
+                }
+            } else if (directive.effect === 'grantSlots') {
+                addRandomOrbitSlots(newValue.slots);
+                if (newValue.gold) addGold(newValue.gold);
+            } else if (directive.effect === 'warBudget') {
+                addGold(newValue.gold);
+            } else if (directive.effect === 'recklessExpansion') {
+                addRandomOrbitSlots(newValue.slots);
+                game.earthMaxHealth = Math.max(50, game.earthMaxHealth - newValue.hp);
+                syncPlanetBars();
+            }
+            updateBossCardList();
+        }
+
+        function updateBossCardList() {
+            const cardList = document.getElementById('boss-card-list');
+            const cardCount = document.getElementById('boss-card-count');
+            if (!cardList || !cardCount) return;
+            const directives = Object.entries(game.commandDirectives)
+                .map(([id, level]) => ({ ...getDirectiveDefinition(id), level }))
+                .filter(Boolean)
+                .sort((a, b) => b.level - a.level || a.name.localeCompare(b.name));
+            cardCount.innerText = `${directives.length} Active`;
+            cardList.innerHTML = directives.length
+                ? directives.map(directive => `<div class="bg-slate-900 border border-amber-500/20 rounded px-2 py-1">
+                    <div class="flex justify-between gap-2"><span style="color:${directive.color}" class="font-black uppercase">${directive.name}</span><span class="text-amber-300">LVL ${directive.level}/5</span></div>
+                    <div>${getDirectiveDescription(directive)}</div>
+                    <div class="text-slate-500 uppercase">${directive.rarity}</div>
+                </div>`).join('')
+                : 'No command directives acquired.';
+        }
+
+        function getTargetedDamageMultiplier(enemy, weaponType = '') {
+            let multiplier = 1;
+            if (enemy.category === 'ship') multiplier += getDirectiveEffectValue('shipDamage', 0);
+            if (enemy.category === 'normal') multiplier += getDirectiveEffectValue('rockDamage', 0);
+            if (enemy.slowMultiplier < 1) multiplier += getDirectiveEffectValue('slowedDamage', 0);
+            if (getDirectiveEffectValue('strongestDamage') && game.wave % 5 === 0) {
+                const strongest = game.enemies.reduce((best, item) => item.hp > (best ? best.hp : -1) ? item : best, null);
+                if (strongest && strongest.id === enemy.id) multiplier += getDirectiveEffectValue('strongestDamage', 0);
+            }
+            if (weaponType === 'plasma') multiplier += getDirectiveEffectValue('plasmaDamage', 0);
+            return multiplier;
         }
         
         function createLvlDotsHTML(lvl) {
@@ -1655,6 +2358,7 @@
         function triggerPauseToggle() {
             if (game && game.running) {
                 game.paused = true;
+                pauseBgm();
                 const p = document.getElementById('pause-modal');
                 if (p) p.classList.remove('hidden');
                 playSynthSound('upgrade');
@@ -1665,11 +2369,154 @@
             ['next-wave-btn', 'mobile-launch-btn'].forEach(id => {
                 const btn = document.getElementById(id);
                 if (!btn) return;
+                const bossReady = isReady && isBossWave(game.wave);
                 btn.disabled = !isReady;
                 btn.classList.toggle('wave-ready', isReady);
+                btn.classList.toggle('boss-wave-ready', bossReady);
                 btn.classList.toggle('opacity-45', !isReady);
                 btn.classList.toggle('cursor-not-allowed', !isReady);
+                btn.innerHTML = bossReady
+                    ? `<i class="fa-solid fa-skull"></i> <span>ENTER BOSS ROUND</span>`
+                    : `<i class="fa-solid fa-play"></i> <span>${id === 'mobile-launch-btn' ? 'WAVE' : 'START WAVE'}</span>`;
             });
+        }
+
+        function setBuildControlEnabled(isEnabled) {
+            const buildBtn = document.getElementById('open-build-drawer-btn');
+            if (!buildBtn) return;
+            buildBtn.disabled = !isEnabled;
+            buildBtn.classList.toggle('opacity-45', !isEnabled);
+            buildBtn.classList.toggle('cursor-not-allowed', !isEnabled);
+            updateBuildButtonState();
+        }
+
+        function cancelBuildMode(options = {}) {
+            game.selectedShopType = null;
+            game.orbitGridHighlights = false;
+            if (!options.keepHint) {
+                const hint = document.getElementById('action-hint');
+                if (hint) hint.innerText = "Tap the planet core to open Master Command, or tap BUILD to deploy satellites!";
+            }
+            updateShopAvailability();
+            updateBuildButtonState();
+        }
+
+        function hasEmptyDeployableOrbitSlot() {
+            for (let orbitIndex = 0; orbitIndex < orbitSlotCapacities.length; orbitIndex++) {
+                if (orbitLockStates[orbitIndex]) continue;
+                for (let slotIndex = 0; slotIndex < orbitSlotCapacities[orbitIndex]; slotIndex++) {
+                    if (!game.towers.some(tower => tower.orbitIndex === orbitIndex && tower.slotIndex === slotIndex)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function notifyNoEmptyOrbitSlots() {
+            showGameNotice('<i class="fa-solid fa-circle-exclamation mr-1"></i> No empty orbit slots available. Expand or unlock an orbit in Master Command.', 3200);
+            const hint = document.getElementById('action-hint');
+            if (hint) hint.innerHTML = `<span class="text-red-300 font-bold">No empty orbit slots. Open Master Command to expand orbital capacity.</span>`;
+        }
+
+        function updateBuildButtonState() {
+            const buildBtn = document.getElementById('open-build-drawer-btn');
+            if (!buildBtn) return;
+            if (game && game.selectedShopType) {
+                buildBtn.classList.remove('bg-emerald-500', 'hover:bg-emerald-400', 'glow-green');
+                buildBtn.classList.add('bg-red-500', 'hover:bg-red-400', 'glow-red');
+                buildBtn.innerHTML = `<i class="fa-solid fa-ban font-bold"></i><span class="md:hidden">CANCEL</span><span class="hidden md:inline">CANCEL BUILD</span>`;
+            } else {
+                buildBtn.classList.remove('bg-red-500', 'hover:bg-red-400', 'glow-red');
+                buildBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-400', 'glow-green');
+                buildBtn.innerHTML = `<i class="fa-solid fa-hammer font-bold"></i><span class="md:hidden">BUILD</span><span class="hidden md:inline">BUILD SATELLITE</span>`;
+            }
+        }
+
+        function showGameNotice(message, duration = 2400) {
+            const notice = document.getElementById('game-notice');
+            if (!notice) return;
+            notice.innerHTML = message;
+            notice.classList.remove('hidden', 'notice-pop');
+            notice.offsetHeight;
+            notice.classList.add('notice-pop');
+            if (gameNoticeTimer) clearTimeout(gameNoticeTimer);
+            gameNoticeTimer = setTimeout(() => notice.classList.add('hidden'), duration);
+        }
+
+        function showModeTransition(title, subtitle = 'Reconfiguring command systems', icon = 'fa-circle-nodes', duration = 1450, onCovered = null) {
+            const overlay = document.getElementById('mode-transition-overlay');
+            const titleEl = document.getElementById('mode-transition-title');
+            const subtitleEl = document.getElementById('mode-transition-subtitle');
+            const iconEl = document.getElementById('mode-transition-icon');
+            modeTransitionActive = true;
+            if (!overlay) {
+                if (typeof onCovered === 'function') onCovered();
+                modeTransitionActive = false;
+                return;
+            }
+            if (titleEl) titleEl.innerText = title;
+            if (subtitleEl) subtitleEl.innerText = subtitle;
+            if (iconEl) iconEl.className = `fa-solid ${icon} text-cyan-300 text-2xl animate-spin-slow`;
+            overlay.classList.remove('hidden', 'mode-transition-pop');
+            overlay.classList.add('flex');
+            overlay.offsetHeight;
+            overlay.classList.add('mode-transition-pop');
+            setTimeout(() => {
+                if (typeof onCovered === 'function') onCovered();
+            }, Math.floor(duration * 0.34));
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex', 'mode-transition-pop');
+                modeTransitionActive = false;
+            }, duration);
+        }
+
+        function setStarterTooltipsVisible(isVisible) {
+            tutorialHints.planet = isVisible;
+            tutorialHints.build = isVisible;
+            updateTutorialTooltips();
+        }
+
+        function updateTutorialTooltips() {
+            const planetTip = document.getElementById('planet-tutorial-tooltip');
+            const buildTip = document.getElementById('build-tutorial-tooltip');
+            const introModal = document.getElementById('intro-modal');
+            const hasIntroOpen = introModal && !introModal.classList.contains('hidden');
+            const inputWord = isCoarsePointerInput() ? 'Tap' : 'Click';
+
+            if (planetTip) {
+                if (game.running && !hasIntroOpen && tutorialHints.planet) {
+                    const centerX = canvas.width / 2;
+                    const centerY = canvas.height / 2;
+                    const safeTopOffset = window.visualViewport ? window.visualViewport.offsetTop : 0;
+                    const tipTop = Math.max(safeTopOffset + 92, centerY - EARTH_RADIUS - 52);
+                    planetTip.innerText = `${inputWord} the Planet to access Master Command Center`;
+                    planetTip.style.left = `${centerX}px`;
+                    planetTip.style.top = `${tipTop}px`;
+                    planetTip.style.transform = 'translateX(-50%)';
+                    planetTip.classList.remove('hidden');
+                } else {
+                    planetTip.classList.add('hidden');
+                }
+            }
+
+            if (buildTip) {
+                const buildText = document.getElementById('build-tutorial-text');
+                if (buildText) buildText.innerText = `${inputWord} here to deploy satellites`;
+                buildTip.classList.toggle('hidden', !(game.running && !hasIntroOpen && tutorialHints.build));
+                const buildButton = document.getElementById('open-build-drawer-btn');
+                if (buildButton && !buildTip.classList.contains('hidden')) {
+                    const tipRect = buildTip.getBoundingClientRect();
+                    const buttonRect = buildButton.getBoundingClientRect();
+                    const targetX = buttonRect.left + buttonRect.width / 2;
+                    const targetY = buttonRect.top + buttonRect.height / 2;
+                    const connectorLeft = targetX - tipRect.left;
+                    const connectorHeight = Math.max(24, targetY - tipRect.bottom - 5);
+                    buildTip.style.setProperty('--connector-left', `${connectorLeft}px`);
+                    buildTip.style.setProperty('--connector-height', `${connectorHeight}px`);
+                }
+            }
         }
 
         function refreshAtmosphereSelection() {
@@ -1700,6 +2547,11 @@
                 if (wave >= 5) selectionPool.push(5);
                 if (wave >= 8) selectionPool.push(6);
                 if (wave >= 12) selectionPool.push(7);
+                const eliteIncentive = getDirectiveEffectValue('eliteIncentive');
+                if (eliteIncentive && wave >= 3) {
+                    const extraEliteRolls = Math.max(1, Math.floor(eliteIncentive.spawn * 4));
+                    for (let i = 0; i < extraEliteRolls; i++) selectionPool.push(4, 5, 6, 7);
+                }
                 const index = selectionPool[Math.floor(Math.random() * selectionPool.length)];
                 const profile = ENEMY_PROFILES[index];
                 const difficultyWave = Math.max(0, wave - 1);
@@ -1712,6 +2564,13 @@
                 this.baseDamage = profile.damage;
                 this.damage = profile.damage + Math.floor(difficultyWave * 1.15);
                 this.goldReward = Math.floor(profile.goldReward * (1 + (difficultyWave * 0.04)));
+                const rewardHpTradeoff = getDirectiveEffectValue('rewardHpTradeoff');
+                if (rewardHpTradeoff) this.maxHp = Math.floor(this.maxHp * (1 + rewardHpTradeoff.hp));
+                if (this.category === 'normal') {
+                    const rockRewardSpeed = getDirectiveEffectValue('rockRewardSpeed');
+                    if (rockRewardSpeed) this.baseSpeed *= (1 + rockRewardSpeed.speed);
+                }
+                this.hp = this.maxHp;
                 this.attackRange = (profile.attackRange || 0) * rangeScale;
                 this.attackCooldownMax = profile.attackCooldown || 0;
                 this.attackCooldown = Math.floor(Math.random() * Math.max(1, this.attackCooldownMax));
@@ -1854,8 +2713,48 @@
                 this.updateCoordinates();
             }
             get damage() { return Math.floor(this.baseDamage * (1 + (this.dmgLvl - 1) * 0.45)); }
-            get range() { return Math.floor(this.baseRange * (1 + (this.rngLvl - 1) * 0.15) * rangeScale); }
-            get fireRateCooldown() { return Math.max(8, Math.floor(this.baseCooldown * Math.pow(0.85, this.rateLvl - 1))); }
+            get effectiveDamage() {
+                let multiplier = 1 + getDirectiveEffectValue('damage', 0);
+                const glass = getDirectiveEffectValue('glassCannon'); if (glass) multiplier += glass.dmg;
+                const rangeTradeoff = getDirectiveEffectValue('rangeDamageTradeoff'); if (rangeTradeoff) multiplier -= rangeTradeoff.dmg;
+                const corePowered = getDirectiveEffectValue('corePowered'); if (corePowered) multiplier += corePowered.dmg;
+                const shieldWeapon = getDirectiveEffectValue('shieldWeapon'); if (shieldWeapon) multiplier += shieldWeapon.dmg;
+                const finalStand = getDirectiveEffectValue('finalStand');
+                if (finalStand) multiplier += (game.earthHealth / game.earthMaxHealth) <= finalStand.threshold ? finalStand.low : -finalStand.high;
+                if (this.orbitIndex === 1) multiplier += getDirectiveEffectValue('middleDamage', 0);
+                if (this.type === 'laser') multiplier += getDirectiveEffectValue('laserDamage', 0);
+                if (this.type === 'plasma') {
+                    multiplier += getDirectiveEffectValue('plasmaDamage', 0);
+                    const plasmaTradeoff = getDirectiveEffectValue('plasmaTradeoff'); if (plasmaTradeoff) multiplier += plasmaTradeoff.dmg;
+                }
+                if (this.type === 'railgun') {
+                    multiplier += getDirectiveEffectValue('railgunDamage', 0);
+                    const railTradeoff = getDirectiveEffectValue('railgunUpgradeTradeoff'); if (railTradeoff) multiplier += railTradeoff.dmg;
+                }
+                const lightningTradeoff = getDirectiveEffectValue('lightningTradeoff');
+                if (this.type === 'lightningsentry' && lightningTradeoff) multiplier -= lightningTradeoff.dmg;
+                return Math.max(1, Math.floor(this.damage * multiplier));
+            }
+            get range() {
+                let multiplier = 1 + getDirectiveEffectValue('range', 0);
+                if (this.orbitIndex === 2) multiplier += getDirectiveEffectValue('outerRange', 0);
+                const rangeTradeoff = getDirectiveEffectValue('rangeDamageTradeoff'); if (rangeTradeoff) multiplier += rangeTradeoff.range;
+                const magnetTradeoff = getDirectiveEffectValue('magnetTradeoff'); if (this.type === 'magnetsentry' && magnetTradeoff) multiplier -= magnetTradeoff.range;
+                const compression = getDirectiveEffectValue('orbitCompression'); if (this.orbitIndex === 2 && compression) multiplier -= compression.range;
+                return Math.max(40, Math.floor(this.baseRange * (1 + (this.rngLvl - 1) * 0.15) * rangeScale * multiplier));
+            }
+            get fireRateCooldown() {
+                let multiplier = 1 - getDirectiveEffectValue('fireRate', 0);
+                const overdrive = getDirectiveEffectValue('overdriveRepair'); if (overdrive) multiplier -= overdrive.rate;
+                const corePowered = getDirectiveEffectValue('corePowered'); if (corePowered) multiplier -= corePowered.rate;
+                const lastStand = getDirectiveEffectValue('lastStandRate');
+                if (lastStand && game.earthHealth / game.earthMaxHealth <= 0.3) multiplier -= lastStand;
+                if (this.orbitIndex === 0) multiplier -= getDirectiveEffectValue('innerRate', 0);
+                const compression = getDirectiveEffectValue('orbitCompression'); if (this.orbitIndex === 0 && compression) multiplier -= compression.rate;
+                const plasmaTradeoff = getDirectiveEffectValue('plasmaTradeoff'); if (this.type === 'plasma' && plasmaTradeoff) multiplier += plasmaTradeoff.cd;
+                const missileTradeoff = getDirectiveEffectValue('missileTradeoff'); if (this.type === 'missile' && missileTradeoff) multiplier += missileTradeoff.rate;
+                return Math.max(5, Math.floor(this.baseCooldown * Math.pow(0.85, this.rateLvl - 1) * Math.max(0.2, multiplier)));
+            }
             
             updateCoordinates() {
                 const centerX = canvas.width / 2; const centerY = canvas.height / 2;
@@ -1868,14 +2767,17 @@
             update(enemies) {
                 this.updateCoordinates();
                 
-                if (this.type === 'magnetsentry') {
-                    for (let enemy of enemies) {
-                        const distance = Math.hypot(enemy.x - this.x, enemy.y - this.y);
-                        if (distance < this.range) {
-                            enemy.slowMultiplier = Math.min(enemy.slowMultiplier, 0.65);
-                            enemy.slowTimer = Math.max(enemy.slowTimer, 10);
-                        }
-                    }
+	                if (this.type === 'magnetsentry') {
+	                    const magnetSlowTo = getDirectiveEffectValue('magnetSlowTo', 0.65);
+	                    const magnetTradeoff = getDirectiveEffectValue('magnetTradeoff');
+	                    const slowMultiplier = magnetTradeoff ? magnetTradeoff.slow : magnetSlowTo;
+	                    for (let enemy of enemies) {
+	                        const distance = Math.hypot(enemy.x - this.x, enemy.y - this.y);
+	                        if (distance < this.range) {
+	                            enemy.slowMultiplier = Math.min(enemy.slowMultiplier, slowMultiplier);
+	                            enemy.slowTimer = Math.max(enemy.slowTimer, 10);
+	                        }
+	                    }
                 }
 
                 let closestEnemy = null; 
@@ -1916,16 +2818,18 @@
             }
             fire(enemy) {
                 playSynthSound(this.type);
-                if (this.type === 'lasersentry') {
-                    const rampMultiplier = 1 + Math.min(120, this.beamTicks) * 0.05;
-                    const rampedDmg = Math.floor(this.damage * rampMultiplier);
-                    enemy.hp -= rampedDmg;
+	                if (this.type === 'lasersentry') {
+	                    const rampBoost = 1 + getDirectiveEffectValue('laserRamp', 0) + (getDirectiveEffectValue('laserOverfocus') ? getDirectiveEffectValue('laserOverfocus').ramp : 0);
+	                    const focusBoost = this.beamTicks >= 120 ? getDirectiveEffectValue('laserFocus', 0) : 0;
+	                    const rampMultiplier = 1 + Math.min(120, this.beamTicks) * 0.05 * rampBoost + focusBoost;
+	                    const rampedDmg = Math.floor(this.effectiveDamage * rampMultiplier * getTargetedDamageMultiplier(enemy, this.type));
+	                    enemy.hp -= rampedDmg;
                     
                     if (Math.random() < 0.3) {
                         createExplosion(enemy.x, enemy.y, '#22d3ee', 1);
                     }
                 } else if (this.type === 'lightningsentry') {
-                    enemy.hp -= this.damage;
+	                    enemy.hp -= Math.floor(this.effectiveDamage * getTargetedDamageMultiplier(enemy, this.type));
                     createExplosion(enemy.x, enemy.y, '#fbbf24', 5);
                     
                     lightningArcsToDraw.push({
@@ -1934,10 +2838,13 @@
                         alpha: 1.0
                     });
 
-                    let chainTargets = [enemy];
-                    let currentTarget = enemy;
-                    const bounceRadius = 120 * rangeScale;
-                    for (let b = 0; b < 3; b++) {
+	                    let chainTargets = [enemy];
+	                    let currentTarget = enemy;
+	                    const bounceRadius = 120 * rangeScale;
+	                    const relayChains = getDirectiveEffectValue('lightningChains', 0);
+	                    const stormRelay = getDirectiveEffectValue('lightningTradeoff');
+	                    const maxChains = 3 + relayChains + (stormRelay ? stormRelay.chains : 0);
+	                    for (let b = 0; b < maxChains; b++) {
                         let nextTarget = null;
                         let closestDist = bounceRadius;
                         for (let other of game.enemies) {
@@ -1950,7 +2857,7 @@
                         }
                         if (nextTarget) {
                             chainTargets.push(nextTarget);
-                            const cascadeDamage = Math.floor(this.damage * Math.pow(0.75, b + 1));
+	                            const cascadeDamage = Math.floor(this.effectiveDamage * Math.pow(0.75, b + 1) * getTargetedDamageMultiplier(nextTarget, this.type));
                             nextTarget.hp -= cascadeDamage;
                             createExplosion(nextTarget.x, nextTarget.y, '#fbbf24', 3);
                             
@@ -1966,7 +2873,7 @@
                     }
                 } else {
                     const bulletSpeed = SATELLITE_CONFIGS[this.type].projSpeed * gameScale;
-                    game.projectiles.push(new Projectile(this.x, this.y, enemy, this.type, this.damage, bulletSpeed, this.range));
+                    game.projectiles.push(new Projectile(this.x, this.y, enemy, this.type, this.effectiveDamage, bulletSpeed, this.range));
                 }
             }
             draw() {
@@ -2066,27 +2973,39 @@
             }
             impact(enemy) {
                 this.dead = true;
-                if (this.type === 'plasma') {
-                    playSynthSound('explosion'); createExplosion(this.x, this.y, '#10b981', 25);
-                    const blastRadius = 60 * rangeScale;
-                    for (let e of game.enemies) {
-                        const distance = Math.hypot(e.x - this.x, e.y - this.y);
-                        if (distance < blastRadius) e.hp -= this.damage;
-                    }
-                } else if (this.type === 'railgun') {
-                    playSynthSound('hit'); createExplosion(this.x, this.y, '#a855f7', 15);
-                    enemy.hp -= this.damage; enemy.speed *= 0.5; 
-                } else if (this.type === 'magnetsentry') {
-                    playSynthSound('hit');
-                    createExplosion(this.x, this.y, '#3b82f6', 10);
-                    enemy.hp -= this.damage;
-                    enemy.slowMultiplier = Math.min(enemy.slowMultiplier, 0.4);
-                    enemy.slowTimer = Math.max(enemy.slowTimer, 240);
-                } else {
-                    playSynthSound('hit');
-                    createExplosion(this.x, this.y, this.type === 'missile' ? '#ef4444' : '#38bdf8', 10);
-                    enemy.hp -= this.damage;
-                }
+	                if (this.type === 'plasma') {
+	                    playSynthSound('explosion'); createExplosion(this.x, this.y, '#10b981', 25);
+	                    const blastRadius = 60 * rangeScale;
+	                    for (let e of game.enemies) {
+	                        const distance = Math.hypot(e.x - this.x, e.y - this.y);
+	                        if (distance < blastRadius) e.hp -= Math.floor(this.damage * getTargetedDamageMultiplier(e, this.type));
+	                    }
+	                } else if (this.type === 'railgun') {
+	                    playSynthSound('hit'); createExplosion(this.x, this.y, '#a855f7', 15);
+	                    enemy.hp -= Math.floor(this.damage * getTargetedDamageMultiplier(enemy, this.type)); enemy.speed *= 0.5; 
+	                } else if (this.type === 'magnetsentry') {
+	                    playSynthSound('hit');
+	                    createExplosion(this.x, this.y, '#3b82f6', 10);
+	                    enemy.hp -= Math.floor(this.damage * getTargetedDamageMultiplier(enemy, this.type));
+	                    enemy.slowMultiplier = Math.min(enemy.slowMultiplier, 0.4);
+	                    enemy.slowTimer = Math.max(enemy.slowTimer, 240);
+	                } else {
+	                    playSynthSound('hit');
+	                    createExplosion(this.x, this.y, this.type === 'missile' ? '#ef4444' : '#38bdf8', 10);
+	                    enemy.hp -= Math.floor(this.damage * getTargetedDamageMultiplier(enemy, this.type));
+	                    if (this.type === 'missile') {
+	                        const clusters = getDirectiveEffectValue('missileBlast', 0);
+	                        const missileTradeoff = getDirectiveEffectValue('missileTradeoff');
+	                        const blastRadius = 38 * rangeScale * (1 + (missileTradeoff ? missileTradeoff.blast : 0));
+	                        if (clusters || missileTradeoff) {
+	                            for (let e of game.enemies) {
+	                                if (e.id === enemy.id) continue;
+	                                const distance = Math.hypot(e.x - this.x, e.y - this.y);
+	                                if (distance < blastRadius) e.hp -= Math.floor(this.damage * (0.18 + clusters * 0.04) * getTargetedDamageMultiplier(e, this.type));
+	                            }
+	                        }
+	                    }
+	                }
             }
             draw() {
                 ctx.save(); ctx.lineWidth = 2;
@@ -2299,15 +3218,395 @@
             ctx.restore();
         }
 
+        function drawSpriteImage(image, x, y, maxSide, angle = 0) {
+            if (!image || !image.complete || image.naturalWidth <= 0 || image.naturalHeight <= 0) return false;
+            const ratio = Math.min(maxSide / image.naturalWidth, maxSide / image.naturalHeight);
+            const drawW = image.naturalWidth * ratio;
+            const drawH = image.naturalHeight * ratio;
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.drawImage(image, -drawW / 2, -drawH / 2, drawW, drawH);
+            ctx.restore();
+            return true;
+        }
+
+        function resetBossMode() {
+            bossMode = {
+                active: false, phase: 'idle', wave: 0, frame: 0, spawnTimer: 0, spawned: 0, requiredKills: 0, kills: 0,
+                player: { x: canvas.width / 2, y: canvas.height - 120, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120 },
+                enemies: [], projectiles: [], enemyProjectiles: [], boss: null, rewardOptions: []
+            };
+            const hud = document.getElementById('boss-mode-hud');
+            const modal = document.getElementById('boss-card-modal');
+            const failedModal = document.getElementById('boss-failed-modal');
+            if (hud) hud.classList.add('hidden');
+            if (modal) modal.classList.add('hidden');
+            if (failedModal) failedModal.classList.add('hidden');
+        }
+
+        function startBossMode() {
+            const bossIndex = getBossIndexForWave(game.wave);
+            if (bossIndex < 0 || modeTransitionActive) return;
+            const config = BOSS_SHIPS[bossIndex];
+            waveActive = false;
+            setWaveLaunchReady(false);
+            setBuildControlEnabled(false);
+            closeInspector(); closeOrbitInspector(); closeBlueprintDrawer();
+            setStarterTooltipsVisible(false);
+            showModeTransition('Boss Intercept Mode', 'Manual fighter control engaged', 'fa-skull', 1450, () => {
+                game.mode = 'boss';
+                switchBgm('boss');
+                bossMode.active = true;
+                bossMode.phase = 'minions';
+                bossMode.wave = game.wave;
+                bossMode.frame = 0;
+                bossMode.spawnTimer = 0;
+                bossMode.spawned = 0;
+                bossMode.requiredKills = config.minions;
+                bossMode.kills = 0;
+                bossMode.enemies = [];
+                bossMode.projectiles = [];
+                bossMode.enemyProjectiles = [];
+                bossMode.player = { x: canvas.width / 2, y: canvas.height - 120, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120 };
+                bossMode.player.spriteSize = 58 * gameScale;
+                bossMode.player.hitRadius = bossMode.player.spriteSize * 0.34;
+                bossMode.boss = {
+                    config,
+                    x: canvas.width / 2,
+                    y: 92 + (window.visualViewport ? window.visualViewport.offsetTop : 0),
+                    size: 42 * gameScale,
+                    hp: Math.floor(config.maxHp * (1 + game.wave * 0.03)),
+                    maxHp: Math.floor(config.maxHp * (1 + game.wave * 0.03)),
+                    cooldown: config.fireRate,
+                    drift: 0,
+                    hitRadius: 42 * gameScale * (ENEMY_SPRITE_SCALE['Boss Ship'] || 7.2) * 0.34
+                };
+                const hud = document.getElementById('boss-mode-hud');
+                const title = document.getElementById('boss-mode-title');
+                if (hud) hud.classList.remove('hidden');
+                if (title) title.innerText = `Boss Round ${game.wave}: ${config.name}`;
+                showGameNotice(`<i class="fa-solid fa-skull mr-1"></i> Boss Intercept Mode Commencing`, 2600);
+            });
+        }
+
+        function spawnBossMinion() {
+            const profiles = [ENEMY_PROFILES[4], ENEMY_PROFILES[5], ENEMY_PROFILES[0], ENEMY_PROFILES[1]];
+            const profile = profiles[Math.floor(Math.random() * profiles.length)];
+            const spriteScale = ENEMY_SPRITE_SCALE[profile.type] || 3.2;
+            const size = profile.size * gameScale;
+            bossMode.enemies.push({
+                type: profile.type,
+                color: profile.color,
+                x: Math.random() * (canvas.width - 80) + 40,
+                y: -30,
+                size,
+                hitRadius: size * spriteScale * 0.34,
+                hp: Math.floor(profile.maxHp * (1 + game.wave * 0.05)),
+                maxHp: Math.floor(profile.maxHp * (1 + game.wave * 0.05)),
+                speed: (profile.speed + 0.18) * gameScale * 0.72,
+                damage: profile.damage
+            });
+            bossMode.spawned++;
+        }
+
+        function fireBossProjectile(x, y, angle, speed, damage, color) {
+            const tunedSpeed = speed * 0.68;
+            bossMode.enemyProjectiles.push({ x, y, dx: Math.cos(angle) * tunedSpeed, dy: Math.sin(angle) * tunedSpeed, r: 6.5 * gameScale, damage, color });
+        }
+
+        function getBossEnemyHitRadius(enemy) {
+            return enemy.hitRadius || enemy.size * (ENEMY_SPRITE_SCALE[enemy.type] || 3.2) * 0.34;
+        }
+
+        function getBossHitRadius() {
+            if (!bossMode.boss) return 0;
+            return bossMode.boss.hitRadius || bossMode.boss.size * (ENEMY_SPRITE_SCALE['Boss Ship'] || 7.2) * 0.34;
+        }
+
+        function getPlayerFighterHitRadius() {
+            return bossMode.player.hitRadius || 22 * gameScale;
+        }
+
+        function updateBossMode() {
+            bossMode.frame++;
+            const player = bossMode.player;
+            const playerBottomLimit = isMobileBuildView() ? canvas.height - 150 : canvas.height - 80;
+            if (typeof player.targetX !== 'number') player.targetX = player.x;
+            if (typeof player.targetY !== 'number') player.targetY = player.y;
+            player.targetX = Math.max(24, Math.min(canvas.width - 24, player.targetX));
+            player.targetY = Math.max(120, Math.min(playerBottomLimit, player.targetY));
+            const dragFollow = 0.24;
+            player.x += (player.targetX - player.x) * dragFollow;
+            player.y += (player.targetY - player.y) * dragFollow;
+            player.x = Math.max(24, Math.min(canvas.width - 24, player.x));
+            player.y = Math.max(120, Math.min(playerBottomLimit, player.y));
+
+            if (player.fireCooldown > 0) player.fireCooldown--;
+            if (player.fireCooldown <= 0) {
+                bossMode.projectiles.push({ x: player.x, y: player.y - 28 * gameScale, dy: -7.2 * gameScale, r: 5.5 * gameScale, damage: 18 + Math.floor(game.wave * 1.5) });
+                player.fireCooldown = 10;
+                playSynthSound('laser');
+            }
+
+            if (bossMode.phase === 'minions') {
+                const objective = document.getElementById('boss-mode-objective');
+                const healthWrap = document.getElementById('boss-health-wrap');
+                if (objective) objective.innerText = `Clear Assault Wing ${bossMode.kills}/${bossMode.requiredKills}`;
+                if (healthWrap) healthWrap.classList.add('hidden');
+                bossMode.spawnTimer--;
+                if (bossMode.spawned < bossMode.requiredKills && bossMode.spawnTimer <= 0) {
+                    spawnBossMinion();
+                    bossMode.spawnTimer = Math.max(18, 44 - Math.floor(game.wave / 2));
+                }
+                if (bossMode.spawned >= bossMode.requiredKills && bossMode.enemies.length === 0) {
+                    bossMode.phase = 'boss';
+                    showGameNotice(`<i class="fa-solid fa-skull-crossbones mr-1"></i> ${bossMode.boss.config.name} has entered orbit`, 2400);
+                }
+            } else if (bossMode.phase === 'boss') {
+                updateBossHud();
+                const boss = bossMode.boss;
+                boss.drift += 0.011;
+                boss.x = canvas.width / 2 + Math.sin(boss.drift) * canvas.width * 0.22;
+                boss.cooldown--;
+                if (boss.config.name === 'Dread Orchard' && bossMode.frame % 90 === 0) boss.hp = Math.min(boss.maxHp, boss.hp + 10);
+                if ((boss.config.name === 'Gravemind Carrier' || boss.config.name === 'Eclipse Foundry') && bossMode.frame % 150 === 0) spawnBossMinion();
+                if (boss.cooldown <= 0) {
+                    const baseAngle = Math.atan2(player.y - boss.y, player.x - boss.x);
+                    const rage = boss.config.name === 'Omega Crucible' && boss.hp < boss.maxHp * 0.5;
+                    const shots = boss.config.name === 'Solar Warden' || boss.config.name === 'Vortex Saint' ? 5 : rage ? 6 : 3;
+                    for (let i = 0; i < shots; i++) {
+                        const spread = (i - (shots - 1) / 2) * 0.18;
+                        fireBossProjectile(boss.x, boss.y + 26 * gameScale, baseAngle + spread, (3.0 + game.wave * 0.045) * gameScale, 12 + Math.floor(game.wave * 0.8), boss.config.color);
+                    }
+                    boss.cooldown = rage ? Math.floor(boss.config.fireRate * 0.55) : boss.config.fireRate;
+                    playSynthSound('missile');
+                }
+                if (boss.hp <= 0) openBossRewardCards();
+            }
+
+            for (let i = bossMode.enemies.length - 1; i >= 0; i--) {
+                const enemy = bossMode.enemies[i];
+                enemy.y += enemy.speed;
+                if (Math.hypot(enemy.x - player.x, enemy.y - player.y) < getBossEnemyHitRadius(enemy) + getPlayerFighterHitRadius()) {
+                    player.hp -= enemy.damage;
+                    bossMode.enemies.splice(i, 1);
+                    playSynthSound('earth_hit');
+                    continue;
+                }
+                if (enemy.y > canvas.height + 40) {
+                    player.hp -= enemy.damage;
+                    bossMode.enemies.splice(i, 1);
+                }
+            }
+
+            for (let i = bossMode.projectiles.length - 1; i >= 0; i--) {
+                const proj = bossMode.projectiles[i];
+                proj.y += proj.dy;
+                let hit = false;
+                for (let e = bossMode.enemies.length - 1; e >= 0; e--) {
+                    const enemy = bossMode.enemies[e];
+                    if (Math.hypot(enemy.x - proj.x, enemy.y - proj.y) < getBossEnemyHitRadius(enemy) + proj.r) {
+                        enemy.hp -= proj.damage;
+                        hit = true;
+                        if (enemy.hp <= 0) {
+                            createExplosion(enemy.x, enemy.y, enemy.color, 8);
+                            bossMode.enemies.splice(e, 1);
+                            bossMode.kills++;
+                        }
+                        break;
+                    }
+                }
+                if (!hit && bossMode.phase === 'boss' && bossMode.boss && Math.hypot(bossMode.boss.x - proj.x, bossMode.boss.y - proj.y) < getBossHitRadius() + proj.r) {
+                    bossMode.boss.hp -= proj.damage;
+                    hit = true;
+                }
+                if (hit || proj.y < -20) bossMode.projectiles.splice(i, 1);
+            }
+
+            for (let i = bossMode.enemyProjectiles.length - 1; i >= 0; i--) {
+                const proj = bossMode.enemyProjectiles[i];
+                proj.x += proj.dx; proj.y += proj.dy;
+                if (Math.hypot(player.x - proj.x, player.y - proj.y) < getPlayerFighterHitRadius() + proj.r) {
+                    player.hp -= proj.damage;
+                    bossMode.enemyProjectiles.splice(i, 1);
+                } else if (proj.y > canvas.height + 30 || proj.x < -30 || proj.x > canvas.width + 30) {
+                    bossMode.enemyProjectiles.splice(i, 1);
+                }
+            }
+
+            if (player.hp <= 0) {
+                failBossMission();
+            }
+        }
+
+        function updateBossHud() {
+            const healthWrap = document.getElementById('boss-health-wrap');
+            const healthName = document.getElementById('boss-health-name');
+            const healthText = document.getElementById('boss-health-text');
+            const healthBar = document.getElementById('boss-health-bar');
+            const objective = document.getElementById('boss-mode-objective');
+            if (!bossMode.boss) return;
+            if (healthWrap) healthWrap.classList.remove('hidden');
+            if (healthName) healthName.innerText = bossMode.boss.config.name;
+            const pct = Math.max(0, bossMode.boss.hp / bossMode.boss.maxHp);
+            if (healthText) healthText.innerText = `${Math.ceil(pct * 100)}%`;
+            if (healthBar) healthBar.style.width = `${pct * 100}%`;
+            if (objective) objective.innerText = bossMode.boss.config.skill;
+        }
+
+        function failBossMission() {
+            if (bossMode.phase === 'failed') return;
+            bossMode.phase = 'failed';
+            bossMode.player.dragging = false;
+            bossMode.enemies = [];
+            bossMode.projectiles = [];
+            bossMode.enemyProjectiles = [];
+            const failedModal = document.getElementById('boss-failed-modal');
+            const hud = document.getElementById('boss-mode-hud');
+            const cardModal = document.getElementById('boss-card-modal');
+            if (hud) hud.classList.add('hidden');
+            if (cardModal) cardModal.classList.add('hidden');
+            if (failedModal) failedModal.classList.remove('hidden');
+            playSynthSound('earth_hit');
+        }
+
+        function returnToBaseAfterBossFailure() {
+            if (modeTransitionActive) return;
+            const failedModal = document.getElementById('boss-failed-modal');
+            showModeTransition('Returning To Defense Grid', 'Orbital command restored', 'fa-satellite', 1450, () => {
+                if (failedModal) failedModal.classList.add('hidden');
+                bossMode.active = false;
+                bossMode.phase = 'idle';
+                game.mode = 'defense';
+                switchBgm('default');
+                setBuildControlEnabled(true);
+                game.wave++;
+                const wDisp = document.getElementById('wave-display'); if (wDisp) wDisp.innerText = game.wave;
+                const mWDisp = document.getElementById('mobile-wave'); if (mWDisp) mWDisp.innerText = game.wave;
+                setWaveLaunchReady(true);
+                showGameNotice('<i class="fa-solid fa-wrench mr-1"></i> Returned to base. Command systems repaired.', 3200);
+            });
+        }
+
+        function drawBossMode() {
+            const player = bossMode.player;
+            for (const proj of bossMode.projectiles) {
+                ctx.save(); ctx.fillStyle = '#67e8f9'; ctx.shadowBlur = 8; ctx.shadowColor = '#67e8f9'; ctx.beginPath(); ctx.arc(proj.x, proj.y, proj.r, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+            }
+            for (const proj of bossMode.enemyProjectiles) {
+                ctx.save(); ctx.fillStyle = proj.color; ctx.shadowBlur = 10; ctx.shadowColor = proj.color; ctx.beginPath(); ctx.arc(proj.x, proj.y, proj.r, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+            }
+            for (const enemy of bossMode.enemies) {
+                if (!drawEnemySprite(ctx, enemy.type, enemy.x, enemy.y, enemy.size, Math.PI / 2)) {
+                    ctx.fillStyle = enemy.color; ctx.beginPath(); ctx.arc(enemy.x, enemy.y, enemy.size, 0, Math.PI * 2); ctx.fill();
+                }
+            }
+            if (bossMode.phase === 'boss' && bossMode.boss) {
+                drawEnemySprite(ctx, 'Boss Ship', bossMode.boss.x, bossMode.boss.y, bossMode.boss.size, Math.PI / 2);
+            }
+            const playerSpriteSize = player.spriteSize || 58 * gameScale;
+            if (!drawSpriteImage(playerFighterSprite, player.x, player.y, playerSpriteSize, 0)) {
+                ctx.save(); ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.moveTo(player.x, player.y - 24 * gameScale); ctx.lineTo(player.x - 18 * gameScale, player.y + 20 * gameScale); ctx.lineTo(player.x + 18 * gameScale, player.y + 20 * gameScale); ctx.closePath(); ctx.fill(); ctx.restore();
+            }
+            ctx.save();
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+            ctx.fillRect(player.x - 34 * gameScale, player.y + 34 * gameScale, 68 * gameScale, 5 * gameScale);
+            ctx.fillStyle = '#22c55e';
+            ctx.fillRect(player.x - 34 * gameScale, player.y + 34 * gameScale, 68 * gameScale * (player.hp / player.maxHp), 5 * gameScale);
+            ctx.restore();
+        }
+
+        function openBossRewardCards() {
+            bossMode.phase = 'reward';
+            const eligible = COMMAND_DIRECTIVES.filter(directive => getDirectiveLevel(directive.id) < 5);
+            const shuffled = [];
+            const pool = [...eligible];
+            while (shuffled.length < 3 && pool.length > 0) {
+                const totalWeight = pool.reduce((sum, directive) => sum + (DIRECTIVE_RARITY_WEIGHTS[directive.rarity] || 1), 0);
+                let roll = Math.random() * totalWeight;
+                let selectedIndex = 0;
+                for (let i = 0; i < pool.length; i++) {
+                    roll -= DIRECTIVE_RARITY_WEIGHTS[pool[i].rarity] || 1;
+                    if (roll <= 0) { selectedIndex = i; break; }
+                }
+                shuffled.push(pool.splice(selectedIndex, 1)[0]);
+            }
+            bossMode.rewardOptions = shuffled;
+            const modal = document.getElementById('boss-card-modal');
+            const container = document.getElementById('boss-card-options');
+            if (!modal || !container) return;
+            container.innerHTML = shuffled.map(card => {
+                const currentLevel = getDirectiveLevel(card.id);
+                const nextLevel = Math.min(5, currentLevel + 1);
+                return `<button class="boss-reward-card bg-slate-950 hover:bg-slate-900 border border-amber-500/40 rounded-xl p-3 text-left transition-all active:scale-95" data-card-id="${card.id}">
+                <div class="flex justify-between items-start gap-2">
+                    <div class="text-xs font-black uppercase tracking-widest" style="color:${card.color}">${card.name}</div>
+                    <div class="text-[9px] text-amber-300 font-black">LVL ${nextLevel}/5</div>
+                </div>
+	                <div class="text-[9px] text-slate-500 uppercase tracking-widest mt-1">${card.rarity}</div>
+	                <div class="text-[10px] text-slate-300 mt-2 leading-snug font-semibold">${getDirectiveDescription(card, nextLevel)}</div>
+	            </button>`;
+            }).join('');
+            modal.classList.remove('hidden');
+            document.querySelectorAll('.boss-reward-card').forEach(btn => {
+                btn.addEventListener('pointerdown', e => {
+                    e.preventDefault();
+                    const card = bossMode.rewardOptions.find(item => item.id === btn.dataset.cardId);
+                    if (card) chooseBossRewardCard(card);
+                }, { once: true });
+            });
+        }
+
+        function chooseBossRewardCard(card) {
+            if (modeTransitionActive) return;
+            const previousLevel = getDirectiveLevel(card.id);
+            const newLevel = Math.min(5, previousLevel + 1);
+            game.commandDirectives[card.id] = newLevel;
+            applyDirectiveLevelUp(card, previousLevel, newLevel);
+            const modal = document.getElementById('boss-card-modal');
+            const hud = document.getElementById('boss-mode-hud');
+            if (hud) hud.classList.add('hidden');
+            bossMode.phase = 'transition';
+            showModeTransition('Returning To Defense Grid', 'Command Directive uploaded', 'fa-satellite', 1450, () => {
+                if (modal) modal.classList.add('hidden');
+                bossMode.active = false;
+                game.mode = 'defense';
+                switchBgm('default');
+                setBuildControlEnabled(true);
+                game.wave++;
+                const wDisp = document.getElementById('wave-display'); if (wDisp) wDisp.innerText = game.wave;
+                const mWDisp = document.getElementById('mobile-wave'); if (mWDisp) mWDisp.innerText = game.wave;
+                setWaveLaunchReady(true);
+                addGold(600 + game.wave * 30);
+                showGameNotice(`<i class="fa-solid fa-layer-group mr-1"></i> Command Directive upgraded: ${card.name} LVL ${newLevel}`, 3000);
+            });
+        }
+
         // ----------------------------------------------------------------------
         // 8. GAME FLOW CONTROLLERS
         // ----------------------------------------------------------------------
         function startNextWave() {
-            if (waveActive || game.paused) return;
+            if (waveActive || game.paused || modeTransitionActive) return;
+            if (game.wave === 1 && game.towers.length === 0) {
+                showGameNotice('<i class="fa-solid fa-triangle-exclamation mr-1"></i> Deploy at least one satellite before starting Wave 1');
+                const hint = document.getElementById('action-hint');
+                if (hint) hint.innerHTML = `<span class="text-red-300 font-bold">Build one satellite before launching the first wave.</span>`;
+                setWaveLaunchReady(true);
+                return;
+            }
+            if (isBossWave(game.wave)) {
+                startBossMode();
+                return;
+            }
             waveActive = true;
             setWaveLaunchReady(false);
 
-            const enemyCount = 8 + Math.floor(game.wave * 2.5);
+            let enemyCount = 8 + Math.floor(game.wave * 2.5);
+            const riskContract = getDirectiveEffectValue('riskContract');
+            const warBudget = getDirectiveEffectValue('warBudget');
+            if (riskContract) enemyCount = Math.ceil(enemyCount * (1 + riskContract.enemy));
+            if (warBudget) enemyCount = Math.ceil(enemyCount * (1 + warBudget.enemy));
             game.totalWaveEnemies = enemyCount; game.enemiesSpawnedThisWave = 0; spawnQueue = [];
             const spawnGap = Math.max(22, (56 - game.wave * 1.8));
             for (let i = 0; i < enemyCount; i++) spawnQueue.push({ delay: i === 0 ? 0 : spawnGap, waveNum: game.wave });
@@ -2327,18 +3626,33 @@
             const wDisp = document.getElementById('wave-display'); if (wDisp) wDisp.innerText = game.wave; 
             const mWDisp = document.getElementById('mobile-wave'); if (mWDisp) mWDisp.innerText = game.wave;
             setWaveLaunchReady(true);
-            addGold(120 + (game.wave * 20));
+            let waveReward = 120 + (game.wave * 20) + getDirectiveEffectValue('waveGold', 0);
+            const interest = getDirectiveEffectValue('interest');
+            if (interest) waveReward += Math.min(interest.cap, Math.floor(game.gold * interest.rate));
+            const debt = getDirectiveEffectValue('debtFinancing');
+            if (debt) game.gold = Math.max(0, Math.floor(game.gold * (1 - debt.loss)));
+            const waveRepair = getDirectiveEffectValue('waveRepair', 0);
+            if (waveRepair) {
+                for (const tower of game.towers) tower.hp = Math.min(tower.maxHp, tower.hp + tower.maxHp * waveRepair);
+            }
+            addGold(waveReward);
+            if (isBossWave(game.wave)) {
+                showGameNotice('<i class="fa-solid fa-skull mr-1"></i> Detected: Boss Ship Incoming! Prepare for battle!', 5200);
+            }
         }
 
         function triggerCleanGameReset() {
             game.running = true; game.paused = false; game.score = 0; game.wave = 1; game.totalWaveEnemies = 10; game.enemiesSpawnedThisWave = 0;
             game.earthHealth = game.earthMaxHealth; game.earthShield = game.earthMaxShield; game.towers = []; game.enemies = []; game.projectiles = []; game.particles = [];
             game.selectedTower = null; game.selectedShopType = null; game.orbitGridHighlights = false;
+            game.mode = 'defense'; game.commandDirectives = {}; game.directiveKills = 0;
             
             orbitLockStates = [false, true, true]; orbitSlotCapacities = [4, 4, 4]; orbitUpgradesCount = [0, 0, 0]; orbitRotations = [0, 0, 0];
             shieldUpgradeLevel = 0; game.earthMaxShield = 100; game.earthShield = 100;
             
             waveActive = false; spawnQueue = []; spawnTimer = 0; lightningArcsToDraw = []; shipAttackBeamsToDraw = [];
+            resetBossMode();
+            updateBossCardList();
             
             ['wave-display', 'mobile-wave'].forEach(id => { const el = document.getElementById(id); if (el) el.innerText = game.wave; });
             const scoreDisplay = document.getElementById('score-display'); if (scoreDisplay) scoreDisplay.innerText = game.score;
@@ -2353,8 +3667,10 @@
             ['shield-bar', 'mobile-shield-bar'].forEach(id => { const el = document.getElementById(id); if (el) el.style.width = '100%'; });
             
             setWaveLaunchReady(true);
+            setBuildControlEnabled(true);
             
             closeInspector(); closeOrbitInspector(); closeBlueprintDrawer();
+            setStarterTooltipsVisible(true);
 
             const devModeCheckbox = document.getElementById('dev-mode-checkbox');
             const isDevModeActive = devModeCheckbox ? devModeCheckbox.checked : false;
@@ -2362,13 +3678,21 @@
             
             const gameoverModal = document.getElementById('gameover-modal');
             if (gameoverModal) gameoverModal.classList.add('hidden');
+            switchBgm('default');
         }
 
         // ----------------------------------------------------------------------
         // 9. POINTER CONTROL DISPATCHER
         // ----------------------------------------------------------------------
+        function updateBossDragPosition(e) {
+            const coords = getPointerCoords(e);
+            bossMode.player.targetX = coords.x - (bossMode.player.dragOffsetX || 0);
+            bossMode.player.targetY = coords.y - (bossMode.player.dragOffsetY || 0);
+        }
+
         function handlePointerDown(e) {
             if (!game || !game.running) return; 
+            if (game.mode === 'boss') return;
             const now = Date.now();
             if (now - lastInputTime < 100) return; 
             lastInputTime = now;
@@ -2377,11 +3701,18 @@
             
             const centerX = canvas.width / 2; const centerY = canvas.height / 2;
             if (!game.selectedShopType && Math.hypot(coords.x - centerX, coords.y - centerY) < getPlanetTapRadius()) {
+                tutorialHints.planet = false;
+                updateTutorialTooltips();
                 toggleOrbitInspector(); return;
             }
 
             calculateHoveredOrbitAndAngle(coords.x, coords.y);
             if (game.selectedShopType) {
+                if (!hasEmptyDeployableOrbitSlot()) {
+                    notifyNoEmptyOrbitSlots();
+                    cancelBuildMode({ keepHint: true });
+                    return;
+                }
                 const { closest, dist } = getClosestSlot(coords.x, coords.y);
                 if (!closest || dist > getSlotTapRadius()) {
                     const hint = document.getElementById('action-hint');
@@ -2397,12 +3728,13 @@
 
                 const orbitIndex = closest.orbitIndex;
                 const slotIndex = closest.slotIndex;
-                const cost = SATELLITE_CONFIGS[game.selectedShopType].cost;
+                const cost = getSatelliteBuildCost(game.selectedShopType);
 	                if (game.gold >= cost) {
 	                    if (!game.towers.some(t => t.orbitIndex === orbitIndex && t.slotIndex === slotIndex)) {
 	                        const deployedType = game.selectedShopType;
 	                        spendGold(cost);
 	                        const newSat = new Satellite(deployedType, orbitIndex, slotIndex);
+	                        newSat.investedGold = cost;
 	                        game.towers.push(newSat); game.towersBuiltCount++;
 	                        playSynthSound('upgrade'); createExplosion(newSat.x, newSat.y, SATELLITE_CONFIGS[deployedType].color, 12);
 
@@ -2412,14 +3744,22 @@
 	                            game.orbitGridHighlights = false;
 	                            if (hint) hint.innerText = "Select another satellite blueprint to continue building.";
 	                            openBlueprintDrawer(false);
-	                        } else if (game.gold >= SATELLITE_CONFIGS[deployedType].cost) {
+	                            updateBuildButtonState();
+	                        } else if (game.gold >= getSatelliteBuildCost(deployedType) && hasEmptyDeployableOrbitSlot()) {
 	                            game.selectedShopType = deployedType;
 	                            game.orbitGridHighlights = true;
 	                            if (hint) hint.innerHTML = `Deployment Mode: <span class="text-emerald-400 font-bold">Continue placing ${SATELLITE_CONFIGS[deployedType].name}, or select another blueprint.</span>`;
+	                            updateBuildButtonState();
+	                        } else if (!hasEmptyDeployableOrbitSlot()) {
+	                            game.selectedShopType = null;
+	                            game.orbitGridHighlights = false;
+	                            notifyNoEmptyOrbitSlots();
+	                            updateBuildButtonState();
 	                        } else {
 	                            game.selectedShopType = null;
 	                            game.orbitGridHighlights = false;
 	                            if (hint) hint.innerHTML = `<span class="text-red-400 font-bold">Insufficient credits to continue building ${SATELLITE_CONFIGS[deployedType].name}.</span>`;
+	                            updateBuildButtonState();
 	                        }
 	                        updateShopAvailability();
 	                    } else {
@@ -2430,15 +3770,17 @@
 	                    const hint = document.getElementById('action-hint');
 	                    if (hint) hint.innerHTML = `<span class="text-red-400 font-bold">Need ${cost} Gold!</span>`;
 	                    if (isMobileBuildView()) {
-	                        game.selectedShopType = null;
-	                        game.orbitGridHighlights = false;
-	                        openBlueprintDrawer(false);
-	                        updateShopAvailability();
-	                    } else {
-	                        game.selectedShopType = null;
-	                        game.orbitGridHighlights = false;
-	                        updateShopAvailability();
-	                    }
+		                        game.selectedShopType = null;
+		                        game.orbitGridHighlights = false;
+		                        openBlueprintDrawer(false);
+		                        updateShopAvailability();
+		                        updateBuildButtonState();
+		                    } else {
+		                        game.selectedShopType = null;
+		                        game.orbitGridHighlights = false;
+		                        updateShopAvailability();
+		                        updateBuildButtonState();
+		                    }
 	                }
                 return;
             }
@@ -2494,49 +3836,69 @@
         bindButton('close-planet-options-btn', () => { const config = document.getElementById('inline-planet-options'); if (config) config.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('close-settings-options-btn', () => { const settings = document.getElementById('inline-settings-options'); if (settings) settings.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('close-encyclopedia-options-btn', () => { const encyclopedia = document.getElementById('inline-encyclopedia-options'); if (encyclopedia) encyclopedia.classList.add('hidden'); playSynthSound('upgrade'); });
+        bindButton('encyclopedia-menu-satellites', () => { scrollEncyclopediaTo('satellites'); });
+        bindButton('encyclopedia-menu-rocks', () => { scrollEncyclopediaTo('rocks'); });
+        bindButton('encyclopedia-menu-ships', () => { scrollEncyclopediaTo('ships'); });
+        bindButton('encyclopedia-menu-directives', () => { scrollEncyclopediaTo('directives'); });
         bindButton('close-install-options-btn', () => { const installPanel = document.getElementById('inline-install-options'); if (installPanel) installPanel.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('android-install-btn', triggerAndroidInstall);
 
-        bindButton('open-build-drawer-btn', toggleBlueprintDrawer);
+        bindButton('open-build-drawer-btn', () => {
+            tutorialHints.build = false;
+            updateTutorialTooltips();
+            if (game.selectedShopType) {
+                cancelBuildMode();
+                return;
+            }
+            toggleBlueprintDrawer();
+        });
         bindButton('settings-audio-toggle', toggleAudioState);
+        bindButton('settings-scanlines-toggle', toggleScanlineState);
         bindButton('pause-audio-toggle', toggleAudioState);
 
-        bindButton('resume-game-btn', () => { game.paused = false; const pm = document.getElementById('pause-modal'); if (pm) pm.classList.add('hidden'); playSynthSound('upgrade'); });
+        bindButton('resume-game-btn', () => { game.paused = false; syncBgm(); const pm = document.getElementById('pause-modal'); if (pm) pm.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('pause-restart-game-btn', () => { const pm = document.getElementById('pause-modal'); if (pm) pm.classList.add('hidden'); triggerCleanGameReset(); playSynthSound('upgrade'); });
-        bindButton('quit-to-menu-btn', () => { game.running = false; game.paused = false; const pm = document.getElementById('pause-modal'); if (pm) pm.classList.add('hidden'); const im = document.getElementById('intro-modal'); if (im) im.classList.remove('hidden'); playSynthSound('earth_hit'); });
+        bindButton('quit-to-menu-btn', () => { game.running = false; game.paused = false; game.mode = 'defense'; resetBossMode(); setBuildControlEnabled(true); switchBgm('default'); const pm = document.getElementById('pause-modal'); if (pm) pm.classList.add('hidden'); const im = document.getElementById('intro-modal'); if (im) im.classList.remove('hidden'); playSynthSound('earth_hit'); });
         bindButton('restart-game-btn', triggerCleanGameReset);
-        bindButton('gameover-quit-btn', () => { game.running = false; game.paused = false; const gm = document.getElementById('gameover-modal'); if (gm) gm.classList.add('hidden'); const im = document.getElementById('intro-modal'); if (im) im.classList.remove('hidden'); playSynthSound('earth_hit'); });
+        bindButton('gameover-quit-btn', () => { game.running = false; game.paused = false; game.mode = 'defense'; resetBossMode(); setBuildControlEnabled(true); switchBgm('default'); const gm = document.getElementById('gameover-modal'); if (gm) gm.classList.add('hidden'); const im = document.getElementById('intro-modal'); if (im) im.classList.remove('hidden'); playSynthSound('earth_hit'); });
         bindButton('next-wave-btn', startNextWave);
         bindButton('mobile-launch-btn', startNextWave);
         bindButton('settings-toggle-btn', triggerPauseToggle);
         bindButton('mobile-settings-toggle-btn', triggerPauseToggle);
+        bindButton('boss-failed-return-btn', returnToBaseAfterBossFailure);
 
-        ['laser', 'plasma', 'missile', 'railgun', 'lasersentry', 'lightningsentry', 'magnetsentry'].forEach(type => {
-            bindButton('shop-' + type, () => {
-                const ah = document.getElementById('action-hint');
-                if (game.selectedShopType === type && isMobileBuildView()) {
-                    game.selectedShopType = null;
-                    game.orbitGridHighlights = false;
-                    if (ah) ah.innerText = "Tap the planet core to open Master Command, or tap BUILD to deploy satellites!";
-                } else {
-                    game.selectedShopType = type;
-                    game.orbitGridHighlights = true;
-                    if (ah) ah.innerHTML = `Deployment Mode: <span class="text-emerald-400 font-bold">Tap near any glowing empty slot to place ${SATELLITE_CONFIGS[type].name}</span>`;
-                    if (isMobileBuildView()) closeBlueprintDrawer();
-                }
-                updateShopAvailability();
-            });
-        });
+	        ['laser', 'plasma', 'missile', 'railgun', 'lasersentry', 'lightningsentry', 'magnetsentry'].forEach(type => {
+	            bindButton('shop-' + type, () => {
+	                const ah = document.getElementById('action-hint');
+	                if (game.selectedShopType === type) {
+	                    cancelBuildMode();
+	                } else {
+	                    if (!hasEmptyDeployableOrbitSlot()) {
+	                        notifyNoEmptyOrbitSlots();
+	                        cancelBuildMode({ keepHint: true });
+	                        return;
+	                    }
+	                    game.selectedShopType = type;
+	                    game.orbitGridHighlights = true;
+	                    if (ah) ah.innerHTML = `Deployment Mode: <span class="text-emerald-400 font-bold">Tap near any glowing empty slot to place ${SATELLITE_CONFIGS[type].name}</span>`;
+	                    if (isMobileBuildView()) closeBlueprintDrawer();
+	                }
+	                updateShopAvailability();
+	                updateBuildButtonState();
+	            });
+	        });
 
-        bindButton('btn-upgrade-dmg', () => { const t = game.selectedTower; if (!t || t.dmgLvl >= 10) return; const cost = getStatUpgradeCost(SATELLITE_CONFIGS[t.type].cost, t.dmgLvl); if (game.gold >= cost) { spendGold(cost); t.investedGold += cost; t.dmgLvl++; playSynthSound('upgrade'); selectTower(t); createExplosion(t.x, t.y, '#22d3ee', 10); } });
-        bindButton('btn-upgrade-rate', () => { const t = game.selectedTower; if (!t || t.rateLvl >= 10) return; const cost = getStatUpgradeCost(SATELLITE_CONFIGS[t.type].cost, t.rateLvl); if (game.gold >= cost) { spendGold(cost); t.investedGold += cost; t.rateLvl++; playSynthSound('upgrade'); selectTower(t); createExplosion(t.x, t.y, '#34d399', 10); } });
-        bindButton('btn-upgrade-rng', () => { const t = game.selectedTower; if (!t || t.rngLvl >= 10) return; const cost = getStatUpgradeCost(SATELLITE_CONFIGS[t.type].cost, t.rngLvl); if (game.gold >= cost) { spendGold(cost); t.investedGold += cost; t.rngLvl++; playSynthSound('upgrade'); selectTower(t); createExplosion(t.x, t.y, '#c084fc', 10); } });
+        bindButton('btn-upgrade-dmg', () => { const t = game.selectedTower; if (!t || t.dmgLvl >= 10) return; const cost = getStatUpgradeCost(SATELLITE_CONFIGS[t.type].cost, t.dmgLvl, t.type); if (game.gold >= cost) { spendGold(cost); t.investedGold += cost; t.dmgLvl++; playSynthSound('upgrade'); selectTower(t); createExplosion(t.x, t.y, '#22d3ee', 10); } });
+        bindButton('btn-upgrade-rate', () => { const t = game.selectedTower; if (!t || t.rateLvl >= 10) return; const cost = getStatUpgradeCost(SATELLITE_CONFIGS[t.type].cost, t.rateLvl, t.type); if (game.gold >= cost) { spendGold(cost); t.investedGold += cost; t.rateLvl++; playSynthSound('upgrade'); selectTower(t); createExplosion(t.x, t.y, '#34d399', 10); } });
+        bindButton('btn-upgrade-rng', () => { const t = game.selectedTower; if (!t || t.rngLvl >= 10) return; const cost = getStatUpgradeCost(SATELLITE_CONFIGS[t.type].cost, t.rngLvl, t.type); if (game.gold >= cost) { spendGold(cost); t.investedGold += cost; t.rngLvl++; playSynthSound('upgrade'); selectTower(t); createExplosion(t.x, t.y, '#c084fc', 10); } });
         bindButton('btn-repair-sat', () => { const t = game.selectedTower; if (!t) return; const cost = getSatelliteRepairCost(t); if (cost > 0 && game.gold >= cost) { spendGold(cost); t.investedGold += cost; t.hp = t.maxHp; playSynthSound('upgrade'); createExplosion(t.x, t.y, '#f59e0b', 12); selectTower(t); } });
         bindButton('btn-destroy-sat', () => { if (!game.selectedTower) return; const t = game.selectedTower; const refund = getSatelliteSalvageValue(t); addGold(refund); createExplosion(t.x, t.y, '#f59e0b', 15); playSynthSound('upgrade'); game.towers = game.towers.filter(item => item.id !== t.id); closeInspector(); });
 
         for (let i = 0; i < 3; i++) {
             bindButton(`orbit-btn-${i}`, () => { handleOrbitButtonPress(i); });
         }
+        bindButton('accordion-orbits-btn', () => { setMasterAccordion('orbits'); });
+        bindButton('accordion-directives-btn', () => { setMasterAccordion('directives'); });
 
         bindButton('cmd-repair-shield', () => { const cost = 150; if (game.gold >= cost && game.earthShield < game.earthMaxShield) { spendGold(cost); game.earthShield = Math.min(game.earthMaxShield, game.earthShield + 40); const st = document.getElementById('shield-text'); const mst = document.getElementById('mobile-shield-text'); if (st) st.innerText = `${game.earthShield} / ${game.earthMaxShield}`; if (mst) mst.innerText = `${game.earthShield}/${game.earthMaxShield}`; const shieldWPercent = `${(game.earthShield / game.earthMaxShield) * 100}%`; const sb = document.getElementById('shield-bar'); const msb = document.getElementById('mobile-shield-bar'); if (sb) sb.style.width = shieldWPercent; if (msb) msb.style.width = shieldWPercent; playSynthSound('upgrade'); createExplosion(canvas.width/2, canvas.height/2, '#22d3ee', 15); const ah = document.getElementById('action-hint'); if (ah) ah.innerHTML = `<span class="text-emerald-400 font-bold">Shield integrity recharged!</span>`; } else { const ah = document.getElementById('action-hint'); if (ah) ah.innerHTML = game.earthShield >= game.earthMaxShield ? `<span class="text-red-400 font-bold">Shield is fully charged!</span>` : `<span class="text-red-400 font-bold">Need ${cost} Gold!</span>`; } });
         bindButton('cmd-upgrade-shield', () => { if (shieldUpgradeLevel >= 6) return; const cost = 200 + shieldUpgradeLevel * 150; if (game.gold >= cost) { spendGold(cost); shieldUpgradeLevel++; game.earthMaxShield += 25; game.earthShield += 25; const st = document.getElementById('shield-text'); const mst = document.getElementById('mobile-shield-text'); if (st) st.innerText = `${game.earthShield} / ${game.earthMaxShield}`; if (mst) mst.innerText = `${game.earthShield}/${game.earthMaxShield}`; const shieldWPercent = `${(game.earthShield / game.earthMaxShield) * 100}%`; const sb = document.getElementById('shield-bar'); const msb = document.getElementById('mobile-shield-bar'); if (sb) sb.style.width = shieldWPercent; if (msb) msb.style.width = shieldWPercent; playSynthSound('upgrade'); createExplosion(canvas.width/2, canvas.height/2, '#06b6d4', 20); updateOrbitInspectorUI(); const ah = document.getElementById('action-hint'); if (ah) ah.innerHTML = `<span class="text-emerald-400 font-bold">Maximum Shield Capacity expanded!</span>`; } else { const ah = document.getElementById('action-hint'); if (ah) ah.innerHTML = `<span class="text-red-400 font-bold">Need ${cost} Gold!</span>`; } });
@@ -2555,8 +3917,45 @@
             planetNameInput.addEventListener('input', (e) => { const rawName = e.target.value.trim(); planetName = rawName !== "" ? rawName.toUpperCase() : "EARTH"; document.querySelectorAll('.planet-name-label').forEach(lbl => lbl.innerText = planetName); });
         }
 
-        canvas.addEventListener('pointerdown', (e) => { e.preventDefault(); handlePointerDown(e); });
-        canvas.addEventListener('pointermove', (e) => { const coords = getPointerCoords(e); game.mousePos = coords; if (game && game.selectedShopType) calculateHoveredOrbitAndAngle(coords.x, coords.y); });
+        canvas.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            if (game.mode === 'boss' && bossMode.active && bossMode.phase !== 'reward' && bossMode.phase !== 'failed') {
+                const coords = getPointerCoords(e);
+                const pickupRadius = Math.max(34, getPlayerFighterHitRadius() * 1.75);
+                if (Math.hypot(coords.x - bossMode.player.x, coords.y - bossMode.player.y) <= pickupRadius) {
+                    bossMode.player.dragging = true;
+                    bossMode.player.dragOffsetX = coords.x - bossMode.player.x;
+                    bossMode.player.dragOffsetY = coords.y - bossMode.player.y;
+                    if (canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
+                }
+                return;
+            }
+            handlePointerDown(e);
+        });
+        canvas.addEventListener('pointermove', (e) => {
+            const coords = getPointerCoords(e);
+            game.mousePos = coords;
+            if (game.mode === 'boss' && bossMode.active && bossMode.player.dragging && bossMode.phase !== 'reward' && bossMode.phase !== 'failed') {
+                updateBossDragPosition(e);
+                return;
+            }
+            if (game && game.selectedShopType) calculateHoveredOrbitAndAngle(coords.x, coords.y);
+        });
+        canvas.addEventListener('pointerup', (e) => {
+            if (game.mode === 'boss' && bossMode.active) {
+                bossMode.player.dragging = false;
+                bossMode.player.dragOffsetX = 0;
+                bossMode.player.dragOffsetY = 0;
+                if (canvas.releasePointerCapture) canvas.releasePointerCapture(e.pointerId);
+            }
+        });
+        canvas.addEventListener('pointercancel', () => {
+            if (game.mode === 'boss' && bossMode.active) {
+                bossMode.player.dragging = false;
+                bossMode.player.dragOffsetX = 0;
+                bossMode.player.dragOffsetY = 0;
+            }
+        });
 
         bindDismissButton('close-inspect', closeInspector);
         bindDismissButton('close-orbit-inspect', closeOrbitInspector);
@@ -2579,6 +3978,19 @@
             drawCosmicBackground();
 
             const centerX = canvas.width / 2; const centerY = canvas.height / 2;
+            updateTutorialTooltips();
+
+            if (game.mode === 'boss' && bossMode.active) {
+                if (!game.paused && !modeTransitionActive && bossMode.phase !== 'reward' && bossMode.phase !== 'failed' && bossMode.phase !== 'transition') updateBossMode();
+                drawBossMode();
+                for (let i = game.particles.length - 1; i >= 0; i--) {
+                    const part = game.particles[i];
+                    part.update();
+                    part.draw();
+                    if (part.alpha <= 0) game.particles.splice(i, 1);
+                }
+                return;
+            }
 
             for (let i = 0; i < ORBIT_PATHS.length; i++) {
                 if (!orbitLockStates[i] && (!game.paused || !game.running)) orbitRotations[i] += 0.0015 / ((i + 1) * 0.6);
@@ -2632,8 +4044,15 @@
             drawEarth(centerX, centerY);
 
             for (let tower of game.towers) {
-                if (game.running && !game.paused) tower.update(game.enemies);
+                if (game.running && !game.paused && !modeTransitionActive) tower.update(game.enemies);
                 tower.draw();
+            }
+
+            if (modeTransitionActive) {
+                for (let enemy of game.enemies) enemy.draw();
+                for (let proj of game.projectiles) proj.draw();
+                for (let part of game.particles) part.draw();
+                return;
             }
 
             // Draw active lightning chain jump lines with rapid fade decay
@@ -2708,16 +4127,32 @@
                     }
                 }
                 
-                if (distToCenter < EARTH_RADIUS + 8) {
-                    createExplosion(enemy.x, enemy.y, enemy.color, 12);
-                    if (game.earthShield > 0) {
-                        const remainingDamage = Math.max(0, enemy.damage - game.earthShield);
-                        game.earthShield = Math.max(0, game.earthShield - enemy.damage);
-                        if (remainingDamage > 0) game.earthHealth = Math.max(0, game.earthHealth - remainingDamage);
-                        playSynthSound(remainingDamage > 0 ? 'earth_hit' : 'shield_deflect');
-                    } else {
-                        game.earthHealth = Math.max(0, game.earthHealth - enemy.damage); playSynthSound('earth_hit');
-                    }
+	                if (distToCenter < EARTH_RADIUS + 8) {
+	                    createExplosion(enemy.x, enemy.y, enemy.color, 12);
+	                    const damageMultiplier = Math.max(0.15, 1 - getDirectiveEffectValue('coreDamageReduction', 0) + (getDirectiveEffectValue('corePowered') ? getDirectiveEffectValue('corePowered').taken : 0));
+	                    const incomingDamage = Math.max(1, Math.floor(enemy.damage * damageMultiplier));
+	                    const shieldBeforeHit = game.earthShield;
+	                    if (game.earthShield > 0) {
+	                        const remainingDamage = Math.max(0, incomingDamage - game.earthShield);
+	                        game.earthShield = Math.max(0, game.earthShield - incomingDamage);
+	                        if (remainingDamage > 0) game.earthHealth = Math.max(0, game.earthHealth - remainingDamage);
+	                        playSynthSound(remainingDamage > 0 ? 'earth_hit' : 'shield_deflect');
+	                    } else {
+	                        game.earthHealth = Math.max(0, game.earthHealth - incomingDamage); playSynthSound('earth_hit');
+	                    }
+	                    if (shieldBeforeHit > 0 && game.earthShield <= 0) {
+	                        const shockDamage = getDirectiveEffectValue('shieldBreakDamage', 0);
+	                        if (shockDamage) {
+	                            for (const e of game.enemies) {
+	                                e.hp -= shockDamage;
+	                                if (shockDamage >= 320) {
+	                                    e.slowMultiplier = Math.min(e.slowMultiplier, shockDamage >= 460 ? 0.35 : 0.55);
+	                                    e.slowTimer = Math.max(e.slowTimer, 180);
+	                                }
+	                            }
+	                            createExplosion(centerX, centerY, '#67e8f9', 35);
+	                        }
+	                    }
 
                     const shieldWPercent = `${(game.earthShield / game.earthMaxShield) * 100}%`;
                     const shieldText = document.getElementById('shield-text'); const mobileShieldText = document.getElementById('mobile-shield-text');
@@ -2751,7 +4186,26 @@
 
                 if (enemy.hp <= 0) {
                     createExplosion(enemy.x, enemy.y, enemy.color, 16);
-                    addGold(enemy.goldReward); game.score += enemy.goldReward * 2; 
+                    let rewardMultiplier = 1;
+                    const riskContract = getDirectiveEffectValue('riskContract'); if (riskContract) rewardMultiplier += riskContract.reward;
+                    const rewardHpTradeoff = getDirectiveEffectValue('rewardHpTradeoff'); if (rewardHpTradeoff) rewardMultiplier += rewardHpTradeoff.reward;
+                    const rockRewardSpeed = getDirectiveEffectValue('rockRewardSpeed'); if (enemy.category === 'normal' && rockRewardSpeed) rewardMultiplier += rockRewardSpeed.reward;
+                    const shipReward = getDirectiveEffectValue('shipReward'); if (enemy.category === 'ship' && shipReward) rewardMultiplier += shipReward;
+                    const eliteIncentive = getDirectiveEffectValue('eliteIncentive'); if (enemy.category === 'ship' && eliteIncentive) rewardMultiplier *= eliteIncentive.reward;
+                    const reward = Math.floor(enemy.goldReward * rewardMultiplier);
+                    addGold(reward); game.score += reward * 2; 
+                    const shieldPerKill = getDirectiveEffectValue('shieldPerKill', 0);
+                    const fragileShield = getDirectiveEffectValue('fragileShield');
+                    const shieldGain = shieldPerKill + (fragileShield ? fragileShield.shieldKill : 0);
+                    if (shieldGain > 0) {
+                        game.earthShield = Math.min(game.earthMaxShield, game.earthShield + shieldGain);
+                        syncPlanetBars();
+                    }
+                    const scrap = getDirectiveEffectValue('scrapEveryKills');
+                    if (scrap) {
+                        game.directiveKills++;
+                        if (game.directiveKills % scrap.kills === 0) addGold(scrap.gold);
+                    }
                     const scoreDisplay = document.getElementById('score-display');
                     if (scoreDisplay) scoreDisplay.innerText = game.score;
                     game.enemies.splice(i, 1);
@@ -2775,9 +4229,13 @@
 
         // Run engine setup and kick off main execution pipeline
         if (planetNameInput) planetNameInput.value = "EARTH";
+        const appVersionLabel = document.getElementById('app-version-label');
+        if (appVersionLabel) appVersionLabel.innerText = `Version: ${APP_VERSION}`;
         syncAudioUI();
+        syncScanlineUI();
         registerPwaSupport();
         syncInstallUI();
+        startTitleBgm();
         loop();
     </script>
 </body>
