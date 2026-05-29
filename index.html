@@ -712,7 +712,7 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        const APP_VERSION = '2026.05.29.49';
+        const APP_VERSION = '2026.05.29.51';
 
         let gameScale = 1;
         let rangeScale = 1;
@@ -747,6 +747,7 @@
         let deferredInstallPrompt = null;
         let gameNoticeTimer = null;
         let tutorialHints = { planet: false, build: false };
+        let starterTooltipsSuppressed = false;
         let modeTransitionActive = false;
         let gameLoopStarted = false;
 
@@ -2412,8 +2413,14 @@
         }
 
         function setStarterTooltipsVisible(isVisible) {
+            starterTooltipsSuppressed = false;
             tutorialHints.planet = isVisible;
             tutorialHints.build = isVisible;
+            updateTutorialTooltips();
+        }
+
+        function suppressStarterTooltips(isSuppressed) {
+            starterTooltipsSuppressed = isSuppressed;
             updateTutorialTooltips();
         }
 
@@ -2425,7 +2432,7 @@
             const inputWord = isCoarsePointerInput() ? 'Tap' : 'Click';
 
             if (planetTip) {
-                if (game.running && !hasIntroOpen && tutorialHints.planet) {
+                if (game.running && !hasIntroOpen && !starterTooltipsSuppressed && tutorialHints.planet) {
                     const centerX = canvas.width / 2;
                     const centerY = canvas.height / 2;
                     const safeTopOffset = window.visualViewport ? window.visualViewport.offsetTop : 0;
@@ -2443,7 +2450,7 @@
             if (buildTip) {
                 const buildText = document.getElementById('build-tutorial-text');
                 if (buildText) buildText.innerText = `${inputWord} here to deploy satellites`;
-                buildTip.classList.toggle('hidden', !(game.running && !hasIntroOpen && tutorialHints.build));
+                buildTip.classList.toggle('hidden', !(game.running && !hasIntroOpen && !starterTooltipsSuppressed && tutorialHints.build));
                 const buildButton = document.getElementById('open-build-drawer-btn');
                 if (buildButton && !buildTip.classList.contains('hidden')) {
                     const tipRect = buildTip.getBoundingClientRect();
@@ -3192,7 +3199,7 @@
             setWaveLaunchReady(false);
             setBuildControlEnabled(false);
             closeInspector(); closeOrbitInspector(); closeBlueprintDrawer();
-            setStarterTooltipsVisible(false);
+            suppressStarterTooltips(true);
             showModeTransition('Boss Intercept Mode', 'Manual fighter control engaged', 'fa-skull', 1450, () => {
                 game.mode = 'boss';
                 switchBgm('boss');
@@ -3420,6 +3427,7 @@
                 game.mode = 'defense';
                 switchBgm('default');
                 setBuildControlEnabled(true);
+                suppressStarterTooltips(false);
                 game.wave++;
                 const wDisp = document.getElementById('wave-display'); if (wDisp) wDisp.innerText = game.wave;
                 const mWDisp = document.getElementById('mobile-wave'); if (mWDisp) mWDisp.innerText = game.wave;
@@ -3513,6 +3521,7 @@
                 game.mode = 'defense';
                 switchBgm('default');
                 setBuildControlEnabled(true);
+                suppressStarterTooltips(false);
                 game.wave++;
                 const wDisp = document.getElementById('wave-display'); if (wDisp) wDisp.innerText = game.wave;
                 const mWDisp = document.getElementById('mobile-wave'); if (mWDisp) mWDisp.innerText = game.wave;
@@ -3534,6 +3543,7 @@
                 setWaveLaunchReady(true);
                 return;
             }
+            suppressStarterTooltips(true);
             if (isBossWave(game.wave)) {
                 startBossMode();
                 return;
@@ -3562,6 +3572,7 @@
 
         function endWave() {
             waveActive = false; game.wave++;
+            suppressStarterTooltips(false);
             const wDisp = document.getElementById('wave-display'); if (wDisp) wDisp.innerText = game.wave; 
             const mWDisp = document.getElementById('mobile-wave'); if (mWDisp) mWDisp.innerText = game.wave;
             setWaveLaunchReady(true);
@@ -3860,13 +3871,10 @@
             e.preventDefault();
             if (game.mode === 'boss' && bossMode.active && bossMode.phase !== 'reward' && bossMode.phase !== 'failed') {
                 const coords = getPointerCoords(e);
-                const pickupRadius = Math.max(34, getPlayerFighterHitRadius() * 1.75);
-                if (Math.hypot(coords.x - bossMode.player.x, coords.y - bossMode.player.y) <= pickupRadius) {
-                    bossMode.player.dragging = true;
-                    bossMode.player.dragOffsetX = coords.x - bossMode.player.x;
-                    bossMode.player.dragOffsetY = coords.y - bossMode.player.y;
-                    if (canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
-                }
+                bossMode.player.dragging = true;
+                bossMode.player.dragOffsetX = coords.x - bossMode.player.x;
+                bossMode.player.dragOffsetY = coords.y - bossMode.player.y;
+                if (canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
                 return;
             }
             handlePointerDown(e);
