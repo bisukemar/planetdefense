@@ -232,6 +232,11 @@
                 <div id="boss-victory-title" class="text-cyan-200 text-xs md:text-sm font-black uppercase tracking-widest">Boss Ship Destroyed</div>
                 <p id="boss-victory-story" class="text-slate-300 text-[10px] md:text-xs leading-relaxed mt-2 font-bold"></p>
             </div>
+            <div class="mt-4 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-amber-500/70 to-amber-500/20"></div>
+                <div class="text-amber-300 text-[10px] md:text-xs uppercase tracking-[0.28em] font-black">Choose One</div>
+                <div class="h-px flex-1 bg-gradient-to-l from-transparent via-amber-500/70 to-amber-500/20"></div>
+            </div>
             <div id="boss-card-options" class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4"></div>
         </div>
     </div>
@@ -387,44 +392,36 @@
                     <span id="cost-repair-sat" class="text-[8px] font-bold"><i class="fa-solid fa-coins"></i> 0</span>
                 </button>
             </div>
-            <div class="bg-slate-950/60 p-2 rounded border border-slate-800/85 flex justify-between items-center gap-2 font-bold">
-                <div class="flex-1 min-w-0 font-semibold font-bold">
-                    <div class="flex justify-between text-[10px] text-cyan-300 font-bold">
-                        <span>POW: <span id="inspect-dmg" class="text-slate-200 font-bold">12</span></span>
-                        <span>LVL <span id="inspect-dmg-lvl">1</span>/10</span>
-                    </div>
-                    <div class="flex gap-0.5 mt-1" id="dmg-lvl-dots"></div>
+            <div class="bg-slate-950/60 p-2 rounded border border-slate-800/85 font-bold">
+                <div class="flex justify-between text-[10px] text-amber-300 font-bold">
+                    <span>SATELLITE LEVEL</span>
+                    <span>LVL <span id="inspect-sat-lvl">1</span>/10</span>
                 </div>
-                <button id="btn-upgrade-dmg" class="bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-black px-2 py-1.5 rounded text-[10px] flex flex-col items-center min-w-[70px] select-none">
-                    <span>UPGRADE</span>
-                    <span id="cost-upgrade-dmg" class="text-[8px] font-bold"><i class="fa-solid fa-coins font-bold"></i> 50</span>
+                <div class="grid grid-cols-3 gap-1.5 mt-2 text-[9px] font-black uppercase tracking-wider">
+                    <div class="bg-slate-900/80 border border-cyan-500/20 rounded p-1.5">
+                        <div class="text-cyan-300">POW</div>
+                        <div id="inspect-dmg" class="text-slate-100 tech-font text-[11px]">12</div>
+                    </div>
+                    <div class="bg-slate-900/80 border border-emerald-500/20 rounded p-1.5">
+                        <div class="text-emerald-300">SPD</div>
+                        <div id="inspect-rate" class="text-slate-100 tech-font text-[11px]">1.2</div>
+                    </div>
+                    <div class="bg-slate-900/80 border border-purple-500/20 rounded p-1.5">
+                        <div class="text-purple-300">RNG</div>
+                        <div id="inspect-rng" class="text-slate-100 tech-font text-[11px]">150</div>
+                    </div>
+                </div>
+                <div class="flex gap-0.5 mt-2" id="sat-lvl-dots"></div>
+                <button id="btn-upgrade-sat" class="w-full mt-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2 rounded text-[10px] flex items-center justify-center gap-2 select-none">
+                    <span>UPGRADE SATELLITE</span>
+                    <span id="cost-upgrade-sat" class="text-[8px] font-bold"><i class="fa-solid fa-coins"></i> 75</span>
                 </button>
             </div>
-            <div class="bg-slate-950/60 p-2 rounded border border-slate-800 flex justify-between items-center gap-2 font-bold">
-                <div class="flex-1 min-w-0 font-semibold font-bold">
-                    <div class="flex justify-between text-[10px] text-emerald-300 font-bold">
-                        <span>SPD: <span id="inspect-rate" class="text-slate-200">1.2s</span></span>
-                        <span>LVL <span id="inspect-rate-lvl">1</span>/10</span>
-                    </div>
-                    <div class="flex gap-0.5 mt-1" id="rate-lvl-dots"></div>
+            <div class="bg-slate-950/60 p-2 rounded border border-sky-500/20 font-bold">
+                <div class="text-[10px] text-sky-300 uppercase tracking-widest font-black">Active Stat Bonuses</div>
+                <div id="inspect-bonus-list" class="mt-1.5 flex flex-wrap gap-1 text-[8px] text-slate-300 font-bold">
+                    <span class="text-slate-500">No active directive bonuses.</span>
                 </div>
-                <button id="btn-upgrade-rate" class="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black px-2 py-1.5 rounded text-[10px] flex flex-col items-center min-w-[70px] select-none">
-                    <span>UPGRADE</span>
-                    <span id="cost-upgrade-rate" class="text-[8px] font-bold"><i class="fa-solid fa-coins font-bold"></i> 50</span>
-                </button>
-            </div>
-            <div class="bg-slate-950/60 p-2 rounded border border-slate-800 flex justify-between items-center gap-2 font-bold">
-                <div class="flex-1 min-w-0 font-semibold font-bold">
-                    <div class="flex justify-between text-[10px] text-purple-300 font-bold">
-                        <span>RNG: <span id="inspect-rng" class="text-slate-200 font-bold">150</span></span>
-                        <span>LVL <span id="inspect-rng-lvl">1</span>/10</span>
-                    </div>
-                    <div class="flex gap-0.5 mt-1" id="rng-lvl-dots"></div>
-                </div>
-                <button id="btn-upgrade-rng" class="bg-purple-600 hover:bg-purple-500 text-slate-950 font-black px-2 py-1.5 rounded text-[10px] flex flex-col items-center min-w-[70px] select-none">
-                    <span>UPGRADE</span>
-                    <span id="cost-upgrade-rng" class="text-[8px] font-bold"><i class="fa-solid fa-coins font-bold"></i> 50</span>
-                </button>
             </div>
         </div>
         <div class="mt-1 font-bold">
@@ -632,6 +629,10 @@
                     <i class="fa-solid fa-book-atlas font-bold"></i> SPACE ENCYCLOPEDIA
                 </button>
 
+                <button id="open-patch-notes-btn" class="w-full bg-slate-950 hover:bg-slate-800 border border-slate-700/60 text-lime-300 font-bold py-3 px-4 rounded-xl text-xs tracking-wider active:scale-95 transition-all flex justify-center items-center gap-2 select-none pointer-events-auto">
+                    <i class="fa-solid fa-clipboard-list font-bold"></i> PATCH NOTES
+                </button>
+
                 <button id="open-install-options-btn" class="md:hidden w-full bg-slate-950 hover:bg-slate-800 border border-slate-700/60 text-cyan-300 font-bold py-3 px-4 rounded-xl text-xs tracking-wider active:scale-95 transition-all flex justify-center items-center gap-2 select-none pointer-events-auto">
                     <i class="fa-solid fa-mobile-screen-button font-bold"></i> INSTALL APP
                 </button>
@@ -710,6 +711,14 @@
                             </button>
                         </div>
                     </div>
+                </div>
+
+                <div id="inline-patch-notes-options" class="absolute inset-4 md:inset-6 z-50 bg-slate-950 border border-lime-400/40 rounded-xl p-4 flex flex-col gap-3 transition-all hidden pointer-events-auto font-bold shadow-2xl overflow-y-auto">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-lime-300 font-black text-xs tracking-widest uppercase"><i class="fa-solid fa-clipboard-list mr-1"></i> Patch Notes</span>
+                        <button id="close-patch-notes-btn" class="text-slate-400 hover:text-white p-2 text-sm select-none"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div id="patch-notes-list" class="space-y-2 text-left"></div>
                 </div>
 
                 <div id="inline-encyclopedia-options" class="fixed inset-2 md:inset-4 z-50 bg-slate-950 border border-sky-500/40 rounded-xl p-3 md:p-4 flex flex-col gap-3 transition-all hidden pointer-events-auto font-bold shadow-2xl overflow-hidden max-h-[calc(100dvh-1rem)] md:max-h-[calc(100dvh-2rem)]">
@@ -861,7 +870,37 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        const APP_VERSION = '2026.05.29.66';
+        const APP_VERSION = 'Alpha 0.9.4.71';
+        const TARGET_FRAME_MS = 1000 / 60;
+        let lastLoopTimestamp = 0;
+
+        const PATCH_NOTES = [
+            { version: 'Alpha 0.9.4.71', notes: ['Removed the seconds suffix from satellite speed stats so it is easier to read.'] },
+            { version: 'Alpha 0.9.3.70', notes: ['Satellite stat panels now show upgraded base stats plus separate directive bonus deltas.'] },
+            { version: 'Alpha 0.9.2.69', notes: ['Locked the main game loop to a normalized 60 FPS cadence so gameplay speed stays consistent on high-refresh displays.'] },
+            { version: 'Alpha 0.9.1.68', notes: ['Changed versioning to Alpha Major.Minor.Patch.Build.', 'Command Directive reward cards now show only the next level number.', 'Added README patch history and expanded in-game patch notes.'] },
+            { version: 'Alpha 0.9.0.67', notes: ['Added the Patch Notes menu.', 'Consolidated satellite upgrades into one level capped at 10.', 'Added satellite level badges and active stat bonus display.', 'Moved the first deploy guide above the planet.'] },
+            { version: 'Alpha 0.8.4.66', notes: ['Smoothed the wave event outro animation.'] },
+            { version: 'Alpha 0.8.4.65', notes: ['Revised wave start and wave end effects for better readability.'] },
+            { version: 'Alpha 0.8.3.64', notes: ['Removed duplicate desktop wave button.', 'Moved the visible credit focus to the bottom HUD.', 'Added stronger wave state feedback.'] },
+            { version: 'Alpha 0.8.2.63', notes: ['Reduced flicker risk in layered canvas effects.', 'Extended boss defeat explosions before player fly-out.', 'Added energetic card selection entrance animation.'] },
+            { version: 'Alpha 0.8.1.62', notes: ['Enhanced boss destruction sequence.', 'Added post-boss story briefing before directive selection.'] },
+            { version: 'Alpha 0.8.0.61', notes: ['Added first-open Master Command Center tutorial tour.', 'Made the planet access tooltip one-time only.'] },
+            { version: 'Alpha 0.7.6.60', notes: ['Fixed title menu interaction regressions.'] },
+            { version: 'Alpha 0.7.5.59', notes: ['Restored essential HUD visibility after initial onboarding changes.'] },
+            { version: 'Alpha 0.7.4.58', notes: ['Disabled Master Command at first launch until initial build guidance is complete.', 'Added max-slot warning and improved deployment slot highlighting.', 'Added boss defeat notice before rewards.'] },
+            { version: 'Alpha 0.7.3.57', notes: ['Added faster splash/loading visibility to reduce black screen time on mobile.'] },
+            { version: 'Alpha 0.7.2.56', notes: ['Fixed boss HUD and alert overlap with the play area.'] },
+            { version: 'Alpha 0.7.1.55', notes: ['Temporarily hides unresolved onboarding tooltips during deployment mode.'] },
+            { version: 'Alpha 0.7.0.54', notes: ['Allows boss ship control by dragging anywhere in the play area.', 'Temporarily hides unresolved tooltips during active waves.'] },
+            { version: 'Alpha 0.6.3.53', notes: ['Improved mobile encyclopedia safe-area spacing.'] },
+            { version: 'Alpha 0.6.2.52', notes: ['Started title-screen BGM playback with Blackout Velocity.'] },
+            { version: 'Alpha 0.6.1.51', notes: ['Added default and boss-fight background music support.'] },
+            { version: 'Alpha 0.6.0.50', notes: ['Added visible game version on the title screen.', 'Cleaned directive descriptions and removed Dense Formation Tactics.'] },
+            { version: 'Alpha 0.5.0.49', notes: ['Added Space Encyclopedia sections for satellites, enemies, and Command Directives.', 'Expanded encyclopedia layout and mobile scrolling.'] },
+            { version: 'Alpha 0.4.0.48', notes: ['Implemented Command Directives from the CSV source.', 'Added directive levels, rarity, max level rules, and Master Command listing.'] },
+            { version: 'Alpha 0.3.0.47', notes: ['Introduced boss-round prototype, boss rewards, and the first persistent version counter.'] }
+        ];
 
         let gameScale = 1;
         let rangeScale = 1;
@@ -1377,6 +1416,7 @@
                         ['Power', cfg.baseDamage],
                         ['Range', Math.round(cfg.baseRange * rangeScale)],
                         ['Rate', `${(cfg.baseCooldown / 60).toFixed(2)}s`],
+                        ['Max Level', 10],
                         ['Projectile', cfg.projSpeed]
                     ]
                 });
@@ -2108,11 +2148,83 @@
             card.classList.remove('hidden');
         }
 
+        function formatBonusPercent(value, invert = false) {
+            if (!value) return null;
+            const adjusted = invert ? -value : value;
+            const sign = adjusted > 0 ? '+' : '';
+            return `${sign}${Math.round(adjusted * 100)}%`;
+        }
+
+        function getSatelliteBonusSummary(tower) {
+            if (!tower) return [];
+            const bonuses = [];
+            const addPercent = (label, value, invert = false) => {
+                const formatted = formatBonusPercent(value, invert);
+                if (formatted) bonuses.push(`${label} ${formatted}`);
+            };
+
+            addPercent('All damage', getDirectiveEffectValue('damage', 0));
+            addPercent('All fire rate', getDirectiveEffectValue('fireRate', 0));
+            addPercent('All range', getDirectiveEffectValue('range', 0));
+            addPercent('Satellite HP', getDirectiveEffectValue('satelliteHp', 0));
+            if (tower.orbitIndex === 0) addPercent('Inner orbit fire rate', getDirectiveEffectValue('innerRate', 0));
+            if (tower.orbitIndex === 1) addPercent('Middle orbit damage', getDirectiveEffectValue('middleDamage', 0));
+            if (tower.orbitIndex === 2) addPercent('Outer orbit range', getDirectiveEffectValue('outerRange', 0));
+
+            if (tower.type === 'laser') addPercent('Turret damage', getDirectiveEffectValue('laserDamage', 0));
+            if (tower.type === 'plasma') addPercent('Plasma damage', getDirectiveEffectValue('plasmaDamage', 0));
+            if (tower.type === 'railgun') addPercent('Railgun damage', getDirectiveEffectValue('railgunDamage', 0));
+            if (tower.type === 'magnetsentry') {
+                const magnetTradeoff = getDirectiveEffectValue('magnetTradeoff');
+                if (magnetTradeoff) bonuses.push(`Magnet slow to ${Math.round(magnetTradeoff.slow * 100)}% speed`);
+            }
+            if (tower.type === 'lightningsentry') {
+                const chains = getDirectiveEffectValue('lightningChains', 0);
+                if (chains) bonuses.push(`Lightning chains +${chains}`);
+            }
+
+            const glass = getDirectiveEffectValue('glassCannon');
+            if (glass) bonuses.push(`Glass Cannon +${Math.round(glass.dmg * 100)}% damage, -${Math.round(glass.hp * 100)}% HP`);
+            const rangeTradeoff = getDirectiveEffectValue('rangeDamageTradeoff');
+            if (rangeTradeoff) bonuses.push(`Range priority +${Math.round(rangeTradeoff.range * 100)}% range, -${Math.round(rangeTradeoff.dmg * 100)}% damage`);
+            const corePowered = getDirectiveEffectValue('corePowered');
+            if (corePowered) bonuses.push(`Core powered +${Math.round(corePowered.dmg * 100)}% damage, +${Math.round(corePowered.rate * 100)}% fire rate`);
+            const shieldWeapon = getDirectiveEffectValue('shieldWeapon');
+            if (shieldWeapon) bonuses.push(`Shield coupling +${Math.round(shieldWeapon.dmg * 100)}% damage`);
+            const finalStand = getDirectiveEffectValue('finalStand');
+            if (finalStand) bonuses.push('Final Stand damage shifts with core integrity');
+            const overdrive = getDirectiveEffectValue('overdriveRepair');
+            if (overdrive) bonuses.push(`Overdrive +${Math.round(overdrive.rate * 100)}% fire rate, repairs cost more`);
+
+            return bonuses;
+        }
+
+        function renderSatelliteBonusList(tower) {
+            const bonusList = document.getElementById('inspect-bonus-list');
+            if (!bonusList) return;
+            const bonuses = getSatelliteBonusSummary(tower);
+            if (!bonuses.length) {
+                bonusList.innerHTML = '<span class="text-slate-500">No active directive bonuses.</span>';
+                return;
+            }
+            bonusList.innerHTML = bonuses.map(bonus => `<span class="bg-slate-900 border border-sky-500/20 rounded px-1.5 py-0.5">${bonus}</span>`).join('');
+        }
+
+        function formatSignedNumber(value, suffix = '') {
+            const rounded = Number.isInteger(value) ? value : Number(value.toFixed(2));
+            if (rounded === 0) return `+0${suffix}`;
+            return `${rounded > 0 ? '+' : ''}${rounded}${suffix}`;
+        }
+
+        function formatStatWithBonus(baseValue, effectiveValue, suffix = '') {
+            const delta = effectiveValue - baseValue;
+            return `${baseValue}${suffix} <span class="${delta >= 0 ? 'text-emerald-300' : 'text-red-300'}">(${formatSignedNumber(delta, suffix)})</span>`;
+        }
+
         function selectTower(tower) {
             closeOrbitInspector(); closeBlueprintDrawer();
             if (game) game.selectedTower = tower;
             if (tower) {
-                const baseCost = SATELLITE_CONFIGS[tower.type].cost;
                 const iTitle = document.getElementById('inspect-title');
                 if (iTitle) { iTitle.innerText = SATELLITE_CONFIGS[tower.type].name; iTitle.style.color = SATELLITE_CONFIGS[tower.type].color; }
                 const hpEl = document.getElementById('inspect-hp');
@@ -2134,37 +2246,44 @@
                 }
                 const salvageValue = document.getElementById('salvage-value');
                 if (salvageValue) salvageValue.innerHTML = `<i class="fa-solid fa-coins"></i> ${getSatelliteSalvageValue(tower)}`;
-                
-                ['dmg', 'rate', 'rng'].forEach(stat => {
-                    const valEl = document.getElementById(`inspect-${stat}`);
-                    const lvlEl = document.getElementById(`inspect-${stat}-lvl`);
-                    const dotsEl = document.getElementById(`${stat}-lvl-dots`);
-                    const btnEl = document.getElementById(`btn-upgrade-${stat}`);
-                    const costEl = document.getElementById(`cost-upgrade-${stat}`);
-                    
-                    let statVal, statLvl;
-                    if (stat === 'dmg') { statVal = tower.damage; statLvl = tower.dmgLvl; }
-                    else if (stat === 'rate') { statVal = (tower.fireRateCooldown / 60).toFixed(2) + 's'; statLvl = tower.rateLvl; }
-                    else if (stat === 'rng') { statVal = Math.round(tower.range / rangeScale); statLvl = tower.rngLvl; }
-                    
-                    if (valEl) valEl.innerText = statVal;
-                    if (lvlEl) lvlEl.innerText = statLvl;
-                    if (dotsEl) dotsEl.innerHTML = createLvlDotsHTML(statLvl);
-                    
-                    if (btnEl && costEl) {
-                        if (statLvl >= 10) {
-                            btnEl.disabled = true; btnEl.className = "bg-slate-800 text-slate-500 cursor-not-allowed px-2 py-1.5 rounded text-[10px] min-w-[70px]";
-                            costEl.innerHTML = "MAXED";
-                        } else {
-                            const cost = getStatUpgradeCost(baseCost, statLvl, tower.type);
-                            btnEl.disabled = false;
-                            const colors = { dmg: 'cyan', rate: 'emerald', rng: 'purple', lasersentry: 'cyan', lightningsentry: 'amber', magnetsentry: 'blue' };
-                            const colorScheme = colors[tower.type] || 'cyan';
-                            btnEl.className = `bg-${colorScheme}-600 hover:bg-${colorScheme}-500 text-slate-950 font-black px-2 py-1.5 rounded text-[10px] flex flex-col items-center min-w-[70px] select-none`;
-                            costEl.innerHTML = `<i class="fa-solid fa-coins"></i> ${cost}`;
-                        }
+
+                const level = tower.level || 1;
+                const dmgEl = document.getElementById('inspect-dmg');
+                const rateEl = document.getElementById('inspect-rate');
+                const rngEl = document.getElementById('inspect-rng');
+                const satLvlEl = document.getElementById('inspect-sat-lvl');
+                const satDotsEl = document.getElementById('sat-lvl-dots');
+                const upgradeBtn = document.getElementById('btn-upgrade-sat');
+                const upgradeCostEl = document.getElementById('cost-upgrade-sat');
+
+                if (dmgEl) dmgEl.innerHTML = formatStatWithBonus(tower.damage, tower.effectiveDamage);
+                if (rateEl) {
+                    const baseRate = Number((tower.baseFireRateCooldown / 60).toFixed(2));
+                    const effectiveRate = Number((tower.fireRateCooldown / 60).toFixed(2));
+                    rateEl.innerHTML = formatStatWithBonus(baseRate, effectiveRate);
+                }
+                if (rngEl) {
+                    const baseRange = Math.round(tower.upgradedRange / rangeScale);
+                    const effectiveRange = Math.round(tower.range / rangeScale);
+                    rngEl.innerHTML = formatStatWithBonus(baseRange, effectiveRange);
+                }
+                if (satLvlEl) satLvlEl.innerText = level;
+                if (satDotsEl) satDotsEl.innerHTML = createLvlDotsHTML(level);
+                if (upgradeBtn && upgradeCostEl) {
+                    if (level >= 10) {
+                        upgradeBtn.disabled = true;
+                        upgradeBtn.className = "w-full mt-2 bg-slate-800 text-slate-500 cursor-not-allowed font-black py-2 rounded text-[10px] flex items-center justify-center gap-2 select-none";
+                        upgradeCostEl.innerHTML = "MAXED";
+                    } else {
+                        const cost = getSatelliteUpgradeCost(tower);
+                        upgradeBtn.disabled = game.gold < cost;
+                        upgradeBtn.className = game.gold >= cost ?
+                            "w-full mt-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2 rounded text-[10px] flex items-center justify-center gap-2 select-none" :
+                            "w-full mt-2 bg-slate-800 text-slate-500 cursor-not-allowed font-black py-2 rounded text-[10px] flex items-center justify-center gap-2 select-none";
+                        upgradeCostEl.innerHTML = `<i class="fa-solid fa-coins"></i> ${cost}`;
                     }
-                });
+                }
+                renderSatelliteBonusList(tower);
                 
                 const p = document.getElementById('inspector-panel');
                 if (p) { p.classList.remove('hidden'); p.offsetHeight; p.style.transform = 'translate(0px, 0px)'; }
@@ -2368,12 +2487,14 @@
             });
         }
 
-        function getStatUpgradeCost(baseTypeCost, currentLvl, towerType = null) {
+        function getSatelliteUpgradeCost(tower) {
+            if (!tower || (tower.level || 1) >= 10) return 0;
             let multiplier = 1;
             const railTradeoff = getDirectiveEffectValue('railgunUpgradeTradeoff');
-            if (towerType === 'railgun' && railTradeoff) multiplier += railTradeoff.cost;
-            return Math.floor(baseTypeCost * 0.4 * currentLvl * multiplier);
+            if (tower.type === 'railgun' && railTradeoff) multiplier += railTradeoff.cost;
+            return Math.floor(SATELLITE_CONFIGS[tower.type].cost * 0.75 * (tower.level || 1) * multiplier);
         }
+
         function getSatelliteMaxHp(type) {
             const baseHp = 85 + SATELLITE_CONFIGS[type].cost * 0.28;
             let multiplier = 1 + getDirectiveEffectValue('satelliteHp', 0);
@@ -2519,7 +2640,7 @@
             cardCount.innerText = `${directives.length} Active`;
             cardList.innerHTML = directives.length
                 ? directives.map(directive => `<div class="bg-slate-900 border border-amber-500/20 rounded px-2 py-1">
-                    <div class="flex justify-between gap-2"><span style="color:${directive.color}" class="font-black uppercase">${directive.name}</span><span class="text-amber-300">LVL ${directive.level}/5</span></div>
+                    <div class="flex justify-between gap-2"><span style="color:${directive.color}" class="font-black uppercase">${directive.name}</span><span class="text-amber-300">LVL ${directive.level}</span></div>
                     <div>${getDirectiveDescription(directive)}</div>
                     <div class="text-slate-500 uppercase">${directive.rarity}</div>
                 </div>`).join('')
@@ -2918,7 +3039,7 @@
                 this.type = type; this.orbitIndex = orbitIndex; this.slotIndex = slotIndex;
                 const cfg = SATELLITE_CONFIGS[type];
                 
-                this.dmgLvl = 1; this.rateLvl = 1; this.rngLvl = 1;
+                this.level = 1;
                 this.color = cfg.color; this.baseDamage = cfg.baseDamage; this.baseRange = cfg.baseRange; this.baseCooldown = cfg.baseCooldown;
                 this.cooldown = 0; this.target = null; this.x = 0; this.y = 0; this.aimAngle = 0;
                 this.maxHp = getSatelliteMaxHp(type); this.hp = this.maxHp;
@@ -2929,7 +3050,10 @@
 
                 this.updateCoordinates();
             }
-            get damage() { return Math.floor(this.baseDamage * (1 + (this.dmgLvl - 1) * 0.45)); }
+            get upgradeLevel() { return this.level || 1; }
+            get damage() { return Math.floor(this.baseDamage * (1 + (this.upgradeLevel - 1) * 0.32)); }
+            get upgradedRange() { return Math.floor(this.baseRange * (1 + (this.upgradeLevel - 1) * 0.11) * rangeScale); }
+            get baseFireRateCooldown() { return Math.max(5, Math.floor(this.baseCooldown * Math.pow(0.88, this.upgradeLevel - 1))); }
             get effectiveDamage() {
                 let multiplier = 1 + getDirectiveEffectValue('damage', 0);
                 const glass = getDirectiveEffectValue('glassCannon'); if (glass) multiplier += glass.dmg;
@@ -2958,7 +3082,7 @@
                 const rangeTradeoff = getDirectiveEffectValue('rangeDamageTradeoff'); if (rangeTradeoff) multiplier += rangeTradeoff.range;
                 const magnetTradeoff = getDirectiveEffectValue('magnetTradeoff'); if (this.type === 'magnetsentry' && magnetTradeoff) multiplier -= magnetTradeoff.range;
                 const compression = getDirectiveEffectValue('orbitCompression'); if (this.orbitIndex === 2 && compression) multiplier -= compression.range;
-                return Math.max(40, Math.floor(this.baseRange * (1 + (this.rngLvl - 1) * 0.15) * rangeScale * multiplier));
+                return Math.max(40, Math.floor(this.upgradedRange * multiplier));
             }
             get fireRateCooldown() {
                 let multiplier = 1 - getDirectiveEffectValue('fireRate', 0);
@@ -2970,7 +3094,7 @@
                 const compression = getDirectiveEffectValue('orbitCompression'); if (this.orbitIndex === 0 && compression) multiplier -= compression.rate;
                 const plasmaTradeoff = getDirectiveEffectValue('plasmaTradeoff'); if (this.type === 'plasma' && plasmaTradeoff) multiplier += plasmaTradeoff.cd;
                 const missileTradeoff = getDirectiveEffectValue('missileTradeoff'); if (this.type === 'missile' && missileTradeoff) multiplier += missileTradeoff.rate;
-                return Math.max(5, Math.floor(this.baseCooldown * Math.pow(0.85, this.rateLvl - 1) * Math.max(0.2, multiplier)));
+                return Math.max(5, Math.floor(this.baseFireRateCooldown * Math.max(0.2, multiplier)));
             }
             
             updateCoordinates() {
@@ -3142,6 +3266,26 @@
                     ctx.setLineDash([5, 5]); ctx.beginPath(); ctx.arc(this.x, this.y, this.range, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.restore();
                 }
                 drawSatelliteSprite(ctx, this.type, this.x, this.y, 14 * gameScale, this.aimAngle);
+                const badgeRadius = Math.max(7, 8 * gameScale);
+                const badgeX = this.x + 13 * gameScale;
+                const badgeY = this.y - 17 * gameScale;
+                ctx.save();
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+                ctx.strokeStyle = '#fbbf24';
+                ctx.lineWidth = 1.4;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = '#f59e0b';
+                ctx.beginPath();
+                ctx.arc(badgeX, badgeY, badgeRadius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#fde68a';
+                ctx.font = `900 ${Math.max(8, Math.floor(9 * gameScale))}px Orbitron`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.upgradeLevel, badgeX, badgeY + 0.5);
+                ctx.restore();
                 if (this.hp < this.maxHp) {
                     const barW = 32 * gameScale; const barH = 3 * gameScale;
                     ctx.save();
@@ -3154,8 +3298,7 @@
                 if (isSelected) {
                     ctx.save(); ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(this.x, this.y, 18 * gameScale, 0, Math.PI * 2); ctx.stroke();
                     ctx.fillStyle = '#f59e0b'; ctx.font = 'bold 9px Orbitron'; ctx.textAlign = 'center';
-                    const avgLvl = Math.round((this.dmgLvl + this.rateLvl + this.rngLvl) / 3);
-                    ctx.fillText('RATING: ' + avgLvl, this.x, this.y + 28 * gameScale); ctx.restore();
+                    ctx.fillText('LEVEL: ' + this.upgradeLevel, this.x, this.y + 28 * gameScale); ctx.restore();
                 }
             }
         }
@@ -3937,7 +4080,7 @@
                 return `<button class="boss-reward-card bg-slate-950 hover:bg-slate-900 border border-amber-500/40 rounded-xl p-3 text-left transition-all active:scale-95" data-card-id="${card.id}">
                 <div class="flex justify-between items-start gap-2">
                     <div class="text-xs font-black uppercase tracking-widest" style="color:${card.color}">${card.name}</div>
-                    <div class="text-[9px] text-amber-300 font-black">LVL ${nextLevel}/5</div>
+	                    <div class="text-[9px] text-amber-300 font-black">LVL ${nextLevel}</div>
                 </div>
 	                <div class="text-[9px] text-slate-500 uppercase tracking-widest mt-1">${card.rarity}</div>
 	                <div class="text-[10px] text-slate-300 mt-2 leading-snug font-semibold">${getDirectiveDescription(card, nextLevel)}</div>
@@ -4238,10 +4381,23 @@
         // 10. ACTION BINDINGS MATRIX
         // ----------------------------------------------------------------------
         function hideTitleSubpanels() {
-            ['inline-planet-options', 'inline-settings-options', 'inline-encyclopedia-options', 'inline-install-options'].forEach(id => {
+            ['inline-planet-options', 'inline-settings-options', 'inline-encyclopedia-options', 'inline-install-options', 'inline-patch-notes-options'].forEach(id => {
                 const panel = document.getElementById(id);
                 if (panel) panel.classList.add('hidden');
             });
+        }
+
+        function renderPatchNotes() {
+            const container = document.getElementById('patch-notes-list');
+            if (!container) return;
+            container.innerHTML = PATCH_NOTES.map(entry => `
+                <article class="bg-slate-900 border border-lime-400/20 rounded-xl p-3">
+                    <div class="text-lime-300 text-xs font-black uppercase tracking-widest">Version ${entry.version}</div>
+                    <ul class="mt-2 space-y-1.5 text-[10px] text-slate-300 leading-snug font-bold">
+                        ${entry.notes.map(note => `<li>${note}</li>`).join('')}
+                    </ul>
+                </article>
+            `).join('');
         }
 
         bindButton('start-game-btn', () => { initAudio(); const introModal = document.getElementById('intro-modal'); if (introModal) introModal.classList.add('hidden'); triggerCleanGameReset(); });
@@ -4269,6 +4425,13 @@
             if (encyclopedia) encyclopedia.classList.remove('hidden');
             playSynthSound('upgrade');
         });
+        bindButton('open-patch-notes-btn', () => {
+            hideTitleSubpanels();
+            renderPatchNotes();
+            const patchNotes = document.getElementById('inline-patch-notes-options');
+            if (patchNotes) patchNotes.classList.remove('hidden');
+            playSynthSound('upgrade');
+        });
         bindButton('open-install-options-btn', () => {
             hideTitleSubpanels();
             syncInstallUI();
@@ -4279,6 +4442,7 @@
         bindButton('close-planet-options-btn', () => { const config = document.getElementById('inline-planet-options'); if (config) config.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('close-settings-options-btn', () => { const settings = document.getElementById('inline-settings-options'); if (settings) settings.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('close-encyclopedia-options-btn', () => { const encyclopedia = document.getElementById('inline-encyclopedia-options'); if (encyclopedia) encyclopedia.classList.add('hidden'); playSynthSound('upgrade'); });
+        bindButton('close-patch-notes-btn', () => { const patchNotes = document.getElementById('inline-patch-notes-options'); if (patchNotes) patchNotes.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('encyclopedia-menu-satellites', () => { scrollEncyclopediaTo('satellites'); });
         bindButton('encyclopedia-menu-rocks', () => { scrollEncyclopediaTo('rocks'); });
         bindButton('encyclopedia-menu-ships', () => { scrollEncyclopediaTo('ships'); });
@@ -4332,9 +4496,19 @@
 	            });
 	        });
 
-        bindButton('btn-upgrade-dmg', () => { const t = game.selectedTower; if (!t || t.dmgLvl >= 10) return; const cost = getStatUpgradeCost(SATELLITE_CONFIGS[t.type].cost, t.dmgLvl, t.type); if (game.gold >= cost) { spendGold(cost); t.investedGold += cost; t.dmgLvl++; playSynthSound('upgrade'); selectTower(t); createExplosion(t.x, t.y, '#22d3ee', 10); } });
-        bindButton('btn-upgrade-rate', () => { const t = game.selectedTower; if (!t || t.rateLvl >= 10) return; const cost = getStatUpgradeCost(SATELLITE_CONFIGS[t.type].cost, t.rateLvl, t.type); if (game.gold >= cost) { spendGold(cost); t.investedGold += cost; t.rateLvl++; playSynthSound('upgrade'); selectTower(t); createExplosion(t.x, t.y, '#34d399', 10); } });
-        bindButton('btn-upgrade-rng', () => { const t = game.selectedTower; if (!t || t.rngLvl >= 10) return; const cost = getStatUpgradeCost(SATELLITE_CONFIGS[t.type].cost, t.rngLvl, t.type); if (game.gold >= cost) { spendGold(cost); t.investedGold += cost; t.rngLvl++; playSynthSound('upgrade'); selectTower(t); createExplosion(t.x, t.y, '#c084fc', 10); } });
+        bindButton('btn-upgrade-sat', () => {
+            const t = game.selectedTower;
+            if (!t || (t.level || 1) >= 10) return;
+            const cost = getSatelliteUpgradeCost(t);
+            if (game.gold >= cost) {
+                spendGold(cost);
+                t.investedGold += cost;
+                t.level = (t.level || 1) + 1;
+                playSynthSound('upgrade');
+                selectTower(t);
+                createExplosion(t.x, t.y, '#f59e0b', 14);
+            }
+        });
         bindButton('btn-repair-sat', () => { const t = game.selectedTower; if (!t) return; const cost = getSatelliteRepairCost(t); if (cost > 0 && game.gold >= cost) { spendGold(cost); t.investedGold += cost; t.hp = t.maxHp; playSynthSound('upgrade'); createExplosion(t.x, t.y, '#f59e0b', 12); selectTower(t); } });
         bindButton('btn-destroy-sat', () => { if (!game.selectedTower) return; const t = game.selectedTower; const refund = getSatelliteSalvageValue(t); addGold(refund); createExplosion(t.x, t.y, '#f59e0b', 15); playSynthSound('upgrade'); game.towers = game.towers.filter(item => item.id !== t.id); closeInspector(); });
 
@@ -4411,8 +4585,12 @@
         // ----------------------------------------------------------------------
         // 11. CORE GAME RENDERING LOOP (With Lightning cascade rendering)
         // ----------------------------------------------------------------------
-        function loop() {
+        function loop(timestamp = performance.now()) {
             requestAnimationFrame(loop);
+            if (!lastLoopTimestamp) lastLoopTimestamp = timestamp;
+            const elapsed = timestamp - lastLoopTimestamp;
+            if (elapsed < TARGET_FRAME_MS - 0.75) return;
+            lastLoopTimestamp = timestamp - (elapsed % TARGET_FRAME_MS);
 
             // Double check canvas scaling hasn't collapsed inside the iframe container context
             const viewportSize = getViewportSize();
@@ -4479,7 +4657,6 @@
                         }
                     }
                 }
-                drawFirstDeploymentSlotGuide(getFirstEmptyDeployableSlot());
             }
 
             if (game.selectedShopType && game.running) {
@@ -4494,6 +4671,7 @@
             }
 
             drawEarth(centerX, centerY);
+            drawFirstDeploymentSlotGuide(getFirstEmptyDeployableSlot());
 
             for (let tower of game.towers) {
                 if (game.running && !game.paused && !modeTransitionActive) tower.update(game.enemies);
