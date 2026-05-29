@@ -1,0 +1,252 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Share+Tech+Mono&display=swap');
+
+html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #030712;
+}
+
+body {
+    font-family: 'Orbitron', sans-serif;
+    background-color: #030712;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+.game-shell {
+    width: 100vw;
+    height: 100vh;
+    min-height: 100vh;
+}
+
+@supports (height: 100dvh) {
+    .game-shell {
+        height: 100dvh;
+        min-height: 100dvh;
+    }
+}
+
+.tech-font {
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.scanline::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 65%, rgba(0, 0, 0, 0.10) 65%), linear-gradient(90deg, rgba(255, 0, 0, 0.025), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.025));
+    z-index: 20;
+    background-size: 100% 7px, 10px 100%;
+    pointer-events: none;
+}
+
+.glow-green {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+}
+
+.glow-blue {
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+}
+
+.glow-red {
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+.text-glow-blue {
+    text-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+}
+
+.text-glow-green {
+    text-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+}
+
+.text-glow-amber {
+    text-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+
+.animate-spin-slow {
+    animation: spin 8s linear infinite;
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.25s ease-out;
+}
+
+.boot-loader-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+}
+
+.boot-loader-bar {
+    width: var(--load-progress, 0%);
+}
+
+.wave-ready {
+    animation: readyPulse 1.15s ease-in-out infinite;
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.55), 0 0 0 1px rgba(190, 242, 100, 0.35);
+}
+
+.boss-wave-ready {
+    background: #dc2626 !important;
+    color: #fff7ed !important;
+    border-color: rgba(248, 113, 113, 0.8) !important;
+    box-shadow: 0 0 22px rgba(239, 68, 68, 0.72), 0 0 0 1px rgba(254, 202, 202, 0.35) !important;
+}
+
+.planet-texture-preview {
+    background-size: auto 100%;
+    background-position: 0 50%;
+    background-repeat: no-repeat;
+    animation: textureDrift 8s ease-in-out infinite alternate;
+}
+
+.planet-texture-preview::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.18), rgba(255,255,255,0.03) 42%, rgba(3,7,18,0.42) 100%);
+}
+
+.planet-texture-oasis { background-image: url('elements/earth-texture.png'); }
+.planet-texture-vulcan { background-image: url('elements/vulcan-texture.png'); }
+.planet-texture-wasteland { background-image: url('elements/toxic-texture.png'); }
+.planet-texture-frost { background-image: url('elements/frost-texture.png'); }
+
+.pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.top-safe {
+    top: calc(env(safe-area-inset-top) + 0.75rem);
+}
+
+.notice-safe-top {
+    top: calc(env(safe-area-inset-top) + 5.8rem);
+}
+
+#inline-encyclopedia-options {
+    top: calc(env(safe-area-inset-top) + 0.75rem);
+    right: 0.5rem;
+    bottom: calc(env(safe-area-inset-bottom) + 0.75rem);
+    left: 0.5rem;
+    max-height: none;
+}
+
+@media (min-width: 768px) {
+    .notice-safe-top {
+        top: 10.75rem;
+    }
+
+    #inline-encyclopedia-options {
+        top: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+        left: 1rem;
+    }
+}
+
+.tech-tooltip {
+    background: rgba(2, 6, 23, 0.9);
+    border: 1px solid rgba(125, 211, 252, 0.78);
+    color: #bae6fd;
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.36), 0 0 34px rgba(16, 185, 129, 0.18), inset 0 0 18px rgba(56, 189, 248, 0.08);
+    text-shadow: 0 0 8px rgba(56, 189, 248, 0.72);
+    animation: tooltipRadiate 1.35s ease-in-out infinite;
+}
+
+.tech-notice {
+    background: rgba(69, 10, 10, 0.92);
+    border: 1px solid rgba(248, 113, 113, 0.72);
+    color: #fecaca;
+    box-shadow: 0 0 22px rgba(239, 68, 68, 0.28);
+    text-shadow: 0 0 8px rgba(248, 113, 113, 0.45);
+}
+
+.notice-pop {
+    animation: noticePop 0.18s ease-out;
+}
+
+.mode-transition-pop {
+    animation: modeTransitionPop 1.45s ease-in-out;
+}
+
+.build-tooltip-connector {
+    position: absolute;
+    left: var(--connector-left, 3rem);
+    top: 100%;
+    width: 1px;
+    height: var(--connector-height, 54px);
+    background: linear-gradient(to bottom, rgba(125, 211, 252, 0.95), rgba(16, 185, 129, 0.7));
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.85);
+}
+
+.build-tooltip-connector::after {
+    content: "";
+    position: absolute;
+    left: -3px;
+    bottom: -4px;
+    width: 7px;
+    height: 7px;
+    border-radius: 9999px;
+    background: #22d3ee;
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.7);
+}
+
+.build-tooltip-target {
+    position: absolute;
+    left: var(--connector-left, 3rem);
+    top: calc(100% + var(--connector-height, 54px) - 5px);
+    width: 10px;
+    height: 10px;
+    border-radius: 9999px;
+    border: 1px solid rgba(190, 242, 100, 0.8);
+    transform: translateX(-50%);
+    box-shadow: 0 0 14px rgba(34, 197, 94, 0.85);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes readyPulse {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.035); filter: brightness(1.18); }
+}
+
+@keyframes textureDrift {
+    from { background-position: 0 50%; }
+    to { background-position: 100% 50%; }
+}
+
+@keyframes tooltipRadiate {
+    0%, 100% {
+        filter: brightness(1);
+        box-shadow: 0 0 16px rgba(56, 189, 248, 0.34), 0 0 34px rgba(16, 185, 129, 0.16), inset 0 0 18px rgba(56, 189, 248, 0.08);
+    }
+
+    50% {
+        filter: brightness(1.18);
+        box-shadow: 0 0 24px rgba(56, 189, 248, 0.68), 0 0 54px rgba(16, 185, 129, 0.32), inset 0 0 24px rgba(56, 189, 248, 0.16);
+    }
+}
+
+@keyframes noticePop {
+    from { opacity: 0; transform: translate(-50%, -12px) scale(0.96); }
+    to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+@keyframes modeTransitionPop {
+    0% { opacity: 0; transform: scale(1.04); }
+    32%, 72% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.98); }
+}
