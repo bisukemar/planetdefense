@@ -133,6 +133,15 @@ body {
     top: calc(env(safe-area-inset-top) + 5.8rem);
 }
 
+body.boss-mode-active #desktop-hud,
+body.boss-mode-active #mobile-hud {
+    display: none !important;
+}
+
+body.boss-mode-active .notice-safe-top {
+    top: calc(env(safe-area-inset-top) + 6.9rem);
+}
+
 #inline-encyclopedia-options {
     top: calc(env(safe-area-inset-top) + 0.75rem);
     right: 0.5rem;
@@ -144,6 +153,10 @@ body {
 @media (min-width: 768px) {
     .notice-safe-top {
         top: 10.75rem;
+    }
+
+    body.boss-mode-active .notice-safe-top {
+        top: 6.75rem;
     }
 
     #inline-encyclopedia-options {

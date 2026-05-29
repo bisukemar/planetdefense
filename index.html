@@ -96,7 +96,7 @@
     </div>
 
     <!-- DESKTOP COMPACT HUD HEADER -->
-    <div class="hidden md:flex absolute top-4 left-4 right-4 z-10 flex-col gap-2 pointer-events-auto">
+    <div id="desktop-hud" class="hidden md:flex absolute top-4 left-4 right-4 z-10 flex-col gap-2 pointer-events-auto">
         <!-- SYSTEM UTILITIES CONTROL BAR -->
         <div class="w-full flex justify-between items-center bg-slate-950/85 backdrop-blur-md p-2 rounded-xl border border-slate-800/80 shadow-lg font-bold">
             <!-- Live Credits / Gold Display -->
@@ -177,7 +177,7 @@
     </div>
 
     <!-- MOBILE VIEW SLIM HUD HEADER -->
-    <div class="flex md:hidden absolute top-safe left-3 right-3 z-10 items-center justify-between bg-slate-950/95 backdrop-blur-md p-2 rounded-xl border border-slate-800/80 shadow-lg gap-2 text-[10px] pointer-events-auto">
+    <div id="mobile-hud" class="flex md:hidden absolute top-safe left-3 right-3 z-10 items-center justify-between bg-slate-950/95 backdrop-blur-md p-2 rounded-xl border border-slate-800/80 shadow-lg gap-2 text-[10px] pointer-events-auto">
         <div class="flex flex-col items-start px-1 select-none font-bold">
             <div class="font-extrabold text-emerald-400 text-glow-green text-[9px] uppercase tracking-wide font-bold">WAVE <span id="mobile-wave" class="text-white font-bold">1</span></div>
             <div class="flex items-center gap-1 mt-0.5">
@@ -712,7 +712,7 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        const APP_VERSION = '2026.05.29.51';
+        const APP_VERSION = '2026.05.29.53';
 
         let gameScale = 1;
         let rangeScale = 1;
@@ -2333,6 +2333,7 @@
         function cancelBuildMode(options = {}) {
             game.selectedShopType = null;
             game.orbitGridHighlights = false;
+            suppressStarterTooltips(false);
             if (!options.keepHint) {
                 const hint = document.getElementById('action-hint');
                 if (hint) hint.innerText = "Tap the planet core to open Master Command, or tap BUILD to deploy satellites!";
@@ -3178,6 +3179,7 @@
         }
 
         function resetBossMode() {
+            document.body.classList.remove('boss-mode-active');
             bossMode = {
                 active: false, phase: 'idle', wave: 0, frame: 0, spawnTimer: 0, spawned: 0, requiredKills: 0, kills: 0,
                 player: { x: canvas.width / 2, y: canvas.height - 120, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120 },
@@ -3191,6 +3193,16 @@
             if (failedModal) failedModal.classList.add('hidden');
         }
 
+        function getBossPlayTop() {
+            const hud = document.getElementById('boss-mode-hud');
+            if (hud && !hud.classList.contains('hidden')) {
+                const rect = hud.getBoundingClientRect();
+                if (rect.height > 0) return rect.bottom + 52;
+            }
+            const viewportOffset = window.visualViewport ? window.visualViewport.offsetTop : 0;
+            return viewportOffset + (isMobileBuildView() ? 132 : 118);
+        }
+
         function startBossMode() {
             const bossIndex = getBossIndexForWave(game.wave);
             if (bossIndex < 0 || modeTransitionActive) return;
@@ -3200,6 +3212,7 @@
             setBuildControlEnabled(false);
             closeInspector(); closeOrbitInspector(); closeBlueprintDrawer();
             suppressStarterTooltips(true);
+            document.body.classList.add('boss-mode-active');
             showModeTransition('Boss Intercept Mode', 'Manual fighter control engaged', 'fa-skull', 1450, () => {
                 game.mode = 'boss';
                 switchBgm('boss');
@@ -3214,13 +3227,14 @@
                 bossMode.enemies = [];
                 bossMode.projectiles = [];
                 bossMode.enemyProjectiles = [];
+                const playTop = getBossPlayTop();
                 bossMode.player = { x: canvas.width / 2, y: canvas.height - 120, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120 };
                 bossMode.player.spriteSize = 58 * gameScale;
                 bossMode.player.hitRadius = bossMode.player.spriteSize * 0.34;
                 bossMode.boss = {
                     config,
                     x: canvas.width / 2,
-                    y: 92 + (window.visualViewport ? window.visualViewport.offsetTop : 0),
+                    y: playTop + 46 * gameScale,
                     size: 42 * gameScale,
                     hp: Math.floor(config.maxHp * (1 + game.wave * 0.03)),
                     maxHp: Math.floor(config.maxHp * (1 + game.wave * 0.03)),
@@ -3241,11 +3255,12 @@
             const profile = profiles[Math.floor(Math.random() * profiles.length)];
             const spriteScale = ENEMY_SPRITE_SCALE[profile.type] || 3.2;
             const size = profile.size * gameScale;
+            const playTop = getBossPlayTop();
             bossMode.enemies.push({
                 type: profile.type,
                 color: profile.color,
                 x: Math.random() * (canvas.width - 80) + 40,
-                y: -30,
+                y: playTop - 34,
                 size,
                 hitRadius: size * spriteScale * 0.34,
                 hp: Math.floor(profile.maxHp * (1 + game.wave * 0.05)),
@@ -3277,16 +3292,17 @@
         function updateBossMode() {
             bossMode.frame++;
             const player = bossMode.player;
+            const playerTopLimit = getBossPlayTop() + 32;
             const playerBottomLimit = isMobileBuildView() ? canvas.height - 150 : canvas.height - 80;
             if (typeof player.targetX !== 'number') player.targetX = player.x;
             if (typeof player.targetY !== 'number') player.targetY = player.y;
             player.targetX = Math.max(24, Math.min(canvas.width - 24, player.targetX));
-            player.targetY = Math.max(120, Math.min(playerBottomLimit, player.targetY));
+            player.targetY = Math.max(playerTopLimit, Math.min(playerBottomLimit, player.targetY));
             const dragFollow = 0.24;
             player.x += (player.targetX - player.x) * dragFollow;
             player.y += (player.targetY - player.y) * dragFollow;
             player.x = Math.max(24, Math.min(canvas.width - 24, player.x));
-            player.y = Math.max(120, Math.min(playerBottomLimit, player.y));
+            player.y = Math.max(playerTopLimit, Math.min(playerBottomLimit, player.y));
 
             if (player.fireCooldown > 0) player.fireCooldown--;
             if (player.fireCooldown <= 0) {
@@ -3425,6 +3441,7 @@
                 bossMode.active = false;
                 bossMode.phase = 'idle';
                 game.mode = 'defense';
+                document.body.classList.remove('boss-mode-active');
                 switchBgm('default');
                 setBuildControlEnabled(true);
                 suppressStarterTooltips(false);
@@ -3519,6 +3536,7 @@
                 if (modal) modal.classList.add('hidden');
                 bossMode.active = false;
                 game.mode = 'defense';
+                document.body.classList.remove('boss-mode-active');
                 switchBgm('default');
                 setBuildControlEnabled(true);
                 suppressStarterTooltips(false);
@@ -3692,6 +3710,7 @@
 	                        if (isMobileBuildView()) {
 	                            game.selectedShopType = null;
 	                            game.orbitGridHighlights = false;
+	                            suppressStarterTooltips(false);
 	                            if (hint) hint.innerText = "Select another satellite blueprint to continue building.";
 	                            openBlueprintDrawer(false);
 	                            updateBuildButtonState();
@@ -3703,11 +3722,13 @@
 	                        } else if (!hasEmptyDeployableOrbitSlot()) {
 	                            game.selectedShopType = null;
 	                            game.orbitGridHighlights = false;
+	                            suppressStarterTooltips(false);
 	                            notifyNoEmptyOrbitSlots();
 	                            updateBuildButtonState();
 	                        } else {
 	                            game.selectedShopType = null;
 	                            game.orbitGridHighlights = false;
+	                            suppressStarterTooltips(false);
 	                            if (hint) hint.innerHTML = `<span class="text-red-400 font-bold">Insufficient credits to continue building ${SATELLITE_CONFIGS[deployedType].name}.</span>`;
 	                            updateBuildButtonState();
 	                        }
@@ -3722,12 +3743,14 @@
 	                    if (isMobileBuildView()) {
 		                        game.selectedShopType = null;
 		                        game.orbitGridHighlights = false;
+		                        suppressStarterTooltips(false);
 		                        openBlueprintDrawer(false);
 		                        updateShopAvailability();
 		                        updateBuildButtonState();
 		                    } else {
 		                        game.selectedShopType = null;
 		                        game.orbitGridHighlights = false;
+		                        suppressStarterTooltips(false);
 		                        updateShopAvailability();
 		                        updateBuildButtonState();
 		                    }
@@ -3830,6 +3853,7 @@
 	                    }
 	                    game.selectedShopType = type;
 	                    game.orbitGridHighlights = true;
+	                    suppressStarterTooltips(true);
 	                    if (ah) ah.innerHTML = `Deployment Mode: <span class="text-emerald-400 font-bold">Tap near any glowing empty slot to place ${SATELLITE_CONFIGS[type].name}</span>`;
 	                    if (isMobileBuildView()) closeBlueprintDrawer();
 	                }
