@@ -42,7 +42,7 @@ body {
     bottom: 0;
     right: 0;
     background: linear-gradient(rgba(18, 16, 16, 0) 65%, rgba(0, 0, 0, 0.10) 65%), linear-gradient(90deg, rgba(255, 0, 0, 0.025), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.025));
-    z-index: 20;
+    z-index: 1;
     background-size: 100% 7px, 10px 100%;
     pointer-events: none;
 }
@@ -91,7 +91,49 @@ body {
 
 .wave-ready {
     animation: readyPulse 1.15s ease-in-out infinite;
-    box-shadow: 0 0 18px rgba(16, 185, 129, 0.55), 0 0 0 1px rgba(190, 242, 100, 0.35);
+    background: #f59e0b !important;
+    box-shadow: 0 0 18px rgba(245, 158, 11, 0.65), 0 0 0 1px rgba(253, 230, 138, 0.45) !important;
+}
+
+.wave-event-pop {
+    animation: waveEventPop 2.7s ease-in-out;
+}
+
+.wave-event-card {
+    width: min(38rem, calc(100vw - 2rem));
+    padding: 1rem 1.2rem;
+    border: 1px solid rgba(251, 191, 36, 0.78);
+    border-radius: 0.9rem;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.96), rgba(15, 23, 42, 0.94));
+    box-shadow: 0 0 0 1px rgba(253, 230, 138, 0.18), 0 0 32px rgba(245, 158, 11, 0.34), inset 0 0 22px rgba(245, 158, 11, 0.08);
+}
+
+.wave-event-card::before,
+.wave-event-card::after {
+    content: "";
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(103, 232, 249, 0.8), transparent);
+}
+
+.wave-event-card::before {
+    top: 0.55rem;
+}
+
+.wave-event-card::after {
+    bottom: 0.55rem;
+}
+
+.wave-event-title {
+    margin-top: 0.2rem;
+    font-size: clamp(1.35rem, 5vw, 3.1rem);
+    line-height: 1.05;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.72), 0 2px 0 rgba(0, 0, 0, 0.65);
 }
 
 .boss-wave-ready {
@@ -176,6 +218,18 @@ body.boss-mode-active .notice-safe-top {
     animation: tooltipRadiate 1.35s ease-in-out infinite;
 }
 
+.master-command-tour-card {
+    width: min(20rem, calc(100vw - 1.5rem));
+}
+
+.master-command-tour-focus {
+    position: relative;
+    z-index: 66;
+    border-color: rgba(125, 211, 252, 0.95) !important;
+    box-shadow: 0 0 0 1px rgba(125, 211, 252, 0.75), 0 0 24px rgba(56, 189, 248, 0.48), inset 0 0 18px rgba(56, 189, 248, 0.1) !important;
+    animation: tooltipRadiate 1.35s ease-in-out infinite;
+}
+
 .tech-notice {
     background: rgba(69, 10, 10, 0.92);
     border: 1px solid rgba(248, 113, 113, 0.72);
@@ -190,6 +244,33 @@ body.boss-mode-active .notice-safe-top {
 
 .mode-transition-pop {
     animation: modeTransitionPop 1.45s ease-in-out;
+}
+
+.boss-card-energy {
+    animation: bossCardEnergyIn 0.72s ease-out;
+}
+
+.boss-reward-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.boss-reward-card::before {
+    content: "";
+    position: absolute;
+    inset: -35%;
+    background: linear-gradient(120deg, transparent 35%, rgba(103, 232, 249, 0.22), rgba(251, 191, 36, 0.2), transparent 65%);
+    transform: translateX(-75%) rotate(10deg);
+    animation: directiveCardSweep 1.4s ease-out 0.18s both;
+    pointer-events: none;
+}
+
+.boss-reward-card:nth-child(2)::before {
+    animation-delay: 0.34s;
+}
+
+.boss-reward-card:nth-child(3)::before {
+    animation-delay: 0.5s;
 }
 
 .build-tooltip-connector {
@@ -236,6 +317,14 @@ body.boss-mode-active .notice-safe-top {
     50% { transform: scale(1.035); filter: brightness(1.18); }
 }
 
+@keyframes waveEventPop {
+    0% { opacity: 0; transform: translate(-50%, -44%) scale(0.96); filter: brightness(1.35); }
+    14% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: brightness(1.12); }
+    70% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: brightness(1); }
+    88% { opacity: 0.72; transform: translate(-50%, -51%) scale(1); filter: brightness(0.98); }
+    100% { opacity: 0; transform: translate(-50%, -52%) scale(0.995); filter: brightness(0.95); }
+}
+
 @keyframes textureDrift {
     from { background-position: 0 50%; }
     to { background-position: 100% 50%; }
@@ -262,4 +351,28 @@ body.boss-mode-active .notice-safe-top {
     0% { opacity: 0; transform: scale(1.04); }
     32%, 72% { opacity: 1; transform: scale(1); }
     100% { opacity: 0; transform: scale(0.98); }
+}
+
+@keyframes bossCardEnergyIn {
+    0% {
+        opacity: 0;
+        filter: brightness(1.8) saturate(1.6);
+        transform: scale(1.035);
+    }
+    55% {
+        opacity: 1;
+        filter: brightness(1.35) saturate(1.35);
+        transform: scale(1);
+    }
+    100% {
+        opacity: 1;
+        filter: brightness(1) saturate(1);
+        transform: scale(1);
+    }
+}
+
+@keyframes directiveCardSweep {
+    0% { transform: translateX(-75%) rotate(10deg); opacity: 0; }
+    18% { opacity: 1; }
+    100% { transform: translateX(90%) rotate(10deg); opacity: 0; }
 }

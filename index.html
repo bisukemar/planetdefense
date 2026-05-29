@@ -9,26 +9,162 @@
     <meta name="apple-mobile-web-app-title" content="PDefense">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Planetary Defense Command</title>
-    <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="elements/favicon.ico" sizes="any">
     <link rel="apple-touch-icon" href="elements/pd_icon.png">
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: #030712;
+        }
+        body {
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        .hidden {
+            display: none !important;
+        }
+        @media (min-width: 768px) {
+            .md\:flex {
+                display: flex !important;
+            }
+            .md\:inline {
+                display: inline !important;
+            }
+            .md\:block {
+                display: block !important;
+            }
+            .md\:hidden {
+                display: none !important;
+            }
+        }
+        #boot-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem;
+            background: #020617;
+            color: #e2e8f0;
+            text-align: center;
+        }
+        #boot-loader-panel {
+            width: min(100%, 24rem);
+        }
+        #boot-loader-mark {
+            width: 4rem;
+            height: 4rem;
+            margin: 0 auto;
+            border-radius: 9999px;
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 28px rgba(16, 185, 129, 0.32);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: bootPulse 1.35s ease-in-out infinite;
+        }
+        #boot-loader-mark::before {
+            content: "";
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            border: 3px solid rgba(52, 211, 153, 0.95);
+            border-top-color: rgba(103, 232, 249, 0.18);
+            animation: bootSpin 1.05s linear infinite;
+        }
+        #boot-loader-title {
+            margin: 1rem 0 0;
+            color: #6ee7b7;
+            font-size: 1.125rem;
+            font-weight: 900;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            text-shadow: 0 0 8px rgba(16, 185, 129, 0.58);
+        }
+        #boot-loader-status {
+            margin: 0.5rem 0 0;
+            color: #94a3b8;
+            font-size: 0.625rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+        #boot-loader-track {
+            height: 0.5rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(16, 185, 129, 0.22);
+            border-radius: 9999px;
+            background: #0f172a;
+            overflow: hidden;
+        }
+        #boot-loader-bar {
+            width: var(--load-progress, 0%);
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #67e8f9);
+            transition: width 0.2s ease;
+        }
+        #boot-loader-count {
+            margin-top: 0.5rem;
+            color: #64748b;
+            font-size: 0.5625rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+        #boot-loader-retry {
+            display: none;
+            width: 100%;
+            margin-top: 1rem;
+            border: 0;
+            border-radius: 0.75rem;
+            padding: 0.85rem 1rem;
+            background: #f59e0b;
+            color: #020617;
+            font-size: 0.75rem;
+            font-weight: 900;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+        #boot-loader-retry:not(.hidden) {
+            display: block;
+        }
+        .boot-loader-hidden {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+        @keyframes bootSpin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes bootPulse {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+    </style>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
-    <link class="ui-sheet" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <link class="ui-sheet" rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link class="ui-sheet" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="styles.css"></noscript>
 </head>
 <body class="game-shell relative text-slate-100 scanline select-none font-semibold">
 
     <!-- LAUNCH ASSET LOADER -->
     <div id="boot-loader" class="fixed inset-0 z-[100] bg-slate-950 flex items-center justify-center p-5 pointer-events-auto">
-        <div class="w-full max-w-sm text-center">
-            <div class="mx-auto w-16 h-16 rounded-full border border-emerald-500/50 bg-emerald-500/10 flex items-center justify-center shadow-[0_0_28px_rgba(16,185,129,0.32)] animate-pulse">
+        <div id="boot-loader-panel" class="w-full max-w-sm text-center">
+            <div id="boot-loader-mark" class="mx-auto w-16 h-16 rounded-full border border-emerald-500/50 bg-emerald-500/10 flex items-center justify-center shadow-[0_0_28px_rgba(16,185,129,0.32)] animate-pulse">
                 <i class="fa-solid fa-earth-asia text-emerald-400 text-3xl animate-spin-slow"></i>
             </div>
-            <h1 class="mt-4 text-lg md:text-2xl font-black uppercase tracking-widest text-emerald-300 text-glow-green">Planetary Defense</h1>
+            <h1 id="boot-loader-title" class="mt-4 text-lg md:text-2xl font-black uppercase tracking-widest text-emerald-300 text-glow-green">Planetary Defense</h1>
             <p id="boot-loader-status" class="mt-2 text-[10px] uppercase tracking-widest text-slate-400 font-bold">Loading command assets</p>
-            <div class="mt-4 h-2 rounded-full bg-slate-900 border border-emerald-500/20 overflow-hidden">
+            <div id="boot-loader-track" class="mt-4 h-2 rounded-full bg-slate-900 border border-emerald-500/20 overflow-hidden">
                 <div id="boot-loader-bar" class="boot-loader-bar h-full bg-gradient-to-r from-emerald-500 to-cyan-300 transition-all duration-200"></div>
             </div>
             <div id="boot-loader-count" class="mt-2 text-[9px] uppercase tracking-widest text-slate-500 tech-font">0%</div>
@@ -43,6 +179,11 @@
 
     <!-- RESPONSIVE GAME NOTICES / STARTER TOOLTIPS -->
     <div id="game-notice" class="hidden fixed left-1/2 notice-safe-top z-[60] -translate-x-1/2 tech-notice notice-pop px-3 py-2 rounded-xl text-[10px] md:text-xs uppercase tracking-widest font-black text-center max-w-[88vw] pointer-events-none"></div>
+    <div id="wave-event-banner" class="hidden fixed left-1/2 top-1/2 z-[62] -translate-x-1/2 -translate-y-1/2 pointer-events-none text-center wave-event-card">
+        <div id="wave-event-kicker" class="text-[9px] md:text-xs text-cyan-200 uppercase tracking-[0.28em] font-black">Command Alert</div>
+        <div id="wave-event-title" class="wave-event-title text-amber-300">Wave Started</div>
+        <div id="wave-event-subtitle" class="mt-1 text-slate-100 text-[10px] md:text-sm uppercase tracking-widest font-black">Enemy signatures inbound</div>
+    </div>
     <div id="mode-transition-overlay" class="hidden fixed inset-0 z-[68] bg-slate-950/90 backdrop-blur-sm pointer-events-none items-center justify-center">
         <div class="text-center px-5">
             <div class="mx-auto w-16 h-16 rounded-full border border-cyan-400/60 bg-cyan-500/10 flex items-center justify-center shadow-[0_0_30px_rgba(34,211,238,0.32)]">
@@ -54,6 +195,15 @@
     </div>
     <div id="planet-tutorial-tooltip" class="hidden absolute z-20 tech-tooltip px-2.5 py-1.5 rounded-lg text-[9px] md:text-[10px] uppercase tracking-wider font-black text-center max-w-[210px] pointer-events-none">
         Click the Planet to access Master Command Center
+    </div>
+    <div id="master-command-tour" class="hidden fixed z-[70] tech-tooltip master-command-tour-card px-3 py-2 rounded-xl text-[10px] md:text-xs uppercase tracking-wider font-black pointer-events-auto">
+        <div id="master-command-tour-step" class="text-[8px] text-slate-400 tracking-widest mb-1">01/03</div>
+        <div id="master-command-tour-title" class="text-cyan-200 text-[11px] md:text-sm">Shield Engineering</div>
+        <div id="master-command-tour-text" class="text-slate-300 text-[9px] md:text-[10px] normal-case tracking-normal leading-snug mt-1 font-bold"></div>
+        <div class="flex gap-2 mt-2">
+            <button id="master-command-tour-skip" class="flex-1 bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-slate-300 rounded-lg py-1.5 text-[9px] uppercase tracking-widest font-black pointer-events-auto">Skip</button>
+            <button id="master-command-tour-next" class="flex-1 bg-cyan-400 hover:bg-cyan-300 text-slate-950 rounded-lg py-1.5 text-[9px] uppercase tracking-widest font-black pointer-events-auto">Next</button>
+        </div>
     </div>
     <div id="boss-mode-hud" class="hidden fixed left-3 right-3 top-safe z-[55] pointer-events-none">
         <div class="max-w-lg mx-auto bg-slate-950/90 border border-red-500/50 rounded-xl p-2.5 shadow-2xl">
@@ -78,6 +228,10 @@
                 <h2 class="text-amber-300 text-lg md:text-2xl font-black uppercase tracking-widest">Choose Command Directive</h2>
                 <p class="text-slate-400 text-[10px] uppercase tracking-widest mt-1">Persistent upgrades for defense waves only</p>
             </div>
+            <div id="boss-victory-briefing" class="mt-4 bg-slate-950/80 border border-cyan-500/30 rounded-xl p-3 text-center">
+                <div id="boss-victory-title" class="text-cyan-200 text-xs md:text-sm font-black uppercase tracking-widest">Boss Ship Destroyed</div>
+                <p id="boss-victory-story" class="text-slate-300 text-[10px] md:text-xs leading-relaxed mt-2 font-bold"></p>
+            </div>
             <div id="boss-card-options" class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4"></div>
         </div>
     </div>
@@ -99,14 +253,7 @@
     <div id="desktop-hud" class="hidden md:flex absolute top-4 left-4 right-4 z-10 flex-col gap-2 pointer-events-auto">
         <!-- SYSTEM UTILITIES CONTROL BAR -->
         <div class="w-full flex justify-between items-center bg-slate-950/85 backdrop-blur-md p-2 rounded-xl border border-slate-800/80 shadow-lg font-bold">
-            <!-- Live Credits / Gold Display -->
-            <div class="flex items-center gap-2">
-                <span class="text-slate-400 text-[10px] uppercase tracking-wider font-bold">Credits:</span>
-                <div class="flex items-center gap-1.5 bg-slate-900 border border-amber-500/20 px-3 py-1 rounded-full shadow-inner">
-                    <span class="text-amber-400 text-xs md:text-sm animate-pulse"><i class="fa-solid fa-coins"></i></span>
-                    <span id="gold-display" class="text-xs md:text-sm font-bold text-amber-300 tech-font">500</span>
-                </div>
-            </div>
+            <div class="w-8"></div>
 
             <!-- Live Wave Header Badge -->
             <div class="flex items-center gap-2 bg-slate-900 border border-emerald-500/30 px-3 py-1 rounded-full text-xs animate-pulse">
@@ -169,9 +316,6 @@
                     <div class="text-sm text-pink-400/90 tech-font mt-0.5 font-bold" id="enemies-remaining">REMAINING: 10</div>
                     <div class="text-xs text-slate-400 tech-font mt-0.5 font-bold">Score: <span id="score-display" class="text-purple-400 font-bold">0</span></div>
                 </div>
-                <button id="next-wave-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-1 transition-all pointer-events-auto min-h-[34px] select-none font-bold">
-                    <i class="fa-solid fa-play"></i> START WAVE
-                </button>
             </div>
         </div>
     </div>
@@ -302,7 +446,7 @@
             <button id="close-orbit-inspect" class="text-slate-400 hover:text-white p-2 text-sm md:text-xs select-none" style="touch-action: manipulation;"><i class="fa-solid fa-xmark font-bold"></i></button>
         </div>
         
-        <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80 space-y-2">
+        <div id="master-tour-shield" class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80 space-y-2">
             <h3 class="text-[10px] text-cyan-400 uppercase tracking-widest font-extrabold text-left"><i class="fa-solid fa-heart-pulse mr-1"></i> Shield Engineering</h3>
             <div class="grid grid-cols-2 gap-2 font-bold">
                 <button id="cmd-repair-shield" class="bg-slate-900 hover:bg-slate-800 border border-cyan-500/20 rounded-lg p-2 flex flex-col items-center justify-center transition-all select-none">
@@ -318,7 +462,7 @@
         </div>
         
         <div class="space-y-2">
-            <div class="bg-slate-950/60 rounded border border-purple-500/30 overflow-hidden font-bold">
+            <div id="master-tour-orbits" class="bg-slate-950/60 rounded border border-purple-500/30 overflow-hidden font-bold">
                 <button id="accordion-orbits-btn" class="w-full px-2.5 py-2 flex items-center justify-between text-[10px] text-purple-300 uppercase tracking-widest font-extrabold select-none">
                     <span><i class="fa-solid fa-circle-dot mr-1"></i> Orbital Array Control</span>
                     <i id="accordion-orbits-icon" class="fa-solid fa-chevron-up text-[9px]"></i>
@@ -350,7 +494,7 @@
                 </div>
                 </div>
             </div>
-            <div class="bg-slate-950/60 rounded border border-amber-500/30 overflow-hidden font-bold">
+            <div id="master-tour-directives" class="bg-slate-950/60 rounded border border-amber-500/30 overflow-hidden font-bold">
                 <button id="accordion-directives-btn" class="w-full px-2.5 py-2 flex items-center justify-between text-[10px] text-amber-300 uppercase tracking-widest font-extrabold select-none">
                     <span><i class="fa-solid fa-layer-group mr-1"></i> Command Directives</span>
                     <span class="flex items-center gap-2"><span id="boss-card-count" class="text-slate-400 font-normal normal-case tracking-normal">0 Active</span><i id="accordion-directives-icon" class="fa-solid fa-chevron-up text-[9px]"></i></span>
@@ -430,22 +574,27 @@
 
     <!-- BOTTOM FLOATING ACTION COMMAND PANEL -->
     <div class="absolute bottom-3 left-2 right-2 md:bottom-4 md:left-4 md:right-4 z-10 flex flex-col items-center gap-1.5 pointer-events-auto pb-safe">
+        <div class="flex items-center gap-1.5 bg-slate-950/90 border border-amber-500/30 px-3 py-1 rounded-full shadow-md backdrop-blur select-none">
+            <i class="fa-solid fa-coins text-amber-400 text-[10px] animate-pulse"></i>
+            <span class="text-[9px] uppercase tracking-widest text-slate-400 font-black">Credits</span>
+            <span id="bottom-gold" class="tech-font text-amber-300 text-xs font-black">500</span>
+        </div>
         <div class="text-center text-[9px] md:text-xs text-slate-300 bg-slate-950/90 px-3 py-1 md:py-1.5 rounded-full border border-slate-800/80 backdrop-blur max-w-full truncate shadow-md select-none font-bold">
             <span id="action-hint">Tap the planet core to open Master Command, or tap BUILD to deploy satellites!</span>
         </div>
-        <div id="build-control-wrapper" class="w-full max-w-xs flex gap-2 md:block relative">
+        <div id="build-control-wrapper" class="w-full max-w-xs md:max-w-md flex gap-2 relative">
             <div id="build-tutorial-tooltip" class="hidden absolute left-0 md:left-1/2 -top-[4.7rem] md:-top-[4.55rem] md:-translate-x-1/2 tech-tooltip px-2.5 py-1.5 rounded-lg text-[9px] md:text-[10px] uppercase tracking-wider font-black text-center whitespace-nowrap pointer-events-none">
                 <span id="build-tutorial-text">Click here to deploy satellites</span>
                 <span class="build-tooltip-connector"></span>
                 <span class="build-tooltip-target"></span>
             </div>
-            <button id="open-build-drawer-btn" class="flex-1 md:w-full bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black py-2.5 rounded-xl text-[10px] md:text-sm tracking-widest uppercase transition-all flex justify-center items-center gap-1.5 md:gap-2 select-none glow-green shadow-xl pointer-events-auto font-bold">
+            <button id="open-build-drawer-btn" class="flex-1 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black py-2.5 rounded-xl text-[10px] md:text-sm tracking-widest uppercase transition-all flex justify-center items-center gap-1.5 md:gap-2 select-none glow-green shadow-xl pointer-events-auto font-bold">
                 <i class="fa-solid fa-hammer font-bold"></i>
                 <span class="md:hidden">BUILD</span>
                 <span class="hidden md:inline">BUILD SATELLITE</span>
             </button>
-            <button id="mobile-launch-btn" class="md:hidden flex-1 bg-emerald-600 active:bg-emerald-500 text-slate-950 text-[10px] font-black py-2.5 rounded-xl select-none uppercase tracking-wider min-h-[38px] transition-all flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-play"></i> WAVE
+            <button id="mobile-launch-btn" class="flex-1 bg-amber-500 hover:bg-amber-400 active:bg-amber-400 text-slate-950 text-[10px] md:text-sm font-black py-2.5 rounded-xl select-none uppercase tracking-wider min-h-[38px] transition-all flex items-center justify-center gap-1.5 border border-amber-300/50 shadow-[0_0_18px_rgba(245,158,11,0.35)]">
+                <i class="fa-solid fa-play"></i> START NEXT WAVE
             </button>
         </div>
     </div>
@@ -712,7 +861,7 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        const APP_VERSION = '2026.05.29.53';
+        const APP_VERSION = '2026.05.29.66';
 
         let gameScale = 1;
         let rangeScale = 1;
@@ -747,7 +896,11 @@
         let deferredInstallPrompt = null;
         let gameNoticeTimer = null;
         let tutorialHints = { planet: false, build: false };
+        let planetTutorialTooltipShown = false;
         let starterTooltipsSuppressed = false;
+        let firstDeploymentSlotHintShown = false;
+        let masterCommandTourSeen = false;
+        let masterCommandTourStep = 0;
         let modeTransitionActive = false;
         let gameLoopStarted = false;
 
@@ -1303,8 +1456,9 @@
         let bossMode = {
             active: false, phase: 'idle', wave: 0, frame: 0, spawnTimer: 0, spawned: 0, requiredKills: 0, kills: 0,
             player: { x: 0, y: 0, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: 0, targetY: 0 },
-            enemies: [], projectiles: [], enemyProjectiles: [], boss: null, rewardOptions: []
+            enemies: [], projectiles: [], enemyProjectiles: [], boss: null, rewardOptions: [], victoryTimer: 0, defeatedBossName: ''
         };
+        let resizeRaf = null;
 
         // ----------------------------------------------------------------------
         // 2. UTILS
@@ -1335,9 +1489,8 @@
         // 3. CANVAS & COSMIC BACKGROUND
         // ----------------------------------------------------------------------
         function getViewportSize() {
-            const viewport = window.visualViewport;
-            const width = Math.round((viewport && viewport.width) || canvas.clientWidth || window.innerWidth);
-            const height = Math.round((viewport && viewport.height) || canvas.clientHeight || window.innerHeight);
+            const width = Math.round(canvas.clientWidth || document.documentElement.clientWidth || window.innerWidth);
+            const height = Math.round(canvas.clientHeight || document.documentElement.clientHeight || window.innerHeight);
             return { width, height };
         }
 
@@ -1345,6 +1498,8 @@
             const viewportSize = getViewportSize();
             const actualWidth = viewportSize.width;
             const actualHeight = viewportSize.height;
+            if (actualWidth <= 0 || actualHeight <= 0) return;
+            if (canvas.width === actualWidth && canvas.height === actualHeight) return;
             
             canvas.width = actualWidth;
             canvas.height = actualHeight;
@@ -1360,14 +1515,21 @@
                 for (let tower of game.towers) tower.updateCoordinates();
             }
         }
+
+        function scheduleResizeCanvas() {
+            if (resizeRaf) return;
+            resizeRaf = requestAnimationFrame(() => {
+                resizeRaf = null;
+                resizeCanvas();
+            });
+        }
         
-        const resizeObserver = new ResizeObserver(() => resizeCanvas());
+        const resizeObserver = new ResizeObserver(() => scheduleResizeCanvas());
         resizeObserver.observe(canvas);
-        window.addEventListener('resize', resizeCanvas);
-        window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 250));
+        window.addEventListener('resize', scheduleResizeCanvas);
+        window.addEventListener('orientationchange', () => setTimeout(scheduleResizeCanvas, 250));
         if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', resizeCanvas);
-            window.visualViewport.addEventListener('scroll', resizeCanvas);
+            window.visualViewport.addEventListener('resize', scheduleResizeCanvas);
         }
         resizeCanvas();
 
@@ -1476,7 +1638,6 @@
             const failed = results.filter(result => !result.ok);
             if (failed.length > 0) {
                 console.warn('Asset preload failures:', failed);
-                throw new Error(`${failed.length} assets failed to load`);
             }
         }
 
@@ -1509,7 +1670,13 @@
                     loop();
                 }
             } catch (error) {
-                showBootLoaderFailure(error);
+                console.warn('Boot preload failed; continuing to title screen:', error);
+                hideBootLoader();
+                startTitleBgm();
+                if (!gameLoopStarted) {
+                    gameLoopStarted = true;
+                    loop();
+                }
             }
         }
 
@@ -1661,7 +1828,20 @@
             }
         }
 
+        function canUsePwaFeatures() {
+            return location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        }
+
+        function attachPwaManifest() {
+            if (!canUsePwaFeatures() || document.querySelector('link[rel="manifest"]')) return;
+            const manifestLink = document.createElement('link');
+            manifestLink.rel = 'manifest';
+            manifestLink.href = 'manifest.webmanifest';
+            document.head.appendChild(manifestLink);
+        }
+
         async function checkForAppUpdate(registration) {
+            if (!canUsePwaFeatures()) return;
             try {
                 const response = await fetch(`./version.json?ts=${Date.now()}`, {
                     cache: 'no-store',
@@ -1685,7 +1865,8 @@
         }
 
         function registerPwaSupport() {
-            if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+            attachPwaManifest();
+            if ('serviceWorker' in navigator && canUsePwaFeatures()) {
                 navigator.serviceWorker.register('./sw.js')
                     .then(registration => {
                         registration.update();
@@ -1820,6 +2001,7 @@
         function closeOrbitInspector() {
             const p = document.getElementById('orbit-inspector-panel');
             if (!p) return;
+            finishMasterCommandTour();
             if (window.innerWidth < 768) p.style.transform = 'translate(0px, 120%)'; else p.style.transform = 'translate(120%, 0px)';
             if (game) game.selectedOrbitIndex = null;
             setTimeout(() => { if (game && game.selectedOrbitIndex === null) p.classList.add('hidden'); }, 300);
@@ -1851,8 +2033,79 @@
         function toggleOrbitInspector() {
             closeInspector(); closeBlueprintDrawer();
             const p = document.getElementById('orbit-inspector-panel');
-            if (p && p.classList.contains('hidden')) { updateOrbitInspectorUI(); openOrbitInspector(); } else { closeOrbitInspector(); }
+            if (p && p.classList.contains('hidden')) { updateOrbitInspectorUI(); openOrbitInspector(); maybeStartMasterCommandTour(); } else { closeOrbitInspector(); }
             playSynthSound('upgrade');
+        }
+
+        const MASTER_COMMAND_TOUR_STEPS = [
+            {
+                targetId: 'master-tour-shield',
+                title: 'Shield Engineering',
+                text: 'Repair depleted shields or expand maximum shield capacity when you have enough credits.'
+            },
+            {
+                targetId: 'master-tour-orbits',
+                title: 'Orbital Array Control',
+                text: 'Unlock additional orbit paths and expand slot capacity so more satellites can be deployed.'
+            },
+            {
+                targetId: 'master-tour-directives',
+                title: 'Command Directives',
+                text: 'Boss rewards appear here. Directives are persistent upgrades that affect future defense waves.'
+            }
+        ];
+
+        function maybeStartMasterCommandTour() {
+            if (masterCommandTourSeen) return;
+            masterCommandTourSeen = true;
+            setTimeout(() => startMasterCommandTour(), 360);
+        }
+
+        function startMasterCommandTour() {
+            masterCommandTourStep = 0;
+            renderMasterCommandTour();
+        }
+
+        function clearMasterCommandTourFocus() {
+            document.querySelectorAll('.master-command-tour-focus').forEach(el => el.classList.remove('master-command-tour-focus'));
+        }
+
+        function finishMasterCommandTour() {
+            clearMasterCommandTourFocus();
+            const card = document.getElementById('master-command-tour');
+            if (card) card.classList.add('hidden');
+        }
+
+        function renderMasterCommandTour() {
+            const card = document.getElementById('master-command-tour');
+            const stepLabel = document.getElementById('master-command-tour-step');
+            const title = document.getElementById('master-command-tour-title');
+            const text = document.getElementById('master-command-tour-text');
+            const next = document.getElementById('master-command-tour-next');
+            const step = MASTER_COMMAND_TOUR_STEPS[masterCommandTourStep];
+            const target = step ? document.getElementById(step.targetId) : null;
+            if (!card || !step || !target) {
+                finishMasterCommandTour();
+                return;
+            }
+
+            clearMasterCommandTourFocus();
+            target.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+            target.classList.add('master-command-tour-focus');
+            if (stepLabel) stepLabel.innerText = `${String(masterCommandTourStep + 1).padStart(2, '0')}/${String(MASTER_COMMAND_TOUR_STEPS.length).padStart(2, '0')}`;
+            if (title) title.innerText = step.title;
+            if (text) text.innerText = step.text;
+            if (next) next.innerText = masterCommandTourStep === MASTER_COMMAND_TOUR_STEPS.length - 1 ? 'Done' : 'Next';
+
+            const rect = target.getBoundingClientRect();
+            const cardWidth = Math.min(320, window.innerWidth - 24);
+            const left = Math.max(12, Math.min(window.innerWidth - cardWidth - 12, rect.left + rect.width / 2 - cardWidth / 2));
+            const placeBelow = rect.bottom + 130 < window.innerHeight;
+            const top = placeBelow ? rect.bottom + 10 : Math.max(12, rect.top - 142);
+            card.style.width = `${cardWidth}px`;
+            card.style.left = `${left}px`;
+            card.style.top = `${top}px`;
+            card.classList.remove('hidden');
         }
 
         function selectTower(tower) {
@@ -2058,10 +2311,10 @@
         }
 
         function updateGoldUI() {
-            const goldDisplay = document.getElementById('gold-display');
             const mobileGold = document.getElementById('mobile-gold');
-            if (goldDisplay) goldDisplay.innerText = game.gold;
+            const bottomGold = document.getElementById('bottom-gold');
             if (mobileGold) mobileGold.innerText = game.gold;
+            if (bottomGold) bottomGold.innerText = game.gold;
             updateShopAvailability(); updateOrbitInspectorUI();
         }
 
@@ -2306,7 +2559,7 @@
         }
 
         function setWaveLaunchReady(isReady) {
-            ['next-wave-btn', 'mobile-launch-btn'].forEach(id => {
+            ['mobile-launch-btn'].forEach(id => {
                 const btn = document.getElementById(id);
                 if (!btn) return;
                 const bossReady = isReady && isBossWave(game.wave);
@@ -2317,8 +2570,24 @@
                 btn.classList.toggle('cursor-not-allowed', !isReady);
                 btn.innerHTML = bossReady
                     ? `<i class="fa-solid fa-skull"></i> <span>ENTER BOSS ROUND</span>`
-                    : `<i class="fa-solid fa-play"></i> <span>${id === 'mobile-launch-btn' ? 'WAVE' : 'START WAVE'}</span>`;
+                    : `<i class="fa-solid fa-play"></i> <span>START NEXT WAVE</span>`;
             });
+        }
+
+        function showWaveEvent(title, subtitle, color = 'amber') {
+            const banner = document.getElementById('wave-event-banner');
+            const titleEl = document.getElementById('wave-event-title');
+            const subtitleEl = document.getElementById('wave-event-subtitle');
+            if (!banner || !titleEl || !subtitleEl) return;
+            titleEl.innerText = title;
+            subtitleEl.innerText = subtitle;
+            titleEl.className = color === 'emerald'
+                ? 'wave-event-title text-emerald-300'
+                : 'wave-event-title text-amber-300';
+            banner.classList.remove('hidden', 'wave-event-pop');
+            banner.offsetHeight;
+            banner.classList.add('wave-event-pop');
+            setTimeout(() => banner.classList.add('hidden'), 2700);
         }
 
         function setBuildControlEnabled(isEnabled) {
@@ -2355,9 +2624,9 @@
         }
 
         function notifyNoEmptyOrbitSlots() {
-            showGameNotice('<i class="fa-solid fa-circle-exclamation mr-1"></i> No empty orbit slots available. Expand or unlock an orbit in Master Command.', 3200);
+            showOrbitExpansionPrompt();
             const hint = document.getElementById('action-hint');
-            if (hint) hint.innerHTML = `<span class="text-red-300 font-bold">No empty orbit slots. Open Master Command to expand orbital capacity.</span>`;
+            if (hint) hint.innerHTML = `<span class="text-red-300 font-bold">No empty orbit slots. Tap the planet to add slots in Master Command.</span>`;
         }
 
         function updateBuildButtonState() {
@@ -2415,7 +2684,7 @@
 
         function setStarterTooltipsVisible(isVisible) {
             starterTooltipsSuppressed = false;
-            tutorialHints.planet = isVisible;
+            tutorialHints.planet = isVisible && !planetTutorialTooltipShown;
             tutorialHints.build = isVisible;
             updateTutorialTooltips();
         }
@@ -2433,7 +2702,7 @@
             const inputWord = isCoarsePointerInput() ? 'Tap' : 'Click';
 
             if (planetTip) {
-                if (game.running && !hasIntroOpen && !starterTooltipsSuppressed && tutorialHints.planet) {
+                if (game.running && !hasIntroOpen && !starterTooltipsSuppressed && tutorialHints.planet && !planetTutorialTooltipShown) {
                     const centerX = canvas.width / 2;
                     const centerY = canvas.height / 2;
                     const safeTopOffset = window.visualViewport ? window.visualViewport.offsetTop : 0;
@@ -2443,6 +2712,7 @@
                     planetTip.style.top = `${tipTop}px`;
                     planetTip.style.transform = 'translateX(-50%)';
                     planetTip.classList.remove('hidden');
+                    planetTutorialTooltipShown = true;
                 } else {
                     planetTip.classList.add('hidden');
                 }
@@ -3088,6 +3358,79 @@
             return { closest, dist: minDist };
         }
 
+        function getFirstEmptyDeployableSlot() {
+            const centerX = canvas.width / 2; const centerY = canvas.height / 2;
+            for (let orbitIndex = 0; orbitIndex < ORBIT_PATHS.length; orbitIndex++) {
+                if (orbitLockStates[orbitIndex]) continue;
+                const radius = ORBIT_PATHS[orbitIndex];
+                const maxSlots = orbitSlotCapacities[orbitIndex];
+                for (let slotIndex = 0; slotIndex < maxSlots; slotIndex++) {
+                    if (game.towers.some(t => t.orbitIndex === orbitIndex && t.slotIndex === slotIndex)) continue;
+                    const angle = orbitRotations[orbitIndex] + slotIndex * (2 * Math.PI / maxSlots);
+                    return {
+                        orbitIndex,
+                        slotIndex,
+                        x: centerX + Math.cos(angle) * radius,
+                        y: centerY + Math.sin(angle) * radius
+                    };
+                }
+            }
+            return null;
+        }
+
+        function showOrbitExpansionPrompt() {
+            showGameNotice('<i class="fa-solid fa-triangle-exclamation mr-1"></i> No empty orbit slots. Tap the Planet to add slots in Master Command.', 4200);
+            if (!planetTutorialTooltipShown) tutorialHints.planet = true;
+            suppressStarterTooltips(false);
+        }
+
+        function drawFirstDeploymentSlotGuide(slot) {
+            if (!slot || firstDeploymentSlotHintShown || !game.selectedShopType) return;
+            const labelX = Math.max(92, Math.min(canvas.width - 92, slot.x));
+            const labelY = Math.max(84, slot.y - 72 * gameScale);
+            const pulse = 0.5 + Math.abs(Math.sin(Date.now() / 180)) * 0.5;
+            ctx.save();
+            ctx.strokeStyle = `rgba(190, 242, 100, ${0.65 + pulse * 0.25})`;
+            ctx.fillStyle = 'rgba(190, 242, 100, 0.08)';
+            ctx.lineWidth = 2 * gameScale;
+            ctx.shadowBlur = 16;
+            ctx.shadowColor = '#bef264';
+            ctx.beginPath();
+            ctx.arc(slot.x, slot.y, (24 + pulse * 7) * gameScale, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.shadowBlur = 10;
+            ctx.strokeStyle = '#67e8f9';
+            ctx.fillStyle = '#67e8f9';
+            ctx.beginPath();
+            ctx.moveTo(labelX, labelY + 20 * gameScale);
+            ctx.lineTo(slot.x, slot.y - 20 * gameScale);
+            ctx.stroke();
+            const arrowAngle = Math.atan2(slot.y - 20 * gameScale - (labelY + 20 * gameScale), slot.x - labelX);
+            ctx.beginPath();
+            ctx.moveTo(slot.x, slot.y - 20 * gameScale);
+            ctx.lineTo(slot.x - Math.cos(arrowAngle - 0.55) * 13 * gameScale, slot.y - 20 * gameScale - Math.sin(arrowAngle - 0.55) * 13 * gameScale);
+            ctx.lineTo(slot.x - Math.cos(arrowAngle + 0.55) * 13 * gameScale, slot.y - 20 * gameScale - Math.sin(arrowAngle + 0.55) * 13 * gameScale);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.shadowBlur = 12;
+            ctx.fillStyle = 'rgba(2, 6, 23, 0.92)';
+            ctx.strokeStyle = 'rgba(103, 232, 249, 0.85)';
+            const boxW = 132 * gameScale;
+            const boxH = 30 * gameScale;
+            ctx.fillRect(labelX - boxW / 2, labelY - boxH / 2, boxW, boxH);
+            ctx.strokeRect(labelX - boxW / 2, labelY - boxH / 2, boxW, boxH);
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#bae6fd';
+            ctx.font = `900 ${Math.max(10, 12 * gameScale)}px Orbitron`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('DEPLOY HERE!', labelX, labelY);
+            ctx.restore();
+        }
+
         function isCoarsePointerInput() {
             return window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
         }
@@ -3183,7 +3526,7 @@
             bossMode = {
                 active: false, phase: 'idle', wave: 0, frame: 0, spawnTimer: 0, spawned: 0, requiredKills: 0, kills: 0,
                 player: { x: canvas.width / 2, y: canvas.height - 120, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120 },
-                enemies: [], projectiles: [], enemyProjectiles: [], boss: null, rewardOptions: []
+                enemies: [], projectiles: [], enemyProjectiles: [], boss: null, rewardOptions: [], victoryTimer: 0, defeatedBossName: ''
             };
             const hud = document.getElementById('boss-mode-hud');
             const modal = document.getElementById('boss-card-modal');
@@ -3291,6 +3634,10 @@
 
         function updateBossMode() {
             bossMode.frame++;
+            if (bossMode.phase === 'boss-defeated') {
+                updateBossVictorySequence();
+                return;
+            }
             const player = bossMode.player;
             const playerTopLimit = getBossPlayTop() + 32;
             const playerBottomLimit = isMobileBuildView() ? canvas.height - 150 : canvas.height - 80;
@@ -3344,7 +3691,7 @@
                     boss.cooldown = rage ? Math.floor(boss.config.fireRate * 0.55) : boss.config.fireRate;
                     playSynthSound('missile');
                 }
-                if (boss.hp <= 0) openBossRewardCards();
+                if (boss.hp <= 0) handleBossDestroyed();
             }
 
             for (let i = bossMode.enemies.length - 1; i >= 0; i--) {
@@ -3399,6 +3746,78 @@
 
             if (player.hp <= 0) {
                 failBossMission();
+            }
+        }
+
+        function handleBossDestroyed() {
+            const boss = bossMode.boss;
+            if (!boss || boss.defeated) return;
+            boss.defeated = true;
+            bossMode.phase = 'boss-defeated';
+            bossMode.victoryTimer = 0;
+            bossMode.defeatedBossName = boss.config.name;
+            bossMode.enemyProjectiles = [];
+            bossMode.enemies = [];
+            bossMode.projectiles = [];
+            boss.defeatAlpha = 1;
+            boss.defeatSpin = 0;
+            playSynthSound('explosion');
+            showGameNotice(`<i class="fa-solid fa-trophy mr-1"></i> Congratulations, you destroyed the ${boss.config.name}!`, 3600);
+            createBossDeathBurst(boss.x, boss.y, boss.config.color, 1.85);
+            bossMode.player.dragging = false;
+            bossMode.player.targetX = bossMode.player.x;
+            bossMode.player.targetY = bossMode.player.y;
+        }
+
+        function createBossDeathBurst(x, y, color, intensity = 1) {
+            createExplosion(x, y, color, Math.floor(42 * intensity));
+            createExplosion(x, y, '#fbbf24', Math.floor(28 * intensity));
+            createExplosion(x, y, '#ffffff', Math.floor(16 * intensity));
+            playSynthSound('explosion');
+        }
+
+        function updateBossVictorySequence() {
+            const boss = bossMode.boss;
+            const player = bossMode.player;
+            bossMode.victoryTimer++;
+            const explosionStageFrames = 138;
+
+            if (boss) {
+                boss.defeatSpin = (boss.defeatSpin || 0) + 0.026;
+                boss.defeatAlpha = Math.max(0, 1 - Math.max(0, bossMode.victoryTimer - 42) / 150);
+                if (bossMode.victoryTimer < explosionStageFrames && bossMode.victoryTimer % 4 === 0) {
+                    const radius = getBossHitRadius() || 90 * gameScale;
+                    const angle = Math.random() * Math.PI * 2;
+                    const spread = (0.2 + Math.random() * 0.92) * radius;
+                    const ex = boss.x + Math.cos(angle) * spread;
+                    const ey = boss.y + Math.sin(angle) * spread * 0.62;
+                    createBossDeathBurst(ex, ey, boss.config.color, bossMode.victoryTimer % 16 === 0 ? 0.92 : 0.46);
+                }
+            }
+
+            if (bossMode.victoryTimer === explosionStageFrames) {
+                showGameNotice(`<i class="fa-solid fa-shuttle-space mr-1"></i> Fighter wing returning to base with recovered command data`, 3800);
+            }
+
+            if (bossMode.victoryTimer > explosionStageFrames) {
+                const flyTimer = bossMode.victoryTimer - explosionStageFrames;
+                player.x += (canvas.width / 2 - player.x) * 0.065;
+                player.y -= (2.4 + Math.min(7.2, flyTimer * 0.055)) * gameScale;
+                player.targetX = player.x;
+                player.targetY = player.y;
+
+                if (flyTimer % 4 === 0) {
+                    createExplosion(player.x, player.y + 34 * gameScale, '#67e8f9', 4);
+                    createExplosion(player.x, player.y + 40 * gameScale, '#ffffff', 1);
+                }
+            }
+
+            if (bossMode.victoryTimer === 78) {
+                showGameNotice(`<i class="fa-solid fa-fire-flame-curved mr-1"></i> Boss hull rupture confirmed. Secondary detonations spreading.`, 3200);
+            }
+
+            if (bossMode.victoryTimer > 248 && bossMode.active && bossMode.phase === 'boss-defeated') {
+                openBossRewardCards();
             }
         }
 
@@ -3468,17 +3887,24 @@
             }
             if (bossMode.phase === 'boss' && bossMode.boss) {
                 drawEnemySprite(ctx, 'Boss Ship', bossMode.boss.x, bossMode.boss.y, bossMode.boss.size, Math.PI / 2);
+            } else if (bossMode.phase === 'boss-defeated' && bossMode.boss && (bossMode.boss.defeatAlpha || 0) > 0) {
+                ctx.save();
+                ctx.globalAlpha = bossMode.boss.defeatAlpha;
+                drawEnemySprite(ctx, 'Boss Ship', bossMode.boss.x, bossMode.boss.y, bossMode.boss.size, Math.PI / 2 + (bossMode.boss.defeatSpin || 0));
+                ctx.restore();
             }
             const playerSpriteSize = player.spriteSize || 58 * gameScale;
             if (!drawSpriteImage(playerFighterSprite, player.x, player.y, playerSpriteSize, 0)) {
                 ctx.save(); ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.moveTo(player.x, player.y - 24 * gameScale); ctx.lineTo(player.x - 18 * gameScale, player.y + 20 * gameScale); ctx.lineTo(player.x + 18 * gameScale, player.y + 20 * gameScale); ctx.closePath(); ctx.fill(); ctx.restore();
             }
-            ctx.save();
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-            ctx.fillRect(player.x - 34 * gameScale, player.y + 34 * gameScale, 68 * gameScale, 5 * gameScale);
-            ctx.fillStyle = '#22c55e';
-            ctx.fillRect(player.x - 34 * gameScale, player.y + 34 * gameScale, 68 * gameScale * (player.hp / player.maxHp), 5 * gameScale);
-            ctx.restore();
+            if (bossMode.phase !== 'boss-defeated') {
+                ctx.save();
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+                ctx.fillRect(player.x - 34 * gameScale, player.y + 34 * gameScale, 68 * gameScale, 5 * gameScale);
+                ctx.fillStyle = '#22c55e';
+                ctx.fillRect(player.x - 34 * gameScale, player.y + 34 * gameScale, 68 * gameScale * (player.hp / player.maxHp), 5 * gameScale);
+                ctx.restore();
+            }
         }
 
         function openBossRewardCards() {
@@ -3499,7 +3925,12 @@
             bossMode.rewardOptions = shuffled;
             const modal = document.getElementById('boss-card-modal');
             const container = document.getElementById('boss-card-options');
+            const victoryTitle = document.getElementById('boss-victory-title');
+            const victoryStory = document.getElementById('boss-victory-story');
             if (!modal || !container) return;
+            const bossName = bossMode.defeatedBossName || (bossMode.boss && bossMode.boss.config.name) || 'Boss Ship';
+            if (victoryTitle) victoryTitle.innerText = `Congratulations, Commander. ${bossName} Has Been Destroyed.`;
+            if (victoryStory) victoryStory.innerText = getBossVictoryStory(bossName);
             container.innerHTML = shuffled.map(card => {
                 const currentLevel = getDirectiveLevel(card.id);
                 const nextLevel = Math.min(5, currentLevel + 1);
@@ -3512,7 +3943,10 @@
 	                <div class="text-[10px] text-slate-300 mt-2 leading-snug font-semibold">${getDirectiveDescription(card, nextLevel)}</div>
 	            </button>`;
             }).join('');
+            modal.classList.remove('boss-card-energy');
             modal.classList.remove('hidden');
+            modal.offsetHeight;
+            modal.classList.add('boss-card-energy');
             document.querySelectorAll('.boss-reward-card').forEach(btn => {
                 btn.addEventListener('pointerdown', e => {
                     e.preventDefault();
@@ -3520,6 +3954,22 @@
                     if (card) chooseBossRewardCard(card);
                 }, { once: true });
             });
+        }
+
+        function getBossVictoryStory(bossName) {
+            const stories = {
+                'Abyss Regent': 'Its crimson command signal collapsed into static, scattering the raider formation and leaving recoverable directive data in the debris field.',
+                'Gravemind Carrier': 'With the carrier core ruptured, its swarm network went silent and allied salvage teams secured the remaining drone-control archives.',
+                'Solar Warden': 'The thermal siege array burned out above orbit, opening a clean corridor for your fighter wing to return with intact targeting records.',
+                'Null Engine': 'The needle barrage generator imploded, restoring sensor clarity across the defense grid and exposing encrypted command fragments.',
+                'Iron Basilica': 'The armored cathedral broke apart plate by plate, proving the orbital line can crack even the heaviest invader hulls.',
+                'Dread Orchard': 'Its regenerative bio-reactors overgrew and detonated, leaving behind volatile growth maps that command can repurpose.',
+                'Vortex Saint': 'The spiral cannon lost containment, pulling hostile escorts into its own wake before the fighter wing escaped northbound.',
+                'Eclipse Foundry': 'The drone foundry cooled into a dead husk, ending its production cycle and freeing the planet from immediate escort pressure.',
+                'Omega Crucible': 'Its rage core overloaded under sustained fire, throwing molten wreckage across the upper atmosphere as command recovered battle telemetry.',
+                'Chronos Devourer': 'The final speed storm fractured, time-distortion readings stabilized, and base command confirmed a rare directive cache in the wreck.'
+            };
+            return stories[bossName] || 'The enemy command vessel broke apart above orbit. Your fighter wing returned to base with recovered tactical data ready for directive selection.';
         }
 
         function chooseBossRewardCard(card) {
@@ -3568,6 +4018,7 @@
             }
             waveActive = true;
             setWaveLaunchReady(false);
+            showWaveEvent(`Wave ${game.wave} Started`, 'Enemy signatures inbound', 'amber');
 
             let enemyCount = 8 + Math.floor(game.wave * 2.5);
             const riskContract = getDirectiveEffectValue('riskContract');
@@ -3589,6 +4040,7 @@
         }
 
         function endWave() {
+            const completedWave = game.wave;
             waveActive = false; game.wave++;
             suppressStarterTooltips(false);
             const wDisp = document.getElementById('wave-display'); if (wDisp) wDisp.innerText = game.wave; 
@@ -3604,6 +4056,7 @@
                 for (const tower of game.towers) tower.hp = Math.min(tower.maxHp, tower.hp + tower.maxHp * waveRepair);
             }
             addGold(waveReward);
+            showWaveEvent(`Wave ${completedWave} Cleared`, `Recovered ${waveReward} credits. Next wave ready.`, 'emerald');
             if (isBossWave(game.wave)) {
                 showGameNotice('<i class="fa-solid fa-skull mr-1"></i> Detected: Boss Ship Incoming! Prepare for battle!', 5200);
             }
@@ -3614,6 +4067,9 @@
             game.earthHealth = game.earthMaxHealth; game.earthShield = game.earthMaxShield; game.towers = []; game.enemies = []; game.projectiles = []; game.particles = [];
             game.selectedTower = null; game.selectedShopType = null; game.orbitGridHighlights = false;
             game.mode = 'defense'; game.commandDirectives = {}; game.directiveKills = 0;
+            firstDeploymentSlotHintShown = false;
+            masterCommandTourSeen = false;
+            masterCommandTourStep = 0;
             
             orbitLockStates = [false, true, true]; orbitSlotCapacities = [4, 4, 4]; orbitUpgradesCount = [0, 0, 0]; orbitRotations = [0, 0, 0];
             shieldUpgradeLevel = 0; game.earthMaxShield = 100; game.earthShield = 100;
@@ -3638,7 +4094,10 @@
             setBuildControlEnabled(true);
             
             closeInspector(); closeOrbitInspector(); closeBlueprintDrawer();
-            setStarterTooltipsVisible(true);
+            starterTooltipsSuppressed = false;
+            tutorialHints.planet = false;
+            tutorialHints.build = true;
+            updateTutorialTooltips();
 
             const devModeCheckbox = document.getElementById('dev-mode-checkbox');
             const isDevModeActive = devModeCheckbox ? devModeCheckbox.checked : false;
@@ -3669,6 +4128,15 @@
             
             const centerX = canvas.width / 2; const centerY = canvas.height / 2;
             if (!game.selectedShopType && Math.hypot(coords.x - centerX, coords.y - centerY) < getPlanetTapRadius()) {
+                if (game.towers.length === 0) {
+                    showGameNotice('<i class="fa-solid fa-hammer mr-1"></i> Deploy a satellite first before opening Master Command.', 3000);
+                    const hint = document.getElementById('action-hint');
+                    if (hint) hint.innerHTML = `<span class="text-emerald-300 font-bold">Build a satellite first. Master Command unlocks after deployment.</span>`;
+                    tutorialHints.build = true;
+                    updateTutorialTooltips();
+                    return;
+                }
+                planetTutorialTooltipShown = true;
                 tutorialHints.planet = false;
                 updateTutorialTooltips();
                 toggleOrbitInspector(); return;
@@ -3704,6 +4172,7 @@
 	                        const newSat = new Satellite(deployedType, orbitIndex, slotIndex);
 	                        newSat.investedGold = cost;
 	                        game.towers.push(newSat); game.towersBuiltCount++;
+	                        firstDeploymentSlotHintShown = true;
 	                        playSynthSound('upgrade'); createExplosion(newSat.x, newSat.y, SATELLITE_CONFIGS[deployedType].color, 12);
 
 	                        const hint = document.getElementById('action-hint');
@@ -3732,6 +4201,7 @@
 	                            if (hint) hint.innerHTML = `<span class="text-red-400 font-bold">Insufficient credits to continue building ${SATELLITE_CONFIGS[deployedType].name}.</span>`;
 	                            updateBuildButtonState();
 	                        }
+	                        if (!hasEmptyDeployableOrbitSlot()) showOrbitExpansionPrompt();
 	                        updateShopAvailability();
 	                    } else {
 	                        const hint = document.getElementById('action-hint');
@@ -3834,7 +4304,6 @@
         bindButton('quit-to-menu-btn', () => { game.running = false; game.paused = false; game.mode = 'defense'; resetBossMode(); setBuildControlEnabled(true); switchBgm('default'); const pm = document.getElementById('pause-modal'); if (pm) pm.classList.add('hidden'); const im = document.getElementById('intro-modal'); if (im) im.classList.remove('hidden'); playSynthSound('earth_hit'); });
         bindButton('restart-game-btn', triggerCleanGameReset);
         bindButton('gameover-quit-btn', () => { game.running = false; game.paused = false; game.mode = 'defense'; resetBossMode(); setBuildControlEnabled(true); switchBgm('default'); const gm = document.getElementById('gameover-modal'); if (gm) gm.classList.add('hidden'); const im = document.getElementById('intro-modal'); if (im) im.classList.remove('hidden'); playSynthSound('earth_hit'); });
-        bindButton('next-wave-btn', startNextWave);
         bindButton('mobile-launch-btn', startNextWave);
         bindButton('settings-toggle-btn', triggerPauseToggle);
         bindButton('mobile-settings-toggle-btn', triggerPauseToggle);
@@ -3855,6 +4324,7 @@
 	                    game.orbitGridHighlights = true;
 	                    suppressStarterTooltips(true);
 	                    if (ah) ah.innerHTML = `Deployment Mode: <span class="text-emerald-400 font-bold">Tap near any glowing empty slot to place ${SATELLITE_CONFIGS[type].name}</span>`;
+	                    game.mousePos = getFirstEmptyDeployableSlot() || game.mousePos;
 	                    if (isMobileBuildView()) closeBlueprintDrawer();
 	                }
 	                updateShopAvailability();
@@ -3873,6 +4343,12 @@
         }
         bindButton('accordion-orbits-btn', () => { setMasterAccordion('orbits'); });
         bindButton('accordion-directives-btn', () => { setMasterAccordion('directives'); });
+        bindButton('master-command-tour-skip', finishMasterCommandTour);
+        bindButton('master-command-tour-next', () => {
+            masterCommandTourStep++;
+            if (masterCommandTourStep >= MASTER_COMMAND_TOUR_STEPS.length) finishMasterCommandTour();
+            else renderMasterCommandTour();
+        });
 
         bindButton('cmd-repair-shield', () => { const cost = 150; if (game.gold >= cost && game.earthShield < game.earthMaxShield) { spendGold(cost); game.earthShield = Math.min(game.earthMaxShield, game.earthShield + 40); const st = document.getElementById('shield-text'); const mst = document.getElementById('mobile-shield-text'); if (st) st.innerText = `${game.earthShield} / ${game.earthMaxShield}`; if (mst) mst.innerText = `${game.earthShield}/${game.earthMaxShield}`; const shieldWPercent = `${(game.earthShield / game.earthMaxShield) * 100}%`; const sb = document.getElementById('shield-bar'); const msb = document.getElementById('mobile-shield-bar'); if (sb) sb.style.width = shieldWPercent; if (msb) msb.style.width = shieldWPercent; playSynthSound('upgrade'); createExplosion(canvas.width/2, canvas.height/2, '#22d3ee', 15); const ah = document.getElementById('action-hint'); if (ah) ah.innerHTML = `<span class="text-emerald-400 font-bold">Shield integrity recharged!</span>`; } else { const ah = document.getElementById('action-hint'); if (ah) ah.innerHTML = game.earthShield >= game.earthMaxShield ? `<span class="text-red-400 font-bold">Shield is fully charged!</span>` : `<span class="text-red-400 font-bold">Need ${cost} Gold!</span>`; } });
         bindButton('cmd-upgrade-shield', () => { if (shieldUpgradeLevel >= 6) return; const cost = 200 + shieldUpgradeLevel * 150; if (game.gold >= cost) { spendGold(cost); shieldUpgradeLevel++; game.earthMaxShield += 25; game.earthShield += 25; const st = document.getElementById('shield-text'); const mst = document.getElementById('mobile-shield-text'); if (st) st.innerText = `${game.earthShield} / ${game.earthMaxShield}`; if (mst) mst.innerText = `${game.earthShield}/${game.earthMaxShield}`; const shieldWPercent = `${(game.earthShield / game.earthMaxShield) * 100}%`; const sb = document.getElementById('shield-bar'); const msb = document.getElementById('mobile-shield-bar'); if (sb) sb.style.width = shieldWPercent; if (msb) msb.style.width = shieldWPercent; playSynthSound('upgrade'); createExplosion(canvas.width/2, canvas.height/2, '#06b6d4', 20); updateOrbitInspectorUI(); const ah = document.getElementById('action-hint'); if (ah) ah.innerHTML = `<span class="text-emerald-400 font-bold">Maximum Shield Capacity expanded!</span>`; } else { const ah = document.getElementById('action-hint'); if (ah) ah.innerHTML = `<span class="text-red-400 font-bold">Need ${cost} Gold!</span>`; } });
@@ -3940,8 +4416,8 @@
 
             // Double check canvas scaling hasn't collapsed inside the iframe container context
             const viewportSize = getViewportSize();
-            if (canvas.width !== viewportSize.width || canvas.height !== viewportSize.height) {
-                resizeCanvas();
+            if (Math.abs(canvas.width - viewportSize.width) > 2 || Math.abs(canvas.height - viewportSize.height) > 2) {
+                scheduleResizeCanvas();
             }
 
             // Clear Screen
@@ -3988,10 +4464,14 @@
                             const angle = orbitRotations[i] + s * (2 * Math.PI / maxSlots);
                             const sx = centerX + Math.cos(angle) * radius; const sy = centerY + Math.sin(angle) * radius;
                             
-                            ctx.save(); ctx.strokeStyle = game.selectedShopType ? 'rgba(16, 185, 129, 0.45)' : 'rgba(255, 255, 255, 0.15)'; ctx.lineWidth = 1.5;
+                            ctx.save(); ctx.strokeStyle = game.selectedShopType ? 'rgba(190, 242, 100, 0.92)' : 'rgba(255, 255, 255, 0.15)'; ctx.lineWidth = game.selectedShopType ? 2.4 : 1.5;
                             if (game.selectedShopType) {
-                                ctx.setLineDash([4, 4]); const pulse = Math.abs(Math.sin(Date.now() / 200)) * 2;
-                                ctx.beginPath(); ctx.arc(sx, sy, (12 + pulse) * gameScale, 0, Math.PI * 2);
+                                ctx.setLineDash([4, 4]); const pulse = Math.abs(Math.sin(Date.now() / 180));
+                                ctx.fillStyle = `rgba(190, 242, 100, ${0.06 + pulse * 0.08})`;
+                                ctx.shadowBlur = 14 + pulse * 10;
+                                ctx.shadowColor = '#bef264';
+                                ctx.beginPath(); ctx.arc(sx, sy, (13 + pulse * 7) * gameScale, 0, Math.PI * 2);
+                                ctx.fill();
                             } else {
                                 ctx.setLineDash([2, 4]); ctx.beginPath(); ctx.arc(sx, sy, 10 * gameScale, 0, Math.PI * 2);
                             }
@@ -3999,6 +4479,7 @@
                         }
                     }
                 }
+                drawFirstDeploymentSlotGuide(getFirstEmptyDeployableSlot());
             }
 
             if (game.selectedShopType && game.running) {
