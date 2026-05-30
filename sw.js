@@ -1,4 +1,4 @@
-const CACHE_NAME = 'planetary-defense-alpha-0-9-4-71';
+const CACHE_NAME = 'planetary-defense-alpha-0-9-35-102';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -26,6 +26,16 @@ const CORE_ASSETS = [
   './elements/void-swarmer.png',
   './elements/armored-cruiser.png',
   './elements/void-harvester.png',
+  './elements/boss-abyss-regent.png',
+  './elements/boss-gravemind-carrier.png',
+  './elements/boss-solar-warden.png',
+  './elements/boss-null-engine.png',
+  './elements/boss-iron-basilica.png',
+  './elements/boss-dread-orchard.png',
+  './elements/boss-vortex-saint.png',
+  './elements/boss-eclipse-foundry.png',
+  './elements/boss-omega-crucible.png',
+  './elements/boss-chronos-devourer.png',
   './elements/player-fighter.png',
   './elements/Blackout_Velocity.mp3',
   './elements/Hull_Breach_Alarm.mp3',

@@ -4,7 +4,7 @@ Planetary Defense Command is a browser-based tower defense and boss intercept ga
 
 ## Current Version
 
-Current game version: `Alpha 0.9.4.71`
+Current game version: `Alpha 0.9.35.102`
 
 The project now uses an alpha version of modified semantic versioning:
 
@@ -14,7 +14,7 @@ The project now uses an alpha version of modified semantic versioning:
 - `PATCH`: Balance, UI, documentation, and bug-fix updates.
 - `BUILD`: Total project build counter. This continues upward and does not reset by date.
 
-The prior date-based version was `2026.05.29.67`. The build counter was preserved and continues upward, so the current version is `Alpha 0.9.4.71`.
+The prior date-based version was `2026.05.29.67`. The build counter was preserved and continues upward, so the current version is `Alpha 0.9.32.99`.
 
 ## Running Locally
 
@@ -42,6 +42,157 @@ http://127.0.0.1:8765/index.html
 ## Patch History
 
 These notes reconstruct the visible project history from the development thread. Earlier builds did not have formal release notes, so this list is maintained from build `47` forward.
+
+### Alpha 0.9.35.102
+
+- Completely separated and fixed the standalone Pause Menu Settings panel to resolve conflicts with the title screen.
+
+### Alpha 0.9.34.101
+
+- Fixed z-index layering bug and removed duplicated settings panel preventing it from appearing over the Pause Menu.
+- Tighter button spacing and padding on the title screen menu.
+
+### Alpha 0.9.33.100
+
+- Reduced spacing and padding on title screen menu buttons for a tighter layout.
+
+### Alpha 0.9.32.99
+
+- Fixed z-index layering bug preventing the Settings panel from appearing over the Pause Menu.
+- Improved spacing, padding, and font weight of the title screen menu buttons.
+
+### Alpha 0.9.32.99
+
+- Fixed z-index layering bug and removed duplicated settings panel preventing it from appearing over the Pause Menu.
+- Tighter button spacing and padding on the title screen menu.
+
+### Alpha 0.9.32.99
+
+- Fixed z-index layering bug and removed duplicated settings panel preventing it from appearing over the Pause Menu.
+- Tighter button spacing and padding on the title screen menu.
+
+### Alpha 0.9.31.98
+
+- Fixed an issue where the redesigned Pause Menu HTML structure was not properly applied.
+
+### Alpha 0.9.30.97
+
+- Redesigned Pause Menu: Removed Audio System toggle and added a direct Settings button.
+
+### Alpha 0.9.29.96
+
+- Improved UI spacing and size for satellite inspector Previous/Next navigation buttons.
+
+### Alpha 0.9.28.95
+
+- Revised wave start sound effect to a "call to action" alert and the wave clear sound to a victorious arpeggio.
+
+### Alpha 0.9.27.94
+
+- Added custom sound effects for deploying satellites, wave start, wave clear, warnings, and destroying enemies.
+- Replaced settings browser confirmation prompt with an in-game modal popup.
+
+### Alpha 0.9.26.93
+
+- Added Previous/Next navigation buttons to the satellite inspector panel to easily cycle through deployed satellites within the same orbit.
+
+### Alpha 0.9.25.92
+
+- Nerfed the Void Harvester Mini-Boss (reduced health, damage, and fire rate).
+
+### Alpha 0.9.24.91
+
+- Mini-Bosses now prioritize targeting satellites with their special attacks before striking the Earth.
+- Escort ships now spawn strictly in front and at the sides of the Mini-Boss.
+
+### Alpha 0.9.23.90
+
+- Fixed Mini-Boss wave warning banner animation glitch.
+- Escorts now spawn directly beside the Mini-Boss and maintain a fixed formation without revolving.
+
+### Alpha 0.9.22.89
+
+- Extended the duration of the Mini-Boss warning banner to ensure visibility.
+- Mini-Boss escorts now actively surround and follow the Mini-Boss.
+- Mini-Bosses now attack satellites and the planet from range rather than crashing.
+- Added a periodic heavy special attack for Mini-Bosses.
+
+### Alpha 0.9.21.88
+
+- Added Mini-Boss enemy classification. Mini-Bosses now reliably spawn with escort formations on the waves immediately preceding a Boss Round.
+
+### Alpha 0.9.20.87
+
+- Changed Master Command's orbit expansion and unlock button text to clearly state "DISABLED WHILE UNDER ATTACK" during active defense waves.
+
+### Alpha 0.9.19.86
+
+- Added defensive weaknesses to satellites: Turrets/Missiles take extra damage from Rock collisions, Plasma/Railguns take extra damage from Ship attacks.
+
+### Alpha 0.9.18.85
+
+- Disabled building, salvaging, and upgrading satellites and orbits during active waves. Added notification when attempted.
+
+### Alpha 0.9.17.84
+
+- Adjusted satellite costs: Reduced Plasma Obliterator cost (220 -> 180) and increased Laser Sentry cost (200 -> 260) to better reflect their tactical value.
+
+### Alpha 0.9.16.83
+
+- Implemented Threat Budget system for balanced enemy generation.
+- Added Specialized Thematic Waves and Veteran enemy variants for exponential difficulty scaling.
+- Added cluster spawn formations and disabled deployment/building during active waves.
+
+### Alpha 0.9.15.82
+
+- Added "Eject Weapon" button during boss fights to let players discard a weapon enhancement and return to the basic attack.
+
+### Alpha 0.9.14.81
+
+- Gathered repair kits now persist between successful boss rounds but are lost upon defeat.
+- Increased the chance of enemy ships dropping weapon enhancements to 25%.
+- Ensured the boss action panel correctly hides when returning to planetary defense.
+
+### Alpha 0.9.13.80
+
+- Boss encounters now persist upon defeat; players must clear the same boss before advancing to the next.
+- Added 10 distinct weapon enhancements dropped from enemy ships during Boss Intercept.
+- Added consumable Repair Kits dropped from rocks during Boss Intercept.
+
+### Alpha 0.9.12.79
+
+- Boss Time Attack mode now spawns the boss immediately, bypassing the minion wave phase.
+
+### Alpha 0.9.11.78
+
+- Boss Time Attack mode now displays the boss special attack prominently and returns to the menu upon completion.
+
+### Alpha 0.9.10.77
+
+- Added Boss Time Attack mode to the main menu for testing specific boss encounters.
+
+### Alpha 0.9.9.76
+
+- Added distinct visual flash effects and particle bursts to telegraph when bosses use their special attacks.
+
+### Alpha 0.9.8.75
+
+- Revised boss battles to feature unique projectile patterns and periodic special attacks tailored to each boss ship.
+
+### Alpha 0.9.7.74
+
+- Replaced generic boss sprite with unique individual sprite files for each boss ship.
+
+### Alpha 0.9.6.73
+
+- Changed update behavior to only refresh the game on launch or in the main menu to prevent mid-game interruptions.
+
+### Alpha 0.9.5.72
+
+- Rebalanced satellites with unique structural specialties and vulnerabilities.
+- Updated Space Encyclopedia to detail satellite strengths and weaknesses.
+- Speed bonus stat improvements now display in green with negative values.
+- Added dynamic empty slot warning overlay to the deployment drawer.
 
 ### Alpha 0.9.4.71
 
