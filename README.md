@@ -4,7 +4,7 @@ Planetary Defense Command is a browser-based tower defense and boss intercept ga
 
 ## Current Version
 
-Current game version: `Alpha 0.9.35.102`
+Current game version: `Alpha 0.9.46.113`
 
 The project now uses an alpha version of modified semantic versioning:
 
@@ -42,6 +42,57 @@ http://127.0.0.1:8765/index.html
 ## Patch History
 
 These notes reconstruct the visible project history from the development thread. Earlier builds did not have formal release notes, so this list is maintained from build `47` forward.
+
+### Alpha 0.9.46.113
+
+- Lowered the attack range of the Void Harvester Mini-Boss.
+
+### Alpha 0.9.45.112
+
+- Added a heavily armored Vanguard Gatekeeper that must be defeated before the main Boss appears.
+- Enhanced Boss Intercept minion swooping patterns with varied speeds and amplitudes.
+
+### Alpha 0.9.44.111
+
+- Optimized warp drive visual rendering logic to run smoother on low-end mobile devices.
+- Added dynamic screen bounding to Boss Intercept enemy squads to prevent ships from spawning or sweeping off-screen on narrow devices.
+
+### Alpha 0.9.43.110
+
+- Added a "Warp Drive" visual effect to the cosmic background during Boss Intercepts.
+- Enemy ships in the Boss Intercept minion phase now spawn in varied tactical formations (V-shape, walls, diagonals) rather than one by one, and utilize sweeping lateral movements.
+
+### Alpha 0.9.42.109
+
+- Replaced modulo-based boss collision with an invulnerability frame (i-frame) system, ensuring direct hits and grazing always damage the player immediately.
+
+### Alpha 0.9.41.108
+
+- Buffed Boss HP and implemented a multi-layered boss health bar to show the total remaining health pools.
+- Added a new Boss Dive Attack mechanic where bosses periodically telegraph a path and sweep downwards, damaging the player on collision.
+- Hostile escort ships during boss waves now periodically fire down at the player while moving.
+
+### Alpha 0.9.40.107
+
+- Added Space Encyclopedia access to the Pause Menu.
+- Removed Dev Mode from the Pause Menu settings.
+
+### Alpha 0.9.39.106
+
+- Changed cost and salvage displays in the UI to show base values with the (+/-) modifiers appended explicitly instead of showing pre-calculated totals.
+
+### Alpha 0.9.38.105
+
+- Fixed legibility of cost penalty and bonus text on dynamic button backgrounds (Repair & Upgrade buttons).
+
+### Alpha 0.9.37.104
+
+- Added middle (+25%) and outer (+50%) orbit penalties to Satellite Upgrade Costs so the increased distance penalty applies to enhancements.
+
+### Alpha 0.9.36.103
+
+- Added explicit `(+x)` and `(-x)` indicators to the repair, upgrade, and salvage buttons to clearly show the impact of orbit placement modifiers and Command Directives.
+- Increased repair costs for middle (+25%) and outer (+50%) orbits. Reduced salvage returns for middle (-15%) and outer (-30%) orbits.
 
 ### Alpha 0.9.35.102
 

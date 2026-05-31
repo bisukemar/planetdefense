@@ -778,48 +778,6 @@
                     <div id="patch-notes-list" class="space-y-2 text-left"></div>
                 </div>
 
-                <div id="inline-encyclopedia-options" class="fixed inset-2 md:inset-4 z-50 bg-slate-950 border border-sky-500/40 rounded-xl p-3 md:p-4 flex flex-col gap-3 transition-all hidden pointer-events-auto font-bold shadow-2xl overflow-hidden max-h-[calc(100dvh-1rem)] md:max-h-[calc(100dvh-2rem)]">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-2 shrink-0 bg-slate-950 z-10">
-                        <div class="flex items-center gap-2">
-                            <button id="back-encyclopedia-options-btn" class="text-slate-400 hover:text-white p-1 text-sm select-none transition-colors"><i class="fa-solid fa-arrow-left"></i></button>
-                            <span class="text-sky-400 font-black text-xs tracking-widest uppercase"><i class="fa-solid fa-book-atlas mr-1"></i> Space Encyclopedia</span>
-                        </div>
-                        <button id="close-encyclopedia-options-btn" class="text-slate-400 hover:text-white p-2 text-sm select-none"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-                    <div class="shrink-0 grid grid-cols-2 md:grid-cols-4 gap-2 bg-slate-950 border-b border-slate-800 pb-2">
-                        <button id="encyclopedia-menu-satellites" class="encyclopedia-menu-btn bg-slate-900 hover:bg-slate-800 border border-emerald-500/30 text-emerald-300 rounded-lg px-2 py-2 text-[9px] uppercase tracking-widest font-black select-none">
-                            <i class="fa-solid fa-satellite mr-1"></i> Satellites
-                        </button>
-                        <button id="encyclopedia-menu-rocks" class="encyclopedia-menu-btn bg-slate-900 hover:bg-slate-800 border border-amber-500/30 text-amber-300 rounded-lg px-2 py-2 text-[9px] uppercase tracking-widest font-black select-none">
-                            <i class="fa-solid fa-meteor mr-1"></i> Rocks
-                        </button>
-                        <button id="encyclopedia-menu-ships" class="encyclopedia-menu-btn bg-slate-900 hover:bg-slate-800 border border-red-500/30 text-red-300 rounded-lg px-2 py-2 text-[9px] uppercase tracking-widest font-black select-none">
-                            <i class="fa-solid fa-jet-fighter mr-1"></i> Ships
-                        </button>
-                        <button id="encyclopedia-menu-directives" class="encyclopedia-menu-btn bg-slate-900 hover:bg-slate-800 border border-sky-500/30 text-sky-300 rounded-lg px-2 py-2 text-[9px] uppercase tracking-widest font-black select-none">
-                            <i class="fa-solid fa-layer-group mr-1"></i> Directives
-                        </button>
-                    </div>
-                    <div id="encyclopedia-scroll-body" class="space-y-3 text-left flex-1 min-h-0 overflow-y-auto pr-1 pb-safe scroll-smooth">
-                        <section id="encyclopedia-section-satellites" class="space-y-2 scroll-mt-2">
-                            <h3 class="text-[10px] text-emerald-400 uppercase tracking-widest font-black">Satellite Arsenal</h3>
-                            <div id="encyclopedia-satellites" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
-                        </section>
-                        <section id="encyclopedia-section-rocks" class="space-y-2 scroll-mt-2">
-                            <h3 class="text-[10px] text-amber-400 uppercase tracking-widest font-black">Rocks</h3>
-                            <div id="encyclopedia-rocks" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
-                        </section>
-                        <section id="encyclopedia-section-ships" class="space-y-2 scroll-mt-2">
-                            <h3 class="text-[10px] text-red-400 uppercase tracking-widest font-black">Hostile Ships</h3>
-                            <div id="encyclopedia-ships" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
-                        </section>
-                        <section id="encyclopedia-section-directives" class="space-y-2 scroll-mt-2">
-                            <h3 class="text-[10px] text-amber-300 uppercase tracking-widest font-black">Command Directives</h3>
-                            <div id="encyclopedia-directives" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
-                        </section>
-                    </div>
-                </div>
-
                 <div id="inline-install-options" class="absolute inset-4 md:inset-6 z-50 bg-slate-950 border border-cyan-500/40 rounded-xl p-4 flex flex-col gap-3 transition-all hidden pointer-events-auto font-bold shadow-2xl overflow-y-auto">
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                         <div class="flex items-center gap-2">
@@ -889,6 +847,9 @@
                 <button id="pause-restart-game-btn" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3 rounded-xl text-xs tracking-widest uppercase min-h-[44px] flex items-center justify-center gap-2 select-none pointer-events-auto shadow-lg shadow-amber-500/20 transition-all active:scale-95">
                     <i class="fa-solid fa-rotate-right"></i> RESTART
                 </button>
+                <button id="pause-encyclopedia-btn" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600/50 text-sky-400 font-black py-3 rounded-xl text-xs tracking-widest uppercase min-h-[44px] flex items-center justify-center gap-2 select-none pointer-events-auto transition-all active:scale-95">
+                    <i class="fa-solid fa-book-atlas"></i> ENCYCLOPEDIA
+                </button>
                 <button id="pause-settings-btn" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600/50 text-sky-400 font-black py-3 rounded-xl text-xs tracking-widest uppercase min-h-[44px] flex items-center justify-center gap-2 select-none pointer-events-auto transition-all active:scale-95">
                     <i class="fa-solid fa-sliders"></i> SETTINGS
                 </button>
@@ -931,6 +892,49 @@
                     RETURN TO MAIN MENU
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- SPACE ENCYCLOPEDIA MODAL -->
+    <div id="inline-encyclopedia-options" class="fixed inset-2 md:inset-4 z-[60] bg-slate-950 border border-sky-500/40 rounded-xl p-3 md:p-4 flex flex-col gap-3 transition-all hidden pointer-events-auto font-bold shadow-2xl overflow-hidden max-h-[calc(100dvh-1rem)] md:max-h-[calc(100dvh-2rem)]">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2 shrink-0 bg-slate-950 z-10">
+            <div class="flex items-center gap-2">
+                <button id="back-encyclopedia-options-btn" class="text-slate-400 hover:text-white p-1 text-sm select-none transition-colors"><i class="fa-solid fa-arrow-left"></i></button>
+                <span class="text-sky-400 font-black text-xs tracking-widest uppercase"><i class="fa-solid fa-book-atlas mr-1"></i> Space Encyclopedia</span>
+            </div>
+            <button id="close-encyclopedia-options-btn" class="text-slate-400 hover:text-white p-2 text-sm select-none"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="shrink-0 grid grid-cols-2 md:grid-cols-4 gap-2 bg-slate-950 border-b border-slate-800 pb-2">
+            <button id="encyclopedia-menu-satellites" class="encyclopedia-menu-btn bg-slate-900 hover:bg-slate-800 border border-emerald-500/30 text-emerald-300 rounded-lg px-2 py-2 text-[9px] uppercase tracking-widest font-black select-none">
+                <i class="fa-solid fa-satellite mr-1"></i> Satellites
+            </button>
+            <button id="encyclopedia-menu-rocks" class="encyclopedia-menu-btn bg-slate-900 hover:bg-slate-800 border border-amber-500/30 text-amber-300 rounded-lg px-2 py-2 text-[9px] uppercase tracking-widest font-black select-none">
+                <i class="fa-solid fa-meteor mr-1"></i> Rocks
+            </button>
+            <button id="encyclopedia-menu-ships" class="encyclopedia-menu-btn bg-slate-900 hover:bg-slate-800 border border-red-500/30 text-red-300 rounded-lg px-2 py-2 text-[9px] uppercase tracking-widest font-black select-none">
+                <i class="fa-solid fa-jet-fighter mr-1"></i> Ships
+            </button>
+            <button id="encyclopedia-menu-directives" class="encyclopedia-menu-btn bg-slate-900 hover:bg-slate-800 border border-sky-500/30 text-sky-300 rounded-lg px-2 py-2 text-[9px] uppercase tracking-widest font-black select-none">
+                <i class="fa-solid fa-layer-group mr-1"></i> Directives
+            </button>
+        </div>
+        <div id="encyclopedia-scroll-body" class="space-y-3 text-left flex-1 min-h-0 overflow-y-auto pr-1 pb-safe scroll-smooth">
+            <section id="encyclopedia-section-satellites" class="space-y-2 scroll-mt-2">
+                <h3 class="text-[10px] text-emerald-400 uppercase tracking-widest font-black">Satellite Arsenal</h3>
+                <div id="encyclopedia-satellites" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+            </section>
+            <section id="encyclopedia-section-rocks" class="space-y-2 scroll-mt-2">
+                <h3 class="text-[10px] text-amber-400 uppercase tracking-widest font-black">Rocks</h3>
+                <div id="encyclopedia-rocks" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+            </section>
+            <section id="encyclopedia-section-ships" class="space-y-2 scroll-mt-2">
+                <h3 class="text-[10px] text-red-400 uppercase tracking-widest font-black">Hostile Ships</h3>
+                <div id="encyclopedia-ships" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+            </section>
+            <section id="encyclopedia-section-directives" class="space-y-2 scroll-mt-2">
+                <h3 class="text-[10px] text-amber-300 uppercase tracking-widest font-black">Command Directives</h3>
+                <div id="encyclopedia-directives" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+            </section>
         </div>
     </div>
 
@@ -982,13 +986,6 @@
                             <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500 peer-checked:after:bg-slate-950"></div>
                         </label>
                     </div>
-                    <div class="flex items-center justify-between bg-slate-900 border border-slate-800 p-2.5 rounded-xl font-bold">
-                        <span class="text-[10px] text-red-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-code"></i> Dev Mode (+100k G)</span>
-                        <label class="relative inline-flex items-center cursor-pointer select-none pointer-events-auto">
-                            <input type="checkbox" id="pause-settings-dev-mode" class="sr-only peer">
-                            <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500 peer-checked:after:bg-slate-950"></div>
-                        </label>
-                    </div>
                 </div>
             </div>
             
@@ -1026,11 +1023,22 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        const APP_VERSION = 'Alpha 0.9.35.102';
+        const APP_VERSION = 'Alpha 0.9.46.113';
         const TARGET_FRAME_MS = 1000 / 60;
         let lastLoopTimestamp = 0;
 
         const PATCH_NOTES = [
+            { version: 'Alpha 0.9.46.113', notes: ['Lowered the attack range of the Void Harvester Mini-Boss.'] },
+            { version: 'Alpha 0.9.45.112', notes: ['Added a heavily armored Vanguard Gatekeeper that must be defeated before the main Boss appears.', 'Enhanced Boss Intercept minion swooping patterns with varied speeds and amplitudes.'] },
+            { version: 'Alpha 0.9.44.111', notes: ['Optimized warp drive rendering for better mobile performance.', 'Added dynamic bounding to boss intercept squads to prevent enemies from spawning or sweeping off-screen on narrow devices.'] },
+            { version: 'Alpha 0.9.43.110', notes: ['Added Warp Drive visual effect to the background during Boss Intercepts.', 'Enemy ships during the Boss Intercept phase now spawn in varied squad formations and use sweeping lateral movements.'] },
+            { version: 'Alpha 0.9.42.109', notes: ['Replaced modulo-based boss collision with an invulnerability frame system, ensuring direct hits always damage the player immediately.'] },
+            { version: 'Alpha 0.9.41.108', notes: ['Buffed Boss HP and added multi-layered boss health bar.', 'Added Boss Dive Attack behavior with a telegraph path indicator.', 'Hostile ships in boss waves now periodically fire downwards.'] },
+            { version: 'Alpha 0.9.40.107', notes: ['Added Space Encyclopedia access to the Pause Menu.', 'Removed Dev Mode from the Pause Menu settings.'] },
+            { version: 'Alpha 0.9.39.106', notes: ['Changed cost and salvage displays to show base values with modifiers appended explicitly.'] },
+            { version: 'Alpha 0.9.38.105', notes: ['Fixed legibility of cost penalty and bonus text on dynamic button backgrounds.'] },
+            { version: 'Alpha 0.9.37.104', notes: ['Added middle (+25%) and outer (+50%) orbit penalties to Satellite Upgrade Costs.'] },
+            { version: 'Alpha 0.9.36.103', notes: ['Added explicit (+x) and (-x) indicators to the repair, upgrade, and salvage buttons to clearly show the impact of orbit placement modifiers and Command Directives.', 'Increased repair costs and reduced salvage yields for outer orbits.'] },
             { version: 'Alpha 0.9.35.102', notes: ['Completely separated and fixed the standalone Pause Menu Settings panel to resolve conflicts with the title screen.'] },
             { version: 'Alpha 0.9.32.99', notes: ['Fixed z-index layering bug and removed duplicated settings panel preventing it from appearing over the Pause Menu.', 'Tighter button spacing and padding on the title screen menu.'] },
             { version: 'Alpha 0.9.31.98', notes: ['Fixed an issue where the redesigned Pause Menu HTML structure was not properly applied.'] },
@@ -1412,9 +1420,6 @@
             const scanT = document.getElementById('pause-settings-scanlines-toggle-new');
             if (scanT) isScanlinesEnabled = scanT.checked;
             
-            const devT = document.getElementById('pause-settings-dev-mode');
-            if (devT) isDevMode = devT.checked;
-            
             if (isSfxEnabled || isBgmEnabled) initAudio();
             
             saveSettings();
@@ -1472,20 +1477,20 @@
             { type: 'Scout Fighter', category: 'ship', color: '#38bdf8', size: 11, speed: 1.75, maxHp: 35, damage: 8, goldReward: 25, attackRange: 125, attackCooldown: 55, threatCost: 3 },
             { type: 'Void Swarmer', category: 'ship', color: '#fb7185', size: 8, speed: 2.2, maxHp: 28, damage: 6, goldReward: 18, attackRange: 105, attackCooldown: 38, threatCost: 2 },
             { type: 'Armored Cruiser', category: 'ship', color: '#fbbf24', size: 18, speed: 0.82, maxHp: 120, damage: 18, goldReward: 60, attackRange: 155, attackCooldown: 70, threatCost: 7 },
-            { type: 'Void Harvester', category: 'miniboss', color: '#f43f5e', size: 25, speed: 0.58, maxHp: 180, damage: 24, goldReward: 120, attackRange: 185, attackCooldown: 110, threatCost: 15 }
+            { type: 'Void Harvester', category: 'miniboss', color: '#f43f5e', size: 25, speed: 0.58, maxHp: 180, damage: 24, goldReward: 120, attackRange: 140, attackCooldown: 110, threatCost: 15 }
         ];
 
         const BOSS_SHIPS = [
-            { name: 'Abyss Regent', color: '#f43f5e', maxHp: 900, fireRate: 48, skill: 'Crimson spread cannons', minions: 12 },
-            { name: 'Gravemind Carrier', color: '#a855f7', maxHp: 1100, fireRate: 60, skill: 'Summons extra swarmers', minions: 14 },
-            { name: 'Solar Warden', color: '#f59e0b', maxHp: 1250, fireRate: 42, skill: 'Triple thermal volleys', minions: 15 },
-            { name: 'Null Engine', color: '#38bdf8', maxHp: 1350, fireRate: 38, skill: 'Fast needle barrages', minions: 16 },
-            { name: 'Iron Basilica', color: '#94a3b8', maxHp: 1600, fireRate: 64, skill: 'Armored hull and heavy shots', minions: 17 },
-            { name: 'Dread Orchard', color: '#10b981', maxHp: 1500, fireRate: 52, skill: 'Regenerates slowly', minions: 18 },
-            { name: 'Vortex Saint', color: '#818cf8', maxHp: 1700, fireRate: 46, skill: 'Spiral projectile pattern', minions: 19 },
-            { name: 'Eclipse Foundry', color: '#fb7185', maxHp: 1900, fireRate: 58, skill: 'Deploys escort drones', minions: 20 },
-            { name: 'Omega Crucible', color: '#ef4444', maxHp: 2100, fireRate: 40, skill: 'Rage fire below half HP', minions: 22 },
-            { name: 'Chronos Devourer', color: '#facc15', maxHp: 2500, fireRate: 34, skill: 'Final boss speed storm', minions: 24 }
+            { name: 'Abyss Regent', color: '#f43f5e', maxHp: 1800, fireRate: 48, skill: 'Crimson spread cannons', minions: 12 },
+            { name: 'Gravemind Carrier', color: '#a855f7', maxHp: 2200, fireRate: 60, skill: 'Summons extra swarmers', minions: 14 },
+            { name: 'Solar Warden', color: '#f59e0b', maxHp: 2500, fireRate: 42, skill: 'Triple thermal volleys', minions: 15 },
+            { name: 'Null Engine', color: '#38bdf8', maxHp: 2700, fireRate: 38, skill: 'Fast needle barrages', minions: 16 },
+            { name: 'Iron Basilica', color: '#94a3b8', maxHp: 3200, fireRate: 64, skill: 'Armored hull and heavy shots', minions: 17 },
+            { name: 'Dread Orchard', color: '#10b981', maxHp: 3000, fireRate: 52, skill: 'Regenerates slowly', minions: 18 },
+            { name: 'Vortex Saint', color: '#818cf8', maxHp: 3400, fireRate: 46, skill: 'Spiral projectile pattern', minions: 19 },
+            { name: 'Eclipse Foundry', color: '#fb7185', maxHp: 3800, fireRate: 58, skill: 'Deploys escort drones', minions: 20 },
+            { name: 'Omega Crucible', color: '#ef4444', maxHp: 4200, fireRate: 40, skill: 'Rage fire below half HP', minions: 22 },
+            { name: 'Chronos Devourer', color: '#facc15', maxHp: 5000, fireRate: 34, skill: 'Final boss speed storm', minions: 24 }
         ];
 
         const BOSS_WEAPON_ENHANCEMENTS = ['twin', 'spread', 'heavy', 'rapid', 'homing', 'explosive', 'wave', 'side', 'ring', 'rear'];
@@ -1906,14 +1911,20 @@
             ctx.fillRect(0, 0, w, h);
 
             const time = Date.now() * 0.002;
+            const isWarping = game && game.mode === 'boss' && bossMode && bossMode.phase !== 'boss-defeated';
+            const speedMult = isWarping ? 8 : 1;
             for (const star of drawCosmicBackground.stars) {
                 const flicker = 0.55 + Math.sin(time + star.twinkle) * 0.25;
                 ctx.globalAlpha = star.alpha * flicker;
                 ctx.fillStyle = '#e0f2fe';
-                ctx.beginPath();
-                ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-                ctx.fill();
-                star.y += star.speed;
+                if (isWarping) {
+                    ctx.fillRect(star.x, star.y, Math.max(1, star.r * 1.5), star.r * 15);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                star.y += star.speed * speedMult;
                 if (star.y > h) { star.y = 0; star.x = Math.random() * w; }
             }
             ctx.globalAlpha = 1;
@@ -2123,12 +2134,10 @@
             const pBgmToggle = document.getElementById('pause-settings-bgm-toggle');
             const pSfxVol = document.getElementById('pause-settings-sfx-volume');
             const pBgmVol = document.getElementById('pause-settings-bgm-volume');
-            const pDevModeCheckbox = document.getElementById('pause-settings-dev-mode');
             if (pSfxToggle) pSfxToggle.checked = isSfxEnabled;
             if (pBgmToggle) pBgmToggle.checked = isBgmEnabled;
             if (pSfxVol) pSfxVol.value = sfxVolume;
             if (pBgmVol) pBgmVol.value = bgmVolume;
-            if (pDevModeCheckbox) pDevModeCheckbox.checked = isDevMode;
         }
 
         function syncScanlineUI() {
@@ -2657,7 +2666,20 @@
                 const repairBtn = document.getElementById('btn-repair-sat');
                 const repairCostEl = document.getElementById('cost-repair-sat');
                 const repairCost = getSatelliteRepairCost(tower);
-                if (repairCostEl) repairCostEl.innerHTML = repairCost > 0 ? `<i class="fa-solid fa-coins"></i> ${repairCost}` : 'FULL';
+                if (repairCostEl) {
+                    const baseRepairCost = Math.ceil(Math.max(0, tower.maxHp - tower.hp) * 1.5);
+                    let repairText = baseRepairCost > 0 ? `<i class="fa-solid fa-coins"></i> ${baseRepairCost}` : 'FULL';
+                    if (baseRepairCost > 0) {
+                        const repairDiff = repairCost - baseRepairCost;
+                        if (repairDiff !== 0) {
+                            const sign = repairDiff > 0 ? '+' : '';
+                            const canAfford = game.gold >= repairCost;
+                            const colorClass = repairDiff > 0 ? (canAfford ? 'text-red-900' : 'text-red-400') : (canAfford ? 'text-emerald-900' : 'text-emerald-400');
+                            repairText += ` <span class="text-[8px] ${colorClass} ml-0.5">(${sign}${repairDiff})</span>`;
+                        }
+                    }
+                    repairCostEl.innerHTML = repairText;
+                }
                 if (repairBtn) {
                     if (repairCost <= 0 || game.gold < repairCost) {
                         repairBtn.disabled = true;
@@ -2668,7 +2690,18 @@
                     }
                 }
                 const salvageValue = document.getElementById('salvage-value');
-                if (salvageValue) salvageValue.innerHTML = `<i class="fa-solid fa-coins"></i> ${getSatelliteSalvageValue(tower)}`;
+                if (salvageValue) {
+                    const salvageFinal = getSatelliteSalvageValue(tower);
+                    const baseSalvage = Math.floor((tower.investedGold || SATELLITE_CONFIGS[tower.type].cost) * 0.25);
+                    const salvageDiff = salvageFinal - baseSalvage;
+                    let salvageText = `<i class="fa-solid fa-coins"></i> ${baseSalvage}`;
+                    if (salvageDiff !== 0) {
+                        const sign = salvageDiff > 0 ? '+' : '';
+                        const colorClass = salvageDiff > 0 ? 'text-emerald-400' : 'text-red-400';
+                        salvageText += ` <span class="text-[8px] ${colorClass} ml-0.5">(${sign}${salvageDiff})</span>`;
+                    }
+                    salvageValue.innerHTML = salvageText;
+                }
 
                 const level = tower.level || 1;
                 const dmgEl = document.getElementById('inspect-dmg');
@@ -2710,18 +2743,27 @@
                         upgradeBtn.disabled = true;
                         upgradeBtn.className = "w-full mt-2 bg-slate-800 text-slate-500 cursor-not-allowed font-black py-2 rounded text-[10px] flex items-center justify-center gap-2 select-none";
                         upgradeCostEl.innerHTML = "MAXED";
-                    } else if (waveActive || game.mode === 'boss') {
-                        upgradeBtn.disabled = false;
-                        upgradeBtn.className = "w-full mt-2 bg-slate-800 text-slate-500 cursor-not-allowed font-black py-2 rounded text-[10px] flex items-center justify-center gap-2 select-none";
-                        const cost = getSatelliteUpgradeCost(tower);
-                        upgradeCostEl.innerHTML = `<i class="fa-solid fa-coins"></i> ${cost}`;
                     } else {
                         const cost = getSatelliteUpgradeCost(tower);
-                        upgradeBtn.disabled = game.gold < cost;
-                        upgradeBtn.className = game.gold >= cost ?
-                            "w-full mt-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2 rounded text-[10px] flex items-center justify-center gap-2 select-none" :
-                            "w-full mt-2 bg-slate-800 text-slate-500 cursor-not-allowed font-black py-2 rounded text-[10px] flex items-center justify-center gap-2 select-none";
-                        upgradeCostEl.innerHTML = `<i class="fa-solid fa-coins"></i> ${cost}`;
+                        const baseUpgradeCost = Math.floor(SATELLITE_CONFIGS[tower.type].cost * 0.75 * level);
+                        const upgradeDiff = cost - baseUpgradeCost;
+                        let upgradeText = `<i class="fa-solid fa-coins"></i> ${baseUpgradeCost}`;
+                        if (upgradeDiff !== 0) {
+                            const sign = upgradeDiff > 0 ? '+' : '';
+                            const canAfford = game.gold >= cost && !(waveActive || game.mode === 'boss');
+                            const colorClass = upgradeDiff > 0 ? (canAfford ? 'text-red-900' : 'text-red-400') : (canAfford ? 'text-emerald-900' : 'text-emerald-400');
+                            upgradeText += ` <span class="text-[8px] ${colorClass} ml-0.5">(${sign}${upgradeDiff})</span>`;
+                        }
+                        if (waveActive || game.mode === 'boss') {
+                            upgradeBtn.disabled = false;
+                            upgradeBtn.className = "w-full mt-2 bg-slate-800 text-slate-500 cursor-not-allowed font-black py-2 rounded text-[10px] flex items-center justify-center gap-2 select-none";
+                        } else {
+                            upgradeBtn.disabled = game.gold < cost;
+                            upgradeBtn.className = game.gold >= cost ?
+                                "w-full mt-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2 rounded text-[10px] flex items-center justify-center gap-2 select-none" :
+                                "w-full mt-2 bg-slate-800 text-slate-500 cursor-not-allowed font-black py-2 rounded text-[10px] flex items-center justify-center gap-2 select-none";
+                        }
+                        upgradeCostEl.innerHTML = upgradeText;
                     }
                 }
 
@@ -2960,6 +3002,8 @@
         function getSatelliteUpgradeCost(tower) {
             if (!tower || (tower.level || 1) >= 10) return 0;
             let multiplier = 1;
+            if (tower.orbitIndex === 1) multiplier += 0.25;
+            if (tower.orbitIndex === 2) multiplier += 0.50;
             const railTradeoff = getDirectiveEffectValue('railgunUpgradeTradeoff');
             if (tower.type === 'railgun' && railTradeoff) multiplier += railTradeoff.cost;
             return Math.floor(SATELLITE_CONFIGS[tower.type].cost * 0.75 * (tower.level || 1) * multiplier);
@@ -2976,13 +3020,18 @@
             if (!tower) return 0;
             const missingHp = Math.max(0, tower.maxHp - tower.hp);
             let multiplier = 1;
+            if (tower.orbitIndex === 1) multiplier += 0.25;
+            if (tower.orbitIndex === 2) multiplier += 0.50;
             const overdrive = getDirectiveEffectValue('overdriveRepair');
             if (overdrive) multiplier += overdrive.repair;
             return Math.ceil(missingHp * 1.5 * multiplier);
         }
         function getSatelliteSalvageValue(tower) {
             if (!tower) return 0;
-            return Math.floor((tower.investedGold || SATELLITE_CONFIGS[tower.type].cost) * 0.25 * (1 + getDirectiveEffectValue('salvage', 0)));
+        let multiplier = 1;
+        if (tower.orbitIndex === 1) multiplier -= 0.15;
+        if (tower.orbitIndex === 2) multiplier -= 0.30;
+        return Math.floor((tower.investedGold || SATELLITE_CONFIGS[tower.type].cost) * 0.25 * (1 + getDirectiveEffectValue('salvage', 0)) * multiplier);
         }
 
         function getDirectiveDefinition(id) {
@@ -4334,7 +4383,7 @@
             document.body.classList.remove('boss-mode-active');
             bossMode = {
                 active: false, phase: 'idle', wave: 0, frame: 0, spawnTimer: 0, spawned: 0, requiredKills: 0, kills: 0,
-                player: { x: canvas.width / 2, y: canvas.height - 120, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120, weapon: 'default', repairKits: game && game.bossRepairKits ? game.bossRepairKits : 0 },
+                player: { x: canvas.width / 2, y: canvas.height - 120, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120, weapon: 'default', repairKits: game && game.bossRepairKits ? game.bossRepairKits : 0, invulnTimer: 0 }, gatekeeperSpawned: false,
                 enemies: [], projectiles: [], enemyProjectiles: [], boss: null, rewardOptions: [], victoryTimer: 0, defeatedBossName: '', drops: []
             };
             updateRepairButton();
@@ -4377,12 +4426,13 @@
                 bossMode.spawned = 0;
                 bossMode.requiredKills = game.isTimeAttack ? 0 : config.minions;
                 bossMode.kills = 0;
+                bossMode.gatekeeperSpawned = false;
                 bossMode.enemies = [];
                 bossMode.projectiles = [];
                 bossMode.enemyProjectiles = [];
                 bossMode.drops = [];
                 const playTop = getBossPlayTop();
-                bossMode.player = { x: canvas.width / 2, y: canvas.height - 120, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120, weapon: 'default', repairKits: game.bossRepairKits || 0 };
+                bossMode.player = { x: canvas.width / 2, y: canvas.height - 120, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120, weapon: 'default', repairKits: game.bossRepairKits || 0, invulnTimer: 0 };
                 bossMode.player.spriteSize = 58 * gameScale;
                 bossMode.player.hitRadius = bossMode.player.spriteSize * 0.34;
                 bossMode.boss = {
@@ -4394,7 +4444,12 @@
                     maxHp: Math.floor(config.maxHp * (1 + game.wave * 0.03)),
                     cooldown: config.fireRate,
                     drift: 0,
-                    hitRadius: 42 * gameScale * (ENEMY_SPRITE_SCALE[config.name] || 7.2) * 0.34
+                    hitRadius: 42 * gameScale * (ENEMY_SPRITE_SCALE[config.name] || 7.2) * 0.34,
+                    state: 'normal',
+                    stateTimer: 0,
+                    diveStartX: 0,
+                    diveStartY: 0,
+                    diveTargetX: 0
                 };
                 updateRepairButton();
                 const hud = document.getElementById('boss-mode-hud');
@@ -4414,25 +4469,85 @@
         }
 
         function spawnBossMinion() {
-            const profiles = [ENEMY_PROFILES[4], ENEMY_PROFILES[5], ENEMY_PROFILES[0], ENEMY_PROFILES[1]];
-            const profile = profiles[Math.floor(Math.random() * profiles.length)];
-            const spriteScale = ENEMY_SPRITE_SCALE[profile.type] || 3.2;
-            const size = profile.size * gameScale;
             const playTop = getBossPlayTop();
+            
+            function spawnSingle(x, y) {
+                const profiles = [ENEMY_PROFILES[4], ENEMY_PROFILES[5], ENEMY_PROFILES[0], ENEMY_PROFILES[1]];
+                const profile = profiles[Math.floor(Math.random() * profiles.length)];
+                const spriteScale = ENEMY_SPRITE_SCALE[profile.type] || 3.2;
+                const size = profile.size * gameScale;
+                bossMode.enemies.push({
+                    type: profile.type,
+                    category: profile.category,
+                    color: profile.color,
+                    x: Math.max(15, Math.min(canvas.width - 15, x)),
+                    y: y,
+                    size,
+                    hitRadius: size * spriteScale * 0.34,
+                    hp: Math.floor(profile.maxHp * (1 + game.wave * 0.05)),
+                    maxHp: Math.floor(profile.maxHp * (1 + game.wave * 0.05)),
+                    speed: (profile.speed + 0.18) * gameScale * 1.15,
+                    damage: profile.damage,
+                    cooldown: Math.floor(Math.random() * 60 + 60),
+                    id: Math.random().toString(36).substring(2, 9),
+                    sweepSpeed: Math.random() * 0.04 + 0.03,
+                    sweepAmp: (Math.random() * 2 + 1.5) * gameScale
+                });
+                bossMode.spawned++;
+            }
+
+            const formationType = Math.random();
+            const safeW = Math.max(100, canvas.width - 40); // Safe inner width
+
+            if (formationType < 0.25) {
+                const spread = Math.min(45 * gameScale, canvas.width * 0.2);
+                const cx = Math.random() * (canvas.width - spread * 2 - 40) + spread + 20;
+                spawnSingle(cx, playTop - 34);
+                spawnSingle(cx - spread, playTop - 74 * gameScale);
+                spawnSingle(cx + spread, playTop - 74 * gameScale);
+            } else if (formationType < 0.50) {
+                const spacing = safeW / 4;
+                for(let i = 0; i < 4; i++) spawnSingle(20 + (spacing / 2) + (i * spacing), playTop - 34);
+            } else if (formationType < 0.65) {
+                const spread = Math.min(45 * gameScale, canvas.width * 0.2);
+                const dir = Math.random() > 0.5 ? 1 : -1;
+                const startX = Math.random() * (canvas.width - spread * 2 - 40) + (dir === 1 ? 20 : spread * 2 + 20);
+                for(let i = 0; i < 3; i++) spawnSingle(startX + (i * spread * dir), playTop - 34 - (i * spread));
+            } else {
+                spawnSingle(Math.random() * safeW + 20, playTop - 34);
+            }
+        }
+
+        function spawnGatekeeper() {
+            const playTop = getBossPlayTop();
+            const profile = ENEMY_PROFILES[6]; 
+            const spriteScale = ENEMY_SPRITE_SCALE[profile.type] || 3.2;
+            const size = profile.size * 1.5 * gameScale;
             bossMode.enemies.push({
-                type: profile.type,
-                category: profile.category,
-                color: profile.color,
-                x: Math.random() * (canvas.width - 80) + 40,
-                y: playTop - 34,
-                size,
-                hitRadius: size * spriteScale * 0.34,
-                hp: Math.floor(profile.maxHp * (1 + game.wave * 0.05)),
-                maxHp: Math.floor(profile.maxHp * (1 + game.wave * 0.05)),
-                speed: (profile.speed + 0.18) * gameScale * 0.72,
-                damage: profile.damage
+                type: profile.type, category: 'gatekeeper', color: '#fbbf24',
+                x: canvas.width / 2, y: playTop - 40 * gameScale, size, hitRadius: size * spriteScale * 0.34,
+                hp: Math.floor(profile.maxHp * 8 * (1 + game.wave * 0.05)),
+                maxHp: Math.floor(profile.maxHp * 8 * (1 + game.wave * 0.05)),
+                speed: profile.speed * gameScale * 0.4, damage: profile.damage * 2, cooldown: 45,
+                id: Math.random().toString(36).substring(2, 9), isGatekeeper: true
             });
-            bossMode.spawned++;
+
+            const escProfile = ENEMY_PROFILES[4];
+            const eSize = escProfile.size * gameScale;
+            const eHit = eSize * (ENEMY_SPRITE_SCALE[escProfile.type] || 3.2) * 0.34;
+            const eHp = Math.floor(escProfile.maxHp * 2 * (1 + game.wave * 0.05));
+            for(let i of [-1, 1]) {
+                bossMode.enemies.push({
+                    type: escProfile.type, category: 'ship', color: escProfile.color,
+                    x: canvas.width / 2 + (50 * gameScale * i), y: playTop - 20 * gameScale,
+                    size: eSize, hitRadius: eHit, hp: eHp, maxHp: eHp,
+                    speed: escProfile.speed * gameScale * 0.6, damage: escProfile.damage, cooldown: 60,
+                    sweepSpeed: 0.04, sweepAmp: 2 * gameScale,
+                    id: Math.random().toString(36).substring(2, 9)
+                });
+            }
+            showGameNotice('<i class="fa-solid fa-shield-halved mr-1"></i> Vanguard Gatekeeper detected!', 3000);
+            playSynthSound('warning');
         }
 
         function fireBossProjectile(x, y, angle, speed, damage, color, radius) {
@@ -4459,7 +4574,7 @@
             createExplosion(enemy.x, enemy.y, enemy.color, 8);
             playSynthSound(enemy.category === 'normal' ? 'rock_destroy' : 'ship_destroy');
             
-            if ((enemy.category === 'ship' || enemy.category === 'miniboss') && Math.random() < 0.25) {
+            if ((enemy.category === 'ship' || enemy.category === 'miniboss' || enemy.category === 'gatekeeper') && Math.random() < (enemy.category === 'gatekeeper' ? 1.0 : 0.25)) {
                 bossMode.drops.push({ x: enemy.x, y: enemy.y, type: 'weapon', enhancement: BOSS_WEAPON_ENHANCEMENTS[Math.floor(Math.random() * BOSS_WEAPON_ENHANCEMENTS.length)] });
             } else if (enemy.category === 'normal' && Math.random() < 0.10) {
                 bossMode.drops.push({ x: enemy.x, y: enemy.y, type: 'repair' });
@@ -4501,6 +4616,8 @@
             player.y += (player.targetY - player.y) * dragFollow;
             player.x = Math.max(24, Math.min(canvas.width - 24, player.x));
             player.y = Math.max(playerTopLimit, Math.min(playerBottomLimit, player.y));
+
+            if (player.invulnTimer > 0) player.invulnTimer--;
 
             if (player.fireCooldown > 0) player.fireCooldown--;
             if (player.fireCooldown <= 0) {
@@ -4553,134 +4670,226 @@
             if (bossMode.phase === 'minions') {
                 const objective = document.getElementById('boss-mode-objective');
                 const healthWrap = document.getElementById('boss-health-wrap');
-                if (objective) objective.innerText = `Clear Assault Wing ${bossMode.kills}/${bossMode.requiredKills}`;
+                if (objective) {
+                    if (bossMode.gatekeeperSpawned && bossMode.enemies.some(e => e.isGatekeeper)) {
+                        objective.innerText = `Destroy Vanguard Gatekeeper`;
+                    } else {
+                        objective.innerText = `Clear Assault Wing ${bossMode.kills}/${bossMode.requiredKills}`;
+                    }
+                }
                 if (healthWrap) healthWrap.classList.add('hidden');
                 bossMode.spawnTimer--;
                 if (bossMode.spawned < bossMode.requiredKills && bossMode.spawnTimer <= 0) {
                     spawnBossMinion();
-                    bossMode.spawnTimer = Math.max(18, 44 - Math.floor(game.wave / 2));
+                    bossMode.spawnTimer = Math.max(40, 85 - Math.floor(game.wave));
                 }
-                if (bossMode.spawned >= bossMode.requiredKills && bossMode.enemies.length === 0) {
-                    bossMode.phase = 'boss';
-                    showGameNotice(`<i class="fa-solid fa-skull-crossbones mr-1"></i> ${bossMode.boss.config.name} has entered orbit`, 2400);
+                if (bossMode.spawned >= bossMode.requiredKills) {
+                    if (!bossMode.gatekeeperSpawned && !game.isTimeAttack) {
+                        bossMode.gatekeeperSpawned = true;
+                        spawnGatekeeper();
+                    } else if (bossMode.enemies.length === 0) {
+                        bossMode.phase = 'boss';
+                        showGameNotice(`<i class="fa-solid fa-skull-crossbones mr-1"></i> ${bossMode.boss.config.name} has entered orbit`, 2400);
+                    }
                 }
             } else if (bossMode.phase === 'boss') {
                 updateBossHud();
                 const boss = bossMode.boss;
-                boss.drift += 0.011;
-                boss.x = canvas.width / 2 + Math.sin(boss.drift) * canvas.width * 0.22;
-                boss.cooldown--;
                 
-                // Global Periodic Checks
-                if (boss.config.name === 'Dread Orchard' && bossMode.frame % 90 === 0) {
-                    boss.hp = Math.min(boss.maxHp, boss.hp + 25);
-                    createExplosion(boss.x, boss.y, '#10b981', 15);
-                    boss.flashFrames = 15;
-                }
-                if ((boss.config.name === 'Gravemind Carrier' || boss.config.name === 'Eclipse Foundry') && bossMode.frame % 180 === 0) {
-                    spawnBossMinion();
-                    createExplosion(boss.x, boss.y, boss.config.color, 25);
-                    boss.flashFrames = 15;
-                }
-
-                const baseAngle = Math.atan2(player.y - boss.y, player.x - boss.x);
-                const projSpeed = (3.0 + game.wave * 0.045) * gameScale;
-                const projDamage = 12 + Math.floor(game.wave * 0.8);
-                const fireY = boss.y + 26 * gameScale;
-
-                // Periodic Special Attacks (Bypasses Cooldown)
-                if (boss.config.name === 'Abyss Regent' && bossMode.frame % 300 < 60 && bossMode.frame % 15 === 0) {
-                    if (bossMode.frame % 300 === 0) { boss.flashFrames = 15; createExplosion(boss.x, fireY, '#ffffff', 30); playSynthSound('explosion'); }
-                    for (let i = 0; i < 7; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 3) * 0.15, projSpeed * 1.2, projDamage, boss.config.color);
-                    playSynthSound('missile');
-                } else if (boss.config.name === 'Eclipse Foundry' && bossMode.frame % 240 === 0) {
-                    boss.flashFrames = 15; createExplosion(boss.x, fireY, '#ffffff', 40); playSynthSound('explosion');
-                    for (let i = 0; i < 12; i++) fireBossProjectile(boss.x, fireY, i * Math.PI / 6, projSpeed * 0.85, projDamage, boss.config.color);
-                    playSynthSound('missile');
-                } else if (boss.config.name === 'Chronos Devourer' && bossMode.frame % 400 < 120 && bossMode.frame % 15 === 0) {
-                    if (bossMode.frame % 400 === 0) { boss.flashFrames = 15; createExplosion(boss.x, fireY, '#ffffff', 30); playSynthSound('explosion'); }
-                    boss.chronosAngle = (boss.chronosAngle || 0) + 0.18;
-                    for (let i = 0; i < 8; i++) fireBossProjectile(boss.x, fireY, boss.chronosAngle + i * Math.PI / 4, projSpeed * 0.7, projDamage, boss.config.color);
-                    playSynthSound('missile');
-                }
-
-                if (boss.cooldown <= 0) {
-                    switch (boss.config.name) {
-                        case 'Abyss Regent':
-                            for (let i = 0; i < 3; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 1) * 0.2, projSpeed, projDamage, boss.config.color);
-                            boss.cooldown = boss.config.fireRate;
-                            break;
-                        case 'Gravemind Carrier':
-                            fireBossProjectile(boss.x, fireY, baseAngle, projSpeed * 1.2, projDamage, boss.config.color, 8 * gameScale);
-                            fireBossProjectile(boss.x - 20 * gameScale, fireY, baseAngle - 0.15, projSpeed * 0.9, projDamage, boss.config.color);
-                            fireBossProjectile(boss.x + 20 * gameScale, fireY, baseAngle + 0.15, projSpeed * 0.9, projDamage, boss.config.color);
-                            boss.cooldown = boss.config.fireRate;
-                            break;
-                        case 'Solar Warden':
-                            if (!boss.burstCount) boss.burstCount = 0;
-                            if (boss.burstCount === 0) { boss.flashFrames = 10; createExplosion(boss.x, fireY, '#ffffff', 15); }
-                            for (let i = 0; i < 3; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 1) * 0.1, projSpeed * 1.5, projDamage, boss.config.color);
-                            boss.burstCount++;
-                            if (boss.burstCount >= 3) {
-                                boss.cooldown = Math.floor(boss.config.fireRate * 1.5);
-                                boss.burstCount = 0;
-                            } else {
-                                boss.cooldown = 12;
-                            }
-                            break;
-                        case 'Null Engine':
-                            boss.sweepAngle = (boss.sweepAngle || 0) + 0.4;
-                            fireBossProjectile(boss.x, fireY, baseAngle + Math.sin(boss.sweepAngle) * 0.6, projSpeed * 1.8, Math.floor(projDamage * 0.7), boss.config.color);
-                            boss.cooldown = Math.floor(boss.config.fireRate * 0.3);
-                            break;
-                        case 'Iron Basilica':
-                            boss.flashFrames = 15; createExplosion(boss.x, fireY, '#94a3b8', 25);
-                            fireBossProjectile(boss.x, fireY, baseAngle, projSpeed * 0.65, projDamage * 3, boss.config.color, 16 * gameScale);
-                            boss.cooldown = Math.floor(boss.config.fireRate * 1.3);
-                            break;
-                        case 'Dread Orchard':
-                            fireBossProjectile(boss.x, fireY, baseAngle, projSpeed, projDamage, boss.config.color);
-                            for (let i = 0; i < 4; i++) fireBossProjectile(boss.x, fireY, baseAngle + Math.PI / 4 + i * Math.PI / 2, projSpeed * 0.6, projDamage, boss.config.color);
-                            boss.cooldown = boss.config.fireRate;
-                            break;
-                        case 'Vortex Saint':
-                            boss.spiralAngle = (boss.spiralAngle || 0) + 0.25;
-                            for (let i = 0; i < 4; i++) fireBossProjectile(boss.x, fireY, boss.spiralAngle + i * Math.PI / 2, projSpeed * 0.85, projDamage, boss.config.color);
-                            boss.cooldown = Math.floor(boss.config.fireRate * 0.45);
-                            break;
-                        case 'Eclipse Foundry':
-                            fireBossProjectile(boss.x - 15 * gameScale, fireY, baseAngle - 0.2, projSpeed, projDamage, boss.config.color);
-                            fireBossProjectile(boss.x + 15 * gameScale, fireY, baseAngle + 0.2, projSpeed, projDamage, boss.config.color);
-                            boss.cooldown = boss.config.fireRate;
-                            break;
-                        case 'Omega Crucible':
-                            const isRage = boss.hp < boss.maxHp * 0.5;
-                            const shots = isRage ? 7 : 4;
-                            const spread = isRage ? 0.12 : 0.18;
-                            if (isRage) { boss.flashFrames = 5; createExplosion(boss.x, fireY, '#ef4444', 6); }
-                            for (let i = 0; i < shots; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - (shots - 1) / 2) * spread, projSpeed * (isRage ? 1.4 : 1.0), projDamage, boss.config.color);
-                            boss.cooldown = isRage ? Math.floor(boss.config.fireRate * 0.6) : boss.config.fireRate;
-                            break;
-                        case 'Chronos Devourer':
-                            if (bossMode.frame % 400 >= 120) {
-                                for (let i = 0; i < 5; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 2) * 0.1, projSpeed * 1.6, projDamage, boss.config.color);
-                            }
-                            boss.cooldown = Math.floor(boss.config.fireRate * 0.85);
-                            break;
-                        default:
-                            for (let i = 0; i < 3; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 1) * 0.15, projSpeed, projDamage, boss.config.color);
-                            boss.cooldown = boss.config.fireRate;
+                if (boss.state === 'normal') {
+                    boss.drift += 0.011;
+                    boss.x = canvas.width / 2 + Math.sin(boss.drift) * canvas.width * 0.22;
+                    boss.cooldown--;
+                    
+                    if (boss.config.name === 'Dread Orchard' && bossMode.frame % 90 === 0) {
+                        boss.hp = Math.min(boss.maxHp, boss.hp + 25);
+                        createExplosion(boss.x, boss.y, '#10b981', 15);
+                        boss.flashFrames = 15;
                     }
-                    playSynthSound('missile');
+                    if ((boss.config.name === 'Gravemind Carrier' || boss.config.name === 'Eclipse Foundry') && bossMode.frame % 180 === 0) {
+                        spawnBossMinion();
+                        createExplosion(boss.x, boss.y, boss.config.color, 25);
+                        boss.flashFrames = 15;
+                    }
+
+                    const baseAngle = Math.atan2(player.y - boss.y, player.x - boss.x);
+                    const projSpeed = (3.0 + game.wave * 0.045) * gameScale;
+                    const projDamage = 12 + Math.floor(game.wave * 0.8);
+                    const fireY = boss.y + 26 * gameScale;
+
+                    if (boss.config.name === 'Abyss Regent' && bossMode.frame % 300 < 60 && bossMode.frame % 15 === 0) {
+                        if (bossMode.frame % 300 === 0) { boss.flashFrames = 15; createExplosion(boss.x, fireY, '#ffffff', 30); playSynthSound('explosion'); }
+                        for (let i = 0; i < 7; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 3) * 0.15, projSpeed * 1.2, projDamage, boss.config.color);
+                        playSynthSound('missile');
+                    } else if (boss.config.name === 'Eclipse Foundry' && bossMode.frame % 240 === 0) {
+                        boss.flashFrames = 15; createExplosion(boss.x, fireY, '#ffffff', 40); playSynthSound('explosion');
+                        for (let i = 0; i < 12; i++) fireBossProjectile(boss.x, fireY, i * Math.PI / 6, projSpeed * 0.85, projDamage, boss.config.color);
+                        playSynthSound('missile');
+                    } else if (boss.config.name === 'Chronos Devourer' && bossMode.frame % 400 < 120 && bossMode.frame % 15 === 0) {
+                        if (bossMode.frame % 400 === 0) { boss.flashFrames = 15; createExplosion(boss.x, fireY, '#ffffff', 30); playSynthSound('explosion'); }
+                        boss.chronosAngle = (boss.chronosAngle || 0) + 0.18;
+                        for (let i = 0; i < 8; i++) fireBossProjectile(boss.x, fireY, boss.chronosAngle + i * Math.PI / 4, projSpeed * 0.7, projDamage, boss.config.color);
+                        playSynthSound('missile');
+                    }
+
+                    if (boss.cooldown <= 0) {
+                        switch (boss.config.name) {
+                            case 'Abyss Regent':
+                                for (let i = 0; i < 3; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 1) * 0.2, projSpeed, projDamage, boss.config.color);
+                                boss.cooldown = boss.config.fireRate;
+                                break;
+                            case 'Gravemind Carrier':
+                                fireBossProjectile(boss.x, fireY, baseAngle, projSpeed * 1.2, projDamage, boss.config.color, 8 * gameScale);
+                                fireBossProjectile(boss.x - 20 * gameScale, fireY, baseAngle - 0.15, projSpeed * 0.9, projDamage, boss.config.color);
+                                fireBossProjectile(boss.x + 20 * gameScale, fireY, baseAngle + 0.15, projSpeed * 0.9, projDamage, boss.config.color);
+                                boss.cooldown = boss.config.fireRate;
+                                break;
+                            case 'Solar Warden':
+                                if (!boss.burstCount) boss.burstCount = 0;
+                                if (boss.burstCount === 0) { boss.flashFrames = 10; createExplosion(boss.x, fireY, '#ffffff', 15); }
+                                for (let i = 0; i < 3; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 1) * 0.1, projSpeed * 1.5, projDamage, boss.config.color);
+                                boss.burstCount++;
+                                if (boss.burstCount >= 3) {
+                                    boss.cooldown = Math.floor(boss.config.fireRate * 1.5);
+                                    boss.burstCount = 0;
+                                } else {
+                                    boss.cooldown = 12;
+                                }
+                                break;
+                            case 'Null Engine':
+                                boss.sweepAngle = (boss.sweepAngle || 0) + 0.4;
+                                fireBossProjectile(boss.x, fireY, baseAngle + Math.sin(boss.sweepAngle) * 0.6, projSpeed * 1.8, Math.floor(projDamage * 0.7), boss.config.color);
+                                boss.cooldown = Math.floor(boss.config.fireRate * 0.3);
+                                break;
+                            case 'Iron Basilica':
+                                boss.flashFrames = 15; createExplosion(boss.x, fireY, '#94a3b8', 25);
+                                fireBossProjectile(boss.x, fireY, baseAngle, projSpeed * 0.65, projDamage * 3, boss.config.color, 16 * gameScale);
+                                boss.cooldown = Math.floor(boss.config.fireRate * 1.3);
+                                break;
+                            case 'Dread Orchard':
+                                fireBossProjectile(boss.x, fireY, baseAngle, projSpeed, projDamage, boss.config.color);
+                                for (let i = 0; i < 4; i++) fireBossProjectile(boss.x, fireY, baseAngle + Math.PI / 4 + i * Math.PI / 2, projSpeed * 0.6, projDamage, boss.config.color);
+                                boss.cooldown = boss.config.fireRate;
+                                break;
+                            case 'Vortex Saint':
+                                boss.spiralAngle = (boss.spiralAngle || 0) + 0.25;
+                                for (let i = 0; i < 4; i++) fireBossProjectile(boss.x, fireY, boss.spiralAngle + i * Math.PI / 2, projSpeed * 0.85, projDamage, boss.config.color);
+                                boss.cooldown = Math.floor(boss.config.fireRate * 0.45);
+                                break;
+                            case 'Eclipse Foundry':
+                                fireBossProjectile(boss.x - 15 * gameScale, fireY, baseAngle - 0.2, projSpeed, projDamage, boss.config.color);
+                                fireBossProjectile(boss.x + 15 * gameScale, fireY, baseAngle + 0.2, projSpeed, projDamage, boss.config.color);
+                                boss.cooldown = boss.config.fireRate;
+                                break;
+                            case 'Omega Crucible':
+                                const isRage = boss.hp < boss.maxHp * 0.5;
+                                const shots = isRage ? 7 : 4;
+                                const spread = isRage ? 0.12 : 0.18;
+                                if (isRage) { boss.flashFrames = 5; createExplosion(boss.x, fireY, '#ef4444', 6); }
+                                for (let i = 0; i < shots; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - (shots - 1) / 2) * spread, projSpeed * (isRage ? 1.4 : 1.0), projDamage, boss.config.color);
+                                boss.cooldown = isRage ? Math.floor(boss.config.fireRate * 0.6) : boss.config.fireRate;
+                                break;
+                            case 'Chronos Devourer':
+                                if (bossMode.frame % 400 >= 120) {
+                                    for (let i = 0; i < 5; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 2) * 0.1, projSpeed * 1.6, projDamage, boss.config.color);
+                                }
+                                boss.cooldown = Math.floor(boss.config.fireRate * 0.85);
+                                break;
+                            default:
+                                for (let i = 0; i < 3; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 1) * 0.15, projSpeed, projDamage, boss.config.color);
+                                boss.cooldown = boss.config.fireRate;
+                        }
+                        playSynthSound('missile');
+                    }
+                    
+                    boss.stateTimer++;
+                    if (boss.stateTimer > 500) {
+                        boss.state = 'telegraph';
+                        boss.stateTimer = 0;
+                        boss.diveStartX = boss.x;
+                        boss.diveStartY = boss.y;
+                        boss.diveTargetX = player.x;
+                        playSynthSound('warning');
+                    }
+                } else if (boss.state === 'telegraph') {
+                    boss.stateTimer++;
+                    if (boss.stateTimer > 60) {
+                        boss.state = 'dive';
+                        boss.stateTimer = 0;
+                        playSynthSound('missile');
+                    }
+                } else if (boss.state === 'dive') {
+                    boss.stateTimer++;
+                    const diveDuration = 45;
+                    const progress = boss.stateTimer / diveDuration;
+                    boss.x = boss.diveStartX + (boss.diveTargetX - boss.diveStartX) * progress;
+                    boss.y = boss.diveStartY + (canvas.height - boss.diveStartY) * progress;
+                    
+                    if (boss.stateTimer >= diveDuration) {
+                        boss.state = 'return';
+                        boss.stateTimer = 0;
+                        boss.diveStartX = boss.x;
+                        boss.diveStartY = boss.y;
+                    }
+                } else if (boss.state === 'return') {
+                    boss.stateTimer++;
+                    const returnDuration = 50;
+                    const progress = boss.stateTimer / returnDuration;
+                    const targetY = getBossPlayTop() + 46 * gameScale;
+                    boss.x = boss.diveStartX + (canvas.width / 2 - boss.diveStartX) * progress;
+                    boss.y = boss.diveStartY + (targetY - boss.diveStartY) * progress;
+                    
+                    if (boss.stateTimer >= returnDuration) {
+                        boss.state = 'normal';
+                        boss.stateTimer = 0;
+                        boss.drift = 0;
+                        boss.x = canvas.width / 2;
+                        boss.y = targetY;
+                    }
                 }
+                
+                if (Math.hypot(player.x - boss.x, player.y - boss.y) < getBossHitRadius() + getPlayerFighterHitRadius()) {
+                    if (!player.invulnTimer || player.invulnTimer <= 0) {
+                        player.hp -= 35;
+                        playSynthSound('earth_hit');
+                        createExplosion(player.x, player.y, '#ef4444', 15);
+                        player.invulnTimer = 60;
+                        showGameNotice('<i class="fa-solid fa-triangle-exclamation mr-1"></i> Hull damaged by boss collision!', 2000);
+                    }
+                }
+                
                 if (boss.hp <= 0) handleBossDestroyed();
             }
 
             for (let i = bossMode.enemies.length - 1; i >= 0; i--) {
                 const enemy = bossMode.enemies[i];
                 enemy.y += enemy.speed;
+                
+                if (enemy.category === 'ship' || enemy.category === 'gatekeeper') {
+                    if (enemy.category === 'ship') {
+                        enemy.x += Math.sin(bossMode.frame * (enemy.sweepSpeed || 0.05) + enemy.id.charCodeAt(0)) * (enemy.sweepAmp || 2 * gameScale);
+                        enemy.x = Math.max(15, Math.min(canvas.width - 15, enemy.x));
+                    }
+                    enemy.cooldown--;
+                    if (enemy.cooldown <= 0) {
+                        const isGk = enemy.category === 'gatekeeper';
+                        const pSpeed = isGk ? 8 * gameScale : 6 * gameScale;
+                        const pRadius = isGk ? 6 * gameScale : 4 * gameScale;
+                        fireBossProjectile(enemy.x, enemy.y + enemy.size, Math.PI / 2, pSpeed, enemy.damage, enemy.color, pRadius);
+                        if (isGk) {
+                            fireBossProjectile(enemy.x - 15 * gameScale, enemy.y + enemy.size, Math.PI / 2 + 0.15, pSpeed * 0.9, enemy.damage, enemy.color, pRadius * 0.8);
+                            fireBossProjectile(enemy.x + 15 * gameScale, enemy.y + enemy.size, Math.PI / 2 - 0.15, pSpeed * 0.9, enemy.damage, enemy.color, pRadius * 0.8);
+                        }
+                        enemy.cooldown = (isGk ? 75 : 120) + Math.floor(Math.random() * 60);
+                        playSynthSound('laser');
+                    }
+                }
+                
                 if (Math.hypot(enemy.x - player.x, enemy.y - player.y) < getBossEnemyHitRadius(enemy) + getPlayerFighterHitRadius()) {
-                    player.hp -= enemy.damage;
+                    if (!player.invulnTimer || player.invulnTimer <= 0) {
+                        player.hp -= enemy.damage;
+                        player.invulnTimer = 30;
+                    }
                     killBossModeEnemy(i);
                     playSynthSound('earth_hit');
                     continue;
@@ -4755,7 +4964,10 @@
                 const proj = bossMode.enemyProjectiles[i];
                 proj.x += proj.dx; proj.y += proj.dy;
                 if (Math.hypot(player.x - proj.x, player.y - proj.y) < getPlayerFighterHitRadius() + proj.r) {
-                    player.hp -= proj.damage;
+                    if (!player.invulnTimer || player.invulnTimer <= 0) {
+                        player.hp -= proj.damage;
+                        player.invulnTimer = 15;
+                    }
                     bossMode.enemyProjectiles.splice(i, 1);
                 } else if (proj.y > canvas.height + 30 || proj.x < -30 || proj.x > canvas.width + 30) {
                     bossMode.enemyProjectiles.splice(i, 1);
@@ -4868,9 +5080,22 @@
             if (!bossMode.boss) return;
             if (healthWrap) healthWrap.classList.remove('hidden');
             if (healthName) healthName.innerText = bossMode.boss.config.name;
-            const pct = Math.max(0, bossMode.boss.hp / bossMode.boss.maxHp);
-            if (healthText) healthText.innerText = `${Math.ceil(pct * 100)}%`;
-            if (healthBar) healthBar.style.width = `${pct * 100}%`;
+            
+            const BARS = 4;
+            const hpPerBar = bossMode.boss.maxHp / BARS;
+            const currentBarIndex = Math.floor(Math.max(0, bossMode.boss.hp - 1) / hpPerBar);
+            const currentBarHp = bossMode.boss.hp - (currentBarIndex * hpPerBar);
+            const pct = Math.max(0, currentBarHp / hpPerBar);
+            
+            if (healthText) healthText.innerText = `x${currentBarIndex + 1} ${Math.ceil(pct * 100)}%`;
+            if (healthBar) {
+                healthBar.style.width = `${pct * 100}%`;
+                const layerColors = [
+                    'bg-gradient-to-r from-red-600 to-amber-400', 'bg-gradient-to-r from-amber-500 to-emerald-400', 
+                    'bg-gradient-to-r from-emerald-500 to-cyan-400', 'bg-gradient-to-r from-cyan-500 to-purple-500'
+                ];
+                healthBar.className = `h-full w-full transition-all duration-150 ${layerColors[Math.min(BARS - 1, currentBarIndex)] || layerColors[0]}`;
+            }
             if (objective) objective.innerText = game.isTimeAttack ? 'Time Attack' : bossMode.boss.config.skill;
         }
 
@@ -4982,8 +5207,38 @@
                 if (!drawEnemySprite(ctx, enemy.type, enemy.x, enemy.y, enemy.size, Math.PI / 2)) {
                     ctx.fillStyle = enemy.color; ctx.beginPath(); ctx.arc(enemy.x, enemy.y, enemy.size, 0, Math.PI * 2); ctx.fill();
                 }
+                if (enemy.isGatekeeper && enemy.hp < enemy.maxHp) {
+                    const barW = enemy.size * 2; const barH = 3 * gameScale;
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.7)'; ctx.fillRect(enemy.x - barW/2, enemy.y - enemy.size - 8*gameScale, barW, barH);
+                    ctx.fillStyle = '#10b981'; ctx.fillRect(enemy.x - barW/2, enemy.y - enemy.size - 8*gameScale, barW * (enemy.hp / enemy.maxHp), barH);
+                    ctx.restore();
+                }
             }
             if (bossMode.phase === 'boss' && bossMode.boss) {
+                if (bossMode.boss.state === 'telegraph') {
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#ef4444';
+                    const targetX = bossMode.boss.diveTargetX;
+                    const w = bossMode.boss.size * 1.5;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(bossMode.boss.x - w/2, bossMode.boss.y);
+                    ctx.lineTo(bossMode.boss.x + w/2, bossMode.boss.y);
+                    ctx.lineTo(targetX + w/2, canvas.height);
+                    ctx.lineTo(targetX - w/2, canvas.height);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    ctx.strokeStyle = 'rgba(239, 68, 68, 0.8)';
+                    ctx.lineWidth = 2 * gameScale;
+                    ctx.setLineDash([15, 10]);
+                    ctx.lineDashOffset = -((Date.now() / 20) % 25);
+                    ctx.beginPath(); ctx.moveTo(bossMode.boss.x, bossMode.boss.y); ctx.lineTo(targetX, canvas.height); ctx.stroke();
+                    ctx.restore();
+                }
                 if (bossMode.boss.flashFrames > 0) {
                     ctx.save();
                     ctx.shadowBlur = 30;
@@ -5002,8 +5257,11 @@
                 ctx.restore();
             }
             const playerSpriteSize = player.spriteSize || 58 * gameScale;
-            if (!drawSpriteImage(playerFighterSprite, player.x, player.y, playerSpriteSize, 0)) {
-                ctx.save(); ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.moveTo(player.x, player.y - 24 * gameScale); ctx.lineTo(player.x - 18 * gameScale, player.y + 20 * gameScale); ctx.lineTo(player.x + 18 * gameScale, player.y + 20 * gameScale); ctx.closePath(); ctx.fill(); ctx.restore();
+            const isInvuln = player.invulnTimer > 0;
+            if (!isInvuln || bossMode.frame % 10 < 5) {
+                if (!drawSpriteImage(playerFighterSprite, player.x, player.y, playerSpriteSize, 0)) {
+                    ctx.save(); ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.moveTo(player.x, player.y - 24 * gameScale); ctx.lineTo(player.x - 18 * gameScale, player.y + 20 * gameScale); ctx.lineTo(player.x + 18 * gameScale, player.y + 20 * gameScale); ctx.closePath(); ctx.fill(); ctx.restore();
+                }
             }
             if (bossMode.phase !== 'boss-defeated') {
                 ctx.save();
@@ -5642,6 +5900,13 @@
             const modal = document.getElementById('confirm-modal');
             if (modal) modal.classList.add('hidden');
             playSynthSound('hit');
+        });
+
+        bindButton('pause-encyclopedia-btn', () => {
+            populateSpaceEncyclopedia();
+            const encyclopedia = document.getElementById('inline-encyclopedia-options');
+            if (encyclopedia) encyclopedia.classList.remove('hidden');
+            playSynthSound('upgrade');
         });
 
         bindButton('pause-settings-btn', () => {
