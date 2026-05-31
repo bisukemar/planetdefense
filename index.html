@@ -179,6 +179,11 @@
 
     <!-- RESPONSIVE GAME NOTICES / STARTER TOOLTIPS -->
     <div id="game-notice" class="hidden fixed left-1/2 notice-safe-top z-[60] -translate-x-1/2 tech-notice notice-pop px-3 py-2 rounded-xl text-[10px] md:text-xs uppercase tracking-widest font-black text-center max-w-[88vw] pointer-events-none"></div>
+    <div id="warning-banner" class="fixed inset-x-0 notice-safe-top z-[60] flex justify-center pointer-events-none hidden">
+        <div id="warning-banner-content" class="bg-red-950/90 border border-red-500 text-red-200 px-3 py-1.5 rounded-lg text-[10px] md:text-xs uppercase tracking-widest animate-bounce font-bold text-center whitespace-nowrap shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+            <i class="fa-solid fa-triangle-exclamation mr-1 animate-ping"></i> Threat Detected!
+        </div>
+    </div>
     <div id="wave-event-banner" class="hidden fixed left-1/2 top-1/2 z-[62] -translate-x-1/2 -translate-y-1/2 pointer-events-none text-center wave-event-card">
         <div id="wave-event-kicker" class="text-[9px] md:text-xs text-cyan-200 uppercase tracking-[0.28em] font-black">Command Alert</div>
         <div id="wave-event-title" class="wave-event-title text-amber-300">Wave Started</div>
@@ -230,6 +235,10 @@
             <i class="fa-solid fa-eject text-sm"></i>
             <span class="text-[10px] uppercase tracking-widest">Eject Weapon</span>
         </button>
+        <button id="btn-boss-shield" class="hidden bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-black py-2 px-3 rounded-full shadow-[0_0_15px_rgba(6,182,212,0.5)] transition-all active:scale-95 flex items-center justify-center gap-1.5 border border-cyan-300 animate-pulse ring-2 ring-cyan-200">
+            <i class="fa-solid fa-shield-halved text-sm"></i>
+            <span class="text-[10px] uppercase tracking-widest">Shield</span>
+        </button>
         <button id="btn-boss-repair" class="hidden bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black py-2 px-3 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)] transition-all active:scale-95 flex items-center justify-center gap-1.5 border border-emerald-300">
             <i class="fa-solid fa-wrench text-sm"></i>
             <span class="text-[10px] uppercase tracking-widest">Repair</span>
@@ -274,16 +283,19 @@
         <div class="w-full flex justify-between items-center bg-slate-950/85 backdrop-blur-md p-2 rounded-xl border border-slate-800/80 shadow-lg font-bold">
             <div class="w-8"></div>
 
-            <!-- Live Wave Header Badge -->
             <div class="flex items-center gap-2 bg-slate-900 border border-emerald-500/30 px-3 py-1 rounded-full text-xs animate-pulse">
                 <span class="text-[9px] text-slate-400 tracking-widest hidden sm:inline font-bold">STATUS</span>
                 <span class="font-extrabold text-emerald-400 tracking-wider">WAVE <span id="wave-display" class="text-white font-bold">1</span></span>
             </div>
 
-            <!-- Pause / Settings Toggle -->
-            <button id="settings-toggle-btn" class="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700/60 flex items-center justify-center text-slate-300 hover:text-white hover:border-emerald-500/50 transition-all select-none">
-                <i class="fa-solid fa-cog animate-spin-slow"></i>
-            </button>
+            <div class="flex items-center gap-2">
+                <button id="fast-forward-btn" class="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700/60 flex items-center justify-center text-slate-400 hover:text-emerald-400 hover:border-emerald-500/50 transition-all select-none">
+                    <i class="fa-solid fa-forward"></i>
+                </button>
+                <button id="settings-toggle-btn" class="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700/60 flex items-center justify-center text-slate-300 hover:text-white hover:border-emerald-500/50 transition-all select-none">
+                    <i class="fa-solid fa-cog animate-spin-slow"></i>
+                </button>
+            </div>
         </div>
 
         <!-- STATUS PANELS ROW -->
@@ -316,13 +328,6 @@
                             <div id="health-bar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-full transition-all duration-150"></div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Warning Banners -->
-            <div class="flex flex-col items-center gap-2 bg-transparent">
-                <div id="warning-banner" class="fixed left-1/2 notice-safe-top z-[60] -translate-x-1/2 bg-red-950/85 border border-red-500 text-red-200 px-3 py-1.5 rounded-lg text-xs uppercase tracking-widest hidden animate-bounce font-bold pointer-events-none">
-                    <i class="fa-solid fa-triangle-exclamation mr-1 animate-ping"></i> Threat Detected!
                 </div>
             </div>
 
@@ -375,6 +380,9 @@
                 <div class="text-purple-300 font-semibold font-bold">Active: <span id="mobile-active" class="font-black text-[9px] text-white font-bold">0</span></div>
                 <div class="text-pink-400 font-semibold font-bold">Left: <span id="mobile-rem" class="font-black text-[9px] text-white font-bold">10</span></div>
             </div>
+            <button id="mobile-fast-forward-btn" class="w-7 h-7 rounded bg-slate-900 border border-slate-700/60 flex items-center justify-center text-slate-400 hover:text-emerald-400 transition-all select-none">
+                <i class="fa-solid fa-forward text-xs"></i>
+            </button>
             <button id="mobile-settings-toggle-btn" class="w-7 h-7 rounded bg-slate-900 border border-slate-700/60 flex items-center justify-center text-slate-300 select-none">
                 <i class="fa-solid fa-cog text-xs animate-spin-slow"></i>
             </button>
@@ -511,6 +519,23 @@
                 </div>
                 </div>
             </div>
+            <div id="master-tour-tactical" class="bg-slate-950/60 rounded border border-red-500/30 overflow-hidden font-bold">
+                <button id="accordion-tactical-btn" class="w-full px-2.5 py-2 flex items-center justify-between text-[10px] text-red-300 uppercase tracking-widest font-extrabold select-none">
+                    <span><i class="fa-solid fa-crosshairs mr-1"></i> Tactical Systems</span>
+                    <i id="accordion-tactical-icon" class="fa-solid fa-chevron-down text-[9px]"></i>
+                </button>
+                <div id="accordion-tactical-content" class="hidden max-h-[30vh] overflow-y-auto px-2 pb-2">
+                    <button id="cmd-unlock-tactical-laser" class="w-full mt-2 bg-red-500 hover:bg-red-400 text-slate-950 font-black py-2 rounded text-[10px] uppercase transition-all select-none">
+                        Unlock Orbital Strike — <i class="fa-solid fa-coins text-[8px]"></i> 300G
+                    </button>
+                    <button id="cmd-unlock-tactical-emp" class="w-full mt-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black py-2 rounded text-[10px] uppercase transition-all select-none">
+                        Unlock EMP Pulse — <i class="fa-solid fa-coins text-[8px]"></i> 400G
+                    </button>
+                    <button id="cmd-unlock-tactical-overcharge" class="w-full mt-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2 rounded text-[10px] uppercase transition-all select-none">
+                        Unlock Shield Surge — <i class="fa-solid fa-coins text-[8px]"></i> 500G
+                    </button>
+                </div>
+            </div>
             <div id="master-tour-directives" class="bg-slate-950/60 rounded border border-amber-500/30 overflow-hidden font-bold">
                 <button id="accordion-directives-btn" class="w-full px-2.5 py-2 flex items-center justify-between text-[10px] text-amber-300 uppercase tracking-widest font-extrabold select-none">
                     <span><i class="fa-solid fa-layer-group mr-1"></i> Command Directives</span>
@@ -607,6 +632,20 @@
         <div class="text-center text-[9px] md:text-xs text-slate-300 bg-slate-950/90 px-3 py-1 md:py-1.5 rounded-full border border-slate-800/80 backdrop-blur max-w-full truncate shadow-md select-none font-bold">
             <span id="action-hint">Tap the planet core to open Master Command, or tap BUILD to deploy satellites!</span>
         </div>
+        <div id="tactical-panel" class="w-full max-w-xs md:max-w-md flex gap-2 justify-center hidden">
+            <button id="btn-tac-laser" class="flex-1 bg-slate-900/90 border border-red-500/50 rounded-lg p-1.5 flex flex-col items-center justify-center text-red-400 font-bold active:scale-95 transition-all text-[8px] md:text-[9px]">
+                <i class="fa-solid fa-crosshairs mb-1"></i> ORBITAL
+                <div class="w-full h-1 bg-slate-800 rounded-full mt-1 overflow-hidden"><div id="cd-tac-laser" class="h-full bg-red-500 w-full transition-all"></div></div>
+            </button>
+            <button id="btn-tac-emp" class="flex-1 bg-slate-900/90 border border-cyan-500/50 rounded-lg p-1.5 flex flex-col items-center justify-center text-cyan-400 font-bold active:scale-95 transition-all text-[8px] md:text-[9px]">
+                <i class="fa-solid fa-bolt mb-1"></i> EMP
+                <div class="w-full h-1 bg-slate-800 rounded-full mt-1 overflow-hidden"><div id="cd-tac-emp" class="h-full bg-cyan-500 w-full transition-all"></div></div>
+            </button>
+            <button id="btn-tac-overcharge" class="flex-1 bg-slate-900/90 border border-emerald-500/50 rounded-lg p-1.5 flex flex-col items-center justify-center text-emerald-400 font-bold active:scale-95 transition-all text-[8px] md:text-[9px]">
+                <i class="fa-solid fa-shield-cat mb-1"></i> SURGE
+                <div class="w-full h-1 bg-slate-800 rounded-full mt-1 overflow-hidden"><div id="cd-tac-overcharge" class="h-full bg-emerald-500 w-full transition-all"></div></div>
+            </button>
+        </div>
         <div id="build-control-wrapper" class="w-full max-w-xs md:max-w-md flex gap-2 relative">
             <div id="build-tutorial-tooltip" class="hidden absolute left-0 md:left-1/2 -top-[4.7rem] md:-top-[4.55rem] md:-translate-x-1/2 tech-tooltip px-2.5 py-1.5 rounded-lg text-[9px] md:text-[10px] uppercase tracking-wider font-black text-center whitespace-nowrap pointer-events-none">
                 <span id="build-tutorial-text">Click here to deploy satellites</span>
@@ -648,6 +687,10 @@
 
                 <button id="open-encyclopedia-options-btn" class="w-full bg-slate-950 hover:bg-slate-800 border border-slate-700/60 text-sky-400 font-black py-2.5 px-4 rounded-xl text-xs tracking-wider active:scale-95 transition-all flex justify-center items-center gap-2 select-none pointer-events-auto">
                     <i class="fa-solid fa-book-atlas font-bold"></i> SPACE ENCYCLOPEDIA
+                </button>
+
+                <button id="open-research-btn" class="w-full bg-slate-950 hover:bg-slate-800 border border-purple-500/60 text-purple-400 font-black py-2.5 px-4 rounded-xl text-xs tracking-wider active:scale-95 transition-all flex justify-center items-center gap-2 select-none pointer-events-auto">
+                    <i class="fa-solid fa-flask font-bold"></i> RESEARCH LAB
                 </button>
 
                 <button id="open-settings-options-btn" class="w-full bg-slate-950 hover:bg-slate-800 border border-slate-700/60 text-amber-400 font-black py-2.5 px-4 rounded-xl text-xs tracking-wider active:scale-95 transition-all flex justify-center items-center gap-2 select-none pointer-events-auto">
@@ -751,6 +794,10 @@
                                 </label>
                             </div>
                             <div class="flex items-center justify-between bg-slate-900 border border-slate-800 p-2.5 rounded-xl font-bold">
+                                <span class="text-[10px] text-slate-400 uppercase tracking-wider">Screen Shake</span>
+                                <input type="range" id="settings-shake-intensity" min="0" max="1" step="0.05" value="1" class="w-24 accent-emerald-500 pointer-events-auto">
+                            </div>
+                            <div class="flex items-center justify-between bg-slate-900 border border-slate-800 p-2.5 rounded-xl font-bold">
                                 <span class="text-[10px] text-red-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-code"></i> Dev Mode (+100k G)</span>
                                 <label class="relative inline-flex items-center cursor-pointer select-none pointer-events-auto">
                                     <input type="checkbox" id="settings-dev-mode" class="sr-only peer">
@@ -821,6 +868,21 @@
                         <button id="close-boss-attack-btn" class="text-slate-400 hover:text-white p-2 text-sm select-none"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                     <div id="boss-attack-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-left"></div>
+                </div>
+
+                <div id="inline-research-options" class="absolute inset-4 md:inset-6 z-50 bg-slate-950 border border-purple-500/40 rounded-xl p-4 flex flex-col gap-3 transition-all hidden pointer-events-auto font-bold shadow-2xl overflow-y-auto">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <div class="flex items-center gap-2">
+                            <button id="back-research-btn" class="text-slate-400 hover:text-white p-1 text-sm select-none transition-colors"><i class="fa-solid fa-arrow-left"></i></button>
+                            <span class="text-purple-400 font-black text-xs tracking-widest uppercase"><i class="fa-solid fa-flask mr-1"></i> Research Lab</span>
+                        </div>
+                        <button id="close-research-btn" class="text-slate-400 hover:text-white p-2 text-sm select-none"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center mb-2">
+                        <div class="text-slate-400 text-[10px] uppercase tracking-widest">Available Cosmic Data</div>
+                        <div class="text-purple-300 text-xl font-black mt-1"><span id="lbl-cosmic-data">0</span> <i class="fa-solid fa-star text-sm"></i></div>
+                    </div>
+                    <div class="space-y-2" id="research-upgrades-list"></div>
                 </div>
             </div>
             <div class="text-center text-[10px] text-slate-500 select-none font-bold">
@@ -986,6 +1048,10 @@
                             <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500 peer-checked:after:bg-slate-950"></div>
                         </label>
                     </div>
+                    <div class="flex items-center justify-between bg-slate-900 border border-slate-800 p-2.5 rounded-xl font-bold">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider">Screen Shake</span>
+                        <input type="range" id="pause-settings-shake-intensity" min="0" max="1" step="0.05" value="1" class="w-24 accent-emerald-500 pointer-events-auto">
+                    </div>
                 </div>
             </div>
             
@@ -1023,11 +1089,35 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        const APP_VERSION = 'Alpha 0.9.46.113';
+        const APP_VERSION = 'Alpha 0.9.70.137';
         const TARGET_FRAME_MS = 1000 / 60;
         let lastLoopTimestamp = 0;
 
         const PATCH_NOTES = [
+            { version: 'Alpha 0.9.70.137', notes: ['Aligned the Mini-Boss warning banner vertically with the other game notices.'] },
+            { version: 'Alpha 0.9.69.136', notes: ['Fixed warning banner centering issue caused by animation transform overrides.', 'Removed the ghosting animation (debris persistence) of killed enemies.'] },
+            { version: 'Alpha 0.9.68.135', notes: ['Restored the missing Research Lab UI panel that was accidentally removed in a previous patch.'] },
+            { version: 'Alpha 0.9.67.134', notes: ['Tactical Abilities (Orbital Strike, EMP, Shield Surge) are now unlocked individually in Master Command.', 'Fixed a bug where Research Lab buttons were unresponsive to touch input.'] },
+            { version: 'Alpha 0.9.66.133', notes: ['Tactical Abilities are now hidden at the start of a run and must be unlocked through the Master Command Center.'] },
+            { version: 'Alpha 0.9.65.132', notes: ['Fixed a silent object-null crash that prevented the Research Lab button from opening when loading older save files.', 'Fixed an undeclared speed variable that caused the game to completely freeze when deploying Tactical Abilities or generating debris.'] },
+            { version: 'Alpha 0.9.64.131', notes: ['Fixed Research Lab accessibility by correcting its parent hierarchy in the title screen.', 'Fixed an undefined variable exception that caused the game to freeze when deploying Tactical Abilities like EMP.'] },
+            { version: 'Alpha 0.9.63.130', notes: ['Added Research Lab for persistent meta-progression using Cosmic Data.', 'Added Active Tactical Abilities (Orbital Laser, EMP, Surge) during defense waves.', 'Added Deep Space Anomalies (Rogue Comets, Smuggler Ships) to mid-wave events.', 'Added satellite damage states (smoking/sparking), destroyed debris persistence, and warp tunnel visual effects.'] },
+            { version: 'Alpha 0.9.62.129', notes: ['Added a continuous, pulsing red visual warning overlay when the planet core or player fighter drops below 30% health.'] },
+            { version: 'Alpha 0.9.61.128', notes: ['Adjusted planet shield visual thickness based on its current health. The shield is now invisible when depleted.'] },
+            { version: 'Alpha 0.9.60.127', notes: ['Added a blue vignette overlay when the planet shield takes damage.'] },
+            { version: 'Alpha 0.9.59.126', notes: ['Added a red visual vignette overlay to indicate when the planet core or the player fighter takes damage.'] },
+            { version: 'Alpha 0.9.58.125', notes: ['Added an "Explosion/Screen Shake Intensity" slider to the Visuals & Gameplay settings menu to allow players to customize or disable screen shake.'] },
+            { version: 'Alpha 0.9.57.124', notes: ['Added a dynamic screen shake effect when the planet core or shields take damage to drastically improve impact feel.'] },
+            { version: 'Alpha 0.9.56.123', notes: ['Added a pulsing outline to the Proton Shield button during Boss Intercepts to clearly indicate when it is available for use.'] },
+            { version: 'Alpha 0.9.55.122', notes: ['Added a visual shatter effect and audio cue when the Proton Shield expires.'] },
+            { version: 'Alpha 0.9.54.121', notes: ['Replaced Boss Intercept Dash with Proton Shield (one-time 3s invulnerability).', 'Fixed hitbox misalignment causing unfair damage during boss encounters by perfectly centering the collision point.'] },
+            { version: 'Alpha 0.9.53.120', notes: ['Redesigned Boss Intercept Dash to use velocity vectors instead of pointer interpolation, fixing mouse and drag control issues.', 'Added Double-Tap and Spacebar/Shift keyboard shortcuts to trigger Dash quickly.'] },
+            { version: 'Alpha 0.9.52.119', notes: ['Fixed an issue where the Mini-Boss warning banner was uncentered and hidden on mobile devices.'] },
+            { version: 'Alpha 0.9.51.118', notes: ['Enhanced the active visual state of the Fast-Forward toggle to include a glowing background and pulsing icon.'] },
+            { version: 'Alpha 0.9.50.117', notes: ['Shrank the player fighter collision hitbox during Boss Intercepts to a small central core, allowing for fair bullet-hell dodging.', 'Added a visual glowing core to the player ship to clearly telegraph the vulnerable hitbox.'] },
+            { version: 'Alpha 0.9.49.116', notes: ['Restored missing collision detection function that caused the game to freeze during defense waves.'] },
+            { version: 'Alpha 0.9.48.115', notes: ['Fixed a major performance freeze when using the Fast-Forward button by switching to a time-delta multiplier instead of double-iteration looping.'] },
+            { version: 'Alpha 0.9.47.114', notes: ['Added Player Phase Dash active ability to Boss Intercepts.', 'Introduced Environmental Hazards (Solar Flares, Ion Storms, Debris Fields) that sporadically appear during defense waves.', 'Added Fast-Forward (2x speed) toggle for defense waves.', 'Refactored core game loop to cleanly separate physics updates from rendering.'] },
             { version: 'Alpha 0.9.46.113', notes: ['Lowered the attack range of the Void Harvester Mini-Boss.'] },
             { version: 'Alpha 0.9.45.112', notes: ['Added a heavily armored Vanguard Gatekeeper that must be defeated before the main Boss appears.', 'Enhanced Boss Intercept minion swooping patterns with varied speeds and amplitudes.'] },
             { version: 'Alpha 0.9.44.111', notes: ['Optimized warp drive rendering for better mobile performance.', 'Added dynamic bounding to boss intercept squads to prevent enemies from spawning or sweeping off-screen on narrow devices.'] },
@@ -1128,6 +1218,7 @@
         let activeBgmKey = 'default';
         let bgmUnlockListenerBound = false;
         let isScanlinesEnabled = true;
+        let screenShakeIntensity = 1.0;
         let isDevMode = false;
         let deferredInstallPrompt = null;
         let gameNoticeTimer = null;
@@ -1139,6 +1230,9 @@
         let masterCommandTourStep = 0;
         let modeTransitionActive = false;
         let gameLoopStarted = false;
+        
+        let cosmicData = 0;
+        let research = { startSlots: 0, baseShield: 0, baseDamage: 0 };
 
         const PLANET_THEMES = {
             oasis: { coreStart: '#1d4ed8', coreEnd: '#0f172a', land: '#10b981', shield: 'rgba(56, 189, 248, ' },
@@ -1321,7 +1415,9 @@
             'Vortex Saint': 'elements/boss-vortex-saint.png',
             'Eclipse Foundry': 'elements/boss-eclipse-foundry.png',
             'Omega Crucible': 'elements/boss-omega-crucible.png',
-            'Chronos Devourer': 'elements/boss-chronos-devourer.png'
+            'Chronos Devourer': 'elements/boss-chronos-devourer.png',
+            'Rogue Comet': 'elements/comet.png',
+            'Smuggler Ship': 'elements/scout-fighter.png'
         };
 
         const enemySprites = {};
@@ -1341,9 +1437,17 @@
                     if (parsed.sfxVolume !== undefined) sfxVolume = parsed.sfxVolume;
                     if (parsed.bgmVolume !== undefined) bgmVolume = parsed.bgmVolume;
                     if (parsed.scanlines !== undefined) isScanlinesEnabled = parsed.scanlines;
+                    if (parsed.shakeIntensity !== undefined) screenShakeIntensity = parsed.shakeIntensity;
                     if (parsed.devMode !== undefined) isDevMode = parsed.devMode;
                     if (parsed.planetName !== undefined) planetName = parsed.planetName;
                     if (parsed.planetTheme !== undefined) activeThemeKey = parsed.planetTheme;
+                    if (parsed.cosmicData !== undefined) cosmicData = parsed.cosmicData;
+                    if (parsed.research) {
+                        research = parsed.research;
+                        research.startSlots = research.startSlots || 0;
+                        research.baseShield = research.baseShield || 0;
+                        research.baseDamage = research.baseDamage || 0;
+                    }
                 }
             } catch (e) { console.warn("Failed to load settings", e); }
             
@@ -1365,9 +1469,12 @@
                     sfxVolume: sfxVolume,
                     bgmVolume: bgmVolume,
                     scanlines: isScanlinesEnabled,
+                    shakeIntensity: screenShakeIntensity,
                     devMode: isDevMode,
                     planetName: planetName,
-                    planetTheme: activeThemeKey
+                    planetTheme: activeThemeKey,
+                    cosmicData: cosmicData,
+                    research: research
                 };
                 localStorage.setItem('pd_settings', JSON.stringify(settings));
             } catch (e) { console.warn("Failed to save settings", e); }
@@ -1395,6 +1502,9 @@
             const scanT = document.getElementById('settings-scanlines-toggle-new');
             if (scanT) isScanlinesEnabled = scanT.checked;
             
+            const shakeV = document.getElementById('settings-shake-intensity');
+            if (shakeV) screenShakeIntensity = parseFloat(shakeV.value);
+            
             const devT = document.getElementById('settings-dev-mode');
             if (devT) isDevMode = devT.checked;
             
@@ -1419,6 +1529,9 @@
             
             const scanT = document.getElementById('pause-settings-scanlines-toggle-new');
             if (scanT) isScanlinesEnabled = scanT.checked;
+            
+            const pShakeV = document.getElementById('pause-settings-shake-intensity');
+            if (pShakeV) screenShakeIntensity = parseFloat(pShakeV.value);
             
             if (isSfxEnabled || isBgmEnabled) initAudio();
             
@@ -1449,7 +1562,9 @@
             'Vortex Saint': 7.2,
             'Eclipse Foundry': 7.2,
             'Omega Crucible': 7.2,
-            'Chronos Devourer': 7.2
+            'Chronos Devourer': 7.2,
+            'Rogue Comet': 4.4,
+            'Smuggler Ship': 4.6
         };
 
         function drawEnemySprite(ctx, type, x, y, size, angle = 0) {
@@ -1477,7 +1592,9 @@
             { type: 'Scout Fighter', category: 'ship', color: '#38bdf8', size: 11, speed: 1.75, maxHp: 35, damage: 8, goldReward: 25, attackRange: 125, attackCooldown: 55, threatCost: 3 },
             { type: 'Void Swarmer', category: 'ship', color: '#fb7185', size: 8, speed: 2.2, maxHp: 28, damage: 6, goldReward: 18, attackRange: 105, attackCooldown: 38, threatCost: 2 },
             { type: 'Armored Cruiser', category: 'ship', color: '#fbbf24', size: 18, speed: 0.82, maxHp: 120, damage: 18, goldReward: 60, attackRange: 155, attackCooldown: 70, threatCost: 7 },
-            { type: 'Void Harvester', category: 'miniboss', color: '#f43f5e', size: 25, speed: 0.58, maxHp: 180, damage: 24, goldReward: 120, attackRange: 140, attackCooldown: 110, threatCost: 15 }
+            { type: 'Void Harvester', category: 'miniboss', color: '#f43f5e', size: 25, speed: 0.58, maxHp: 180, damage: 24, goldReward: 120, attackRange: 140, attackCooldown: 110, threatCost: 15 },
+            { type: 'Rogue Comet', category: 'anomaly', color: '#0ea5e9', size: 24, speed: 2.2, maxHp: 350, damage: 50, goldReward: 400, threatCost: 0 },
+            { type: 'Smuggler Ship', category: 'anomaly', color: '#d946ef', size: 16, speed: 1.9, maxHp: 180, damage: 15, goldReward: 250, threatCost: 0 }
         ];
 
         const BOSS_SHIPS = [
@@ -1595,7 +1712,9 @@
             'Scout Fighter': 'Fast ship that hunts satellites once it reaches weapon range.',
             'Void Swarmer': 'Small assault craft with rapid movement and quick attack cycles.',
             'Armored Cruiser': 'Durable gunship that advances slowly and pressures satellites.',
-            'Void Harvester': 'Mini-Boss. Capital-grade ship with extreme durability and heavy attacks. Arrives with escorts.'
+            'Void Harvester': 'Mini-Boss. Capital-grade ship with extreme durability and heavy attacks. Arrives with escorts.',
+            'Rogue Comet': 'Deep space anomaly. Highly durable and fast. Drops Cosmic Data if destroyed.',
+            'Smuggler Ship': 'Deep space anomaly. Highly evasive neutral vessel. Drops Command Directives if destroyed.'
         };
 
         const DIRECTIVE_EFFECT_CONTEXT = {
@@ -1783,6 +1902,49 @@
                 .join('');
         }
 
+        function updateResearchUI() {
+            try {
+                const lbl = document.getElementById('lbl-cosmic-data');
+                if (lbl) lbl.innerText = cosmicData || 0;
+                const list = document.getElementById('research-upgrades-list');
+                if (!list) return;
+                if (!research) research = { startSlots: 0, baseShield: 0, baseDamage: 0 };
+                const sSlots = research.startSlots || 0;
+                const sShield = research.baseShield || 0;
+                const sDmg = research.baseDamage || 0;
+                const costs = { startSlots: 15 + sSlots * 20, baseShield: 10 + sShield * 15, baseDamage: 20 + sDmg * 30 };
+                list.innerHTML = `
+                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex justify-between items-center">
+                        <div><div class="text-slate-200 text-xs font-black uppercase tracking-widest">Initial Orbit Slots</div><div class="text-slate-400 text-[9px] mt-0.5">Start runs with extra random slots. (Lvl ${sSlots}/10)</div></div>
+                        <button data-research="startSlots" data-cost="${costs.startSlots}" class="research-btn bg-purple-500 hover:bg-purple-400 active:scale-95 text-slate-950 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all pointer-events-auto select-none ${cosmicData >= costs.startSlots && sSlots < 10 ? '' : 'opacity-50 cursor-not-allowed'}">${sSlots >= 10 ? 'MAX' : costs.startSlots + ' CD'}</button>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex justify-between items-center mt-2">
+                        <div><div class="text-slate-200 text-xs font-black uppercase tracking-widest">Reinforced Shielding</div><div class="text-slate-400 text-[9px] mt-0.5">Increase base shield by +25 per level. (Lvl ${sShield}/10)</div></div>
+                        <button data-research="baseShield" data-cost="${costs.baseShield}" class="research-btn bg-purple-500 hover:bg-purple-400 active:scale-95 text-slate-950 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all pointer-events-auto select-none ${cosmicData >= costs.baseShield && sShield < 10 ? '' : 'opacity-50 cursor-not-allowed'}">${sShield >= 10 ? 'MAX' : costs.baseShield + ' CD'}</button>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex justify-between items-center mt-2">
+                        <div><div class="text-slate-200 text-xs font-black uppercase tracking-widest">Weapons Calibration</div><div class="text-slate-400 text-[9px] mt-0.5">Increase all satellite damage by +5% per level. (Lvl ${sDmg}/10)</div></div>
+                        <button data-research="baseDamage" data-cost="${costs.baseDamage}" class="research-btn bg-purple-500 hover:bg-purple-400 active:scale-95 text-slate-950 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all pointer-events-auto select-none ${cosmicData >= costs.baseDamage && sDmg < 10 ? '' : 'opacity-50 cursor-not-allowed'}">${sDmg >= 10 ? 'MAX' : costs.baseDamage + ' CD'}</button>
+                    </div>
+                `;
+                
+                document.querySelectorAll('.research-btn').forEach(btn => {
+                    btn.addEventListener('pointerdown', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const key = btn.getAttribute('data-research');
+                        const cost = parseInt(btn.getAttribute('data-cost'), 10);
+                        const currentLvl = research[key] || 0;
+                        if (cosmicData >= cost && currentLvl < 10) {
+                            cosmicData -= cost; research[key] = currentLvl + 1; saveSettings(); updateResearchUI(); playSynthSound('upgrade');
+                        } else {
+                            playSynthSound('hit');
+                        }
+                    });
+                });
+            } catch (e) { console.warn("Error updating research UI", e); }
+        }
+
         function scrollEncyclopediaTo(sectionKey) {
             const scrollBody = document.getElementById('encyclopedia-scroll-body');
             const section = document.getElementById(`encyclopedia-section-${sectionKey}`);
@@ -1803,13 +1965,15 @@
             mode: 'defense',
             commandDirectives: {},
             directiveKills: 0,
+            hazard: null, fastForward: false, cameraShake: 0, damageOverlayAlpha: 0, shieldOverlayAlpha: 0,
+            tactical: { laser: {cd:0, maxCd:1800, active:false, unlocked:false}, emp: {cd:0, maxCd:2400, unlocked:false}, overcharge: {cd:0, maxCd:3600, activeTime:0, unlocked:false} },
             bossIndex: 0,
             bossRepairKits: 0
         };
 
         let bossMode = {
             active: false, phase: 'idle', wave: 0, frame: 0, spawnTimer: 0, spawned: 0, requiredKills: 0, kills: 0,
-            player: { x: 0, y: 0, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: 0, targetY: 0, weapon: 'default', repairKits: 0 },
+            player: { x: 0, y: 0, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: 0, targetY: 0, weapon: 'default', repairKits: 0, dashCooldown: 0, isDashing: false, dashTimer: 0 },
             enemies: [], projectiles: [], enemyProjectiles: [], boss: null, rewardOptions: [], victoryTimer: 0, defeatedBossName: '', drops: []
         };
         let resizeRaf = null;
@@ -1887,20 +2051,29 @@
         }
         resizeCanvas();
 
-        function drawCosmicBackground() {
+        function updateCosmicBackground(isWarping, speedMultiplier = 1) {
             const w = canvas.width;
             const h = canvas.height;
-
-            if (!drawCosmicBackground.stars || drawCosmicBackground.lastW !== w || drawCosmicBackground.lastH !== h) {
+            if (!updateCosmicBackground.stars || updateCosmicBackground.lastW !== w || updateCosmicBackground.lastH !== h) {
                 const starCount = Math.max(80, Math.min(220, Math.floor((w * h) / 7000)));
-                drawCosmicBackground.stars = Array.from({ length: starCount }, () => ({
+                updateCosmicBackground.stars = Array.from({ length: starCount }, () => ({
                     x: Math.random() * w, y: Math.random() * h,
                     r: Math.random() * 1.4 + 0.25, alpha: Math.random() * 0.7 + 0.25,
                     twinkle: Math.random() * Math.PI * 2, speed: Math.random() * 0.15 + 0.03
                 }));
-                drawCosmicBackground.lastW = w;
-                drawCosmicBackground.lastH = h;
+                updateCosmicBackground.lastW = w;
+                updateCosmicBackground.lastH = h;
             }
+            const speedMult = isWarping ? 8 : 1 * speedMultiplier;
+            for (const star of updateCosmicBackground.stars) {
+                star.y += star.speed * speedMult;
+                if (star.y > h) { star.y = 0; star.x = Math.random() * w; }
+            }
+        }
+
+        function drawCosmicBackgroundOnly(isWarping) {
+            const w = canvas.width;
+            const h = canvas.height;
 
             ctx.save();
             const gradient = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.75);
@@ -1908,12 +2081,10 @@
             gradient.addColorStop(0.45, 'rgba(15, 23, 42, 0.10)');
             gradient.addColorStop(1, 'rgba(3, 7, 18, 0.35)');
             ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, w, h);
+            ctx.fillRect(-30, -30, w + 60, h + 60);
 
             const time = Date.now() * 0.002;
-            const isWarping = game && game.mode === 'boss' && bossMode && bossMode.phase !== 'boss-defeated';
-            const speedMult = isWarping ? 8 : 1;
-            for (const star of drawCosmicBackground.stars) {
+            for (const star of updateCosmicBackground.stars || []) {
                 const flicker = 0.55 + Math.sin(time + star.twinkle) * 0.25;
                 ctx.globalAlpha = star.alpha * flicker;
                 ctx.fillStyle = '#e0f2fe';
@@ -1924,8 +2095,18 @@
                     ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
                     ctx.fill();
                 }
-                star.y += star.speed * speedMult;
-                if (star.y > h) { star.y = 0; star.x = Math.random() * w; }
+            }
+            
+            if (isWarping) {
+                ctx.translate(w / 2, h / 2);
+                ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)';
+                ctx.lineWidth = 2 * gameScale;
+                ctx.setLineDash([40, 20]);
+                ctx.lineDashOffset = -((Date.now() / 20) % 20);
+                for (let i = 0; i < 16; i++) {
+                    ctx.rotate((Math.PI * 2) / 16);
+                    ctx.beginPath(); ctx.moveTo(60 * gameScale, 0); ctx.lineTo(Math.max(w, h), 0); ctx.stroke();
+                }
             }
             ctx.globalAlpha = 1;
             ctx.restore();
@@ -2146,6 +2327,11 @@
             if (toggle) toggle.checked = isScanlinesEnabled;
             const pToggle = document.getElementById('pause-settings-scanlines-toggle-new');
             if (pToggle) pToggle.checked = isScanlinesEnabled;
+            
+            const shake = document.getElementById('settings-shake-intensity');
+            if (shake) shake.value = screenShakeIntensity;
+            const pShake = document.getElementById('pause-settings-shake-intensity');
+            if (pShake) pShake.value = screenShakeIntensity;
         }
 
         function toggleMasterAudio() {
@@ -2793,6 +2979,10 @@
                 directives: {
                     content: document.getElementById('accordion-directives-content'),
                     icon: document.getElementById('accordion-directives-icon')
+                },
+                tactical: {
+                    content: document.getElementById('accordion-tactical-content'),
+                    icon: document.getElementById('accordion-tactical-icon')
                 }
             };
 
@@ -2814,6 +3004,23 @@
                     panel.icon.classList.toggle('fa-chevron-up', isOpen);
                     panel.icon.classList.toggle('fa-chevron-down', !isOpen);
                 }
+            });
+        }
+
+        function updateFastForwardUI() {
+            ['fast-forward-btn', 'mobile-fast-forward-btn'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                btn.classList.toggle('text-emerald-400', game.fastForward);
+                btn.classList.toggle('text-slate-400', !game.fastForward);
+                btn.classList.toggle('border-emerald-400', game.fastForward);
+                btn.classList.toggle('border-slate-700/60', !game.fastForward);
+                btn.classList.toggle('bg-emerald-500/20', game.fastForward);
+                btn.classList.toggle('bg-slate-900', !game.fastForward);
+                btn.classList.toggle('shadow-[0_0_15px_rgba(16,185,129,0.3)]', game.fastForward);
+                
+                const icon = btn.querySelector('i');
+                if (icon) icon.classList.toggle('animate-pulse', game.fastForward);
             });
         }
 
@@ -2902,6 +3109,37 @@
                     }
                 }
             }
+
+            const tacticalItems = [
+                { id: 'laser', cost: 300, name: 'Orbital Strike', color: 'red' },
+                { id: 'emp', cost: 400, name: 'EMP Pulse', color: 'cyan' },
+                { id: 'overcharge', cost: 500, name: 'Shield Surge', color: 'emerald' }
+            ];
+            
+            tacticalItems.forEach(item => {
+                const btn = document.getElementById(`cmd-unlock-tactical-${item.id}`);
+                if (!btn) return;
+                
+                if (game.tactical && game.tactical[item.id] && game.tactical[item.id].unlocked) {
+                    btn.disabled = true;
+                    btn.className = `w-full mt-2 bg-slate-900 border border-${item.color}-500/30 text-${item.color}-500 cursor-not-allowed font-black py-2 rounded text-[10px] uppercase transition-all select-none`;
+                    btn.innerHTML = `<i class="fa-solid fa-check mb-1"></i> ${item.name} Online`;
+                } else {
+                    if (waveActive || game.mode === 'boss') {
+                        btn.disabled = true;
+                        btn.className = "w-full mt-2 bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/40 font-black py-2 rounded text-[10px] uppercase transition-all select-none";
+                        btn.innerText = "DISABLED WHILE UNDER ATTACK";
+                    } else if (game.gold >= item.cost) {
+                        btn.disabled = false;
+                        btn.className = `w-full mt-2 bg-${item.color}-500 hover:bg-${item.color}-400 text-slate-950 font-black py-2 rounded text-[10px] uppercase transition-all select-none`;
+                        btn.innerHTML = `Unlock ${item.name} — <i class="fa-solid fa-coins text-[8px]"></i> ${item.cost}G`;
+                    } else {
+                        btn.disabled = true;
+                        btn.className = "w-full mt-2 bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/40 font-black py-2 rounded text-[10px] uppercase transition-all select-none";
+                        btn.innerHTML = `Unlock ${item.name} — <i class="fa-solid fa-coins text-[8px]"></i> ${item.cost}G`;
+                    }
+                }
+            });
         }
 
         function handleOrbitButtonPress(index) {
@@ -3491,9 +3729,9 @@
                 }
             }
 
-            update() {
+        update(speedMultiplier = 1) {
                 if (this.slowTimer > 0) {
-                    this.slowTimer--;
+                this.slowTimer -= speedMultiplier;
                     if (this.slowTimer <= 0) {
                         this.slowMultiplier = 1;
                     }
@@ -3512,7 +3750,7 @@
                         
                         const distToOrbit = Math.hypot(targetX - this.x, targetY - this.y);
                         if (distToOrbit > 0) {
-                            const currentSpeed = this.baseSpeed * this.slowMultiplier * 1.5; 
+                            const currentSpeed = this.baseSpeed * this.slowMultiplier * 1.5 * speedMultiplier; 
                             if (distToOrbit < currentSpeed) {
                                 this.x = targetX; this.y = targetY;
                             } else {
@@ -3529,7 +3767,7 @@
                         if (nearestTower && nearestDist <= this.attackRange) {
                             this.targetTower = nearestTower;
                             this.angle = Math.atan2(this.targetTower.y - this.y, this.targetTower.x - this.x);
-                            if (this.attackCooldown > 0) this.attackCooldown--;
+                            if (this.attackCooldown > 0) this.attackCooldown -= speedMultiplier;
                             if (this.attackCooldown <= 0) {
                                 damageSatellite(this.targetTower, this.damage, this.category);
                                 createExplosion(this.targetTower.x, this.targetTower.y, this.color, 4);
@@ -3540,7 +3778,7 @@
                         } else {
                             this.angle = Math.atan2(canvas.height/2 - this.y, canvas.width/2 - this.x);
                         }
-                        this.pulseTimer += 0.05;
+                        this.pulseTimer += 0.05 * speedMultiplier;
                         return;
                     }
                 }
@@ -3565,7 +3803,7 @@
                 let isAttacking = false;
                 if (this.targetTower && distToTarget <= this.attackRange) {
                     isAttacking = true;
-                    if (this.attackCooldown > 0) this.attackCooldown--;
+                    if (this.attackCooldown > 0) this.attackCooldown -= speedMultiplier;
                     if (this.attackCooldown <= 0) {
                         damageSatellite(this.targetTower, this.damage, this.category);
                         createExplosion(this.targetTower.x, this.targetTower.y, this.color, 4);
@@ -3575,7 +3813,7 @@
                     }
                 } else if (this.category === 'miniboss' && !this.targetTower && distToTarget <= this.attackRange + EARTH_RADIUS) {
                     isAttacking = true;
-                    if (this.attackCooldown > 0) this.attackCooldown--;
+                    if (this.attackCooldown > 0) this.attackCooldown -= speedMultiplier;
                     if (this.attackCooldown <= 0) {
                         damageEarth(this.damage);
                         createExplosion(centerX, centerY, this.color, 8);
@@ -3585,7 +3823,7 @@
                 }
 
                 if (this.category === 'miniboss') {
-                    if (this.specialCooldown > 0) this.specialCooldown--;
+                    if (this.specialCooldown > 0) this.specialCooldown -= speedMultiplier;
                     if (this.specialCooldown <= 0) {
                         this.specialCooldown = 300; 
                         if (this.targetTower) {
@@ -3603,17 +3841,17 @@
                 }
 
                 if (isAttacking) {
-                    this.pulseTimer += 0.05;
+                    this.pulseTimer += 0.05 * speedMultiplier;
                     return;
                 }
 
-                const currentSpeed = this.baseSpeed * this.slowMultiplier;
+                const currentSpeed = this.baseSpeed * this.slowMultiplier * speedMultiplier;
                 if (distToTarget > 0) {
                     this.x += (targetX - this.x) / distToTarget * currentSpeed;
                     this.y += (targetY - this.y) / distToTarget * currentSpeed;
-                    if (this.isRockEnemy) this.spinAngle += this.spinSpeed * Math.max(0.25, this.slowMultiplier);
+                    if (this.isRockEnemy) this.spinAngle += this.spinSpeed * Math.max(0.25, this.slowMultiplier) * speedMultiplier;
                 }
-                this.pulseTimer += 0.05;
+                this.pulseTimer += 0.05 * speedMultiplier;
             }
 
             draw() {
@@ -3706,7 +3944,7 @@
             get upgradedRange() { return Math.floor(this.baseRange * (1 + (this.upgradeLevel - 1) * 0.11) * rangeScale); }
             get baseFireRateCooldown() { return Math.max(5, Math.floor(this.baseCooldown * Math.pow(0.88, this.upgradeLevel - 1))); }
             get effectiveDamage() {
-                let multiplier = 1 + getDirectiveEffectValue('damage', 0);
+                let multiplier = 1 + getDirectiveEffectValue('damage', 0) + (research.baseDamage * 0.05);
                 const glass = getDirectiveEffectValue('glassCannon'); if (glass) multiplier += glass.dmg;
                 const rangeTradeoff = getDirectiveEffectValue('rangeDamageTradeoff'); if (rangeTradeoff) multiplier -= rangeTradeoff.dmg;
                 const corePowered = getDirectiveEffectValue('corePowered'); if (corePowered) multiplier += corePowered.dmg;
@@ -3733,6 +3971,7 @@
                 const rangeTradeoff = getDirectiveEffectValue('rangeDamageTradeoff'); if (rangeTradeoff) multiplier += rangeTradeoff.range;
                 const magnetTradeoff = getDirectiveEffectValue('magnetTradeoff'); if (this.type === 'magnetsentry' && magnetTradeoff) multiplier -= magnetTradeoff.range;
                 const compression = getDirectiveEffectValue('orbitCompression'); if (this.orbitIndex === 2 && compression) multiplier -= compression.range;
+                if (game.hazard === 'Debris Field') multiplier *= 0.7;
                 return Math.max(40, Math.floor(this.upgradedRange * multiplier));
             }
             get fireRateCooldown() {
@@ -3745,7 +3984,9 @@
                 const compression = getDirectiveEffectValue('orbitCompression'); if (this.orbitIndex === 0 && compression) multiplier -= compression.rate;
                 const plasmaTradeoff = getDirectiveEffectValue('plasmaTradeoff'); if (this.type === 'plasma' && plasmaTradeoff) multiplier += plasmaTradeoff.cd;
                 const missileTradeoff = getDirectiveEffectValue('missileTradeoff'); if (this.type === 'missile' && missileTradeoff) multiplier += missileTradeoff.rate;
-                return Math.max(5, Math.floor(this.baseFireRateCooldown * Math.max(0.2, multiplier)));
+                if (game.hazard === 'Solar Flare') multiplier *= 2.0;
+                if (game.tactical && game.tactical.overcharge.activeTime > 0) multiplier *= 0.5;
+                return Math.max(2, Math.floor(this.baseFireRateCooldown * Math.max(0.2, multiplier)));
             }
             
             updateCoordinates() {
@@ -3756,7 +3997,7 @@
                 this.x = centerX + Math.cos(angle) * radius; this.y = centerY + Math.sin(angle) * radius;
                 if (!this.target) this.aimAngle = Math.atan2(this.y - centerY, this.x - centerX);
             }
-            update(enemies) {
+            update(enemies, speedMultiplier = 1) {
                 this.updateCoordinates();
                 
 	                if (this.type === 'magnetsentry') {
@@ -3800,7 +4041,7 @@
                     this.aimAngle = Math.atan2(this.target.y - this.y, this.target.x - this.x);
                 }
 
-                if (this.cooldown > 0) this.cooldown--;
+                if (this.cooldown > 0) this.cooldown -= speedMultiplier;
                 if (this.cooldown === 0) {
                     if (this.target && game.enemies.includes(this.target)) {
                         this.fire(this.target); 
@@ -3921,6 +4162,14 @@
                 const badgeX = this.x + 13 * gameScale;
                 const badgeY = this.y - 17 * gameScale;
                 ctx.save();
+                
+                if (this.hp / this.maxHp <= 0.5 && Math.random() < 0.1) {
+                    game.particles.push(new Particle(this.x + (Math.random() * 20 - 10) * gameScale, this.y + (Math.random() * 20 - 10) * gameScale, '#64748b'));
+                }
+                if (this.hp / this.maxHp <= 0.2 && Math.random() < 0.05) {
+                    game.particles.push(new Particle(this.x + (Math.random() * 20 - 10) * gameScale, this.y + (Math.random() * 20 - 10) * gameScale, '#facc15'));
+                }
+                
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
                 ctx.strokeStyle = '#fbbf24';
                 ctx.lineWidth = 1.4;
@@ -3962,7 +4211,7 @@
                 this.dx = Math.cos(angle) * speed; this.dy = Math.sin(angle) * speed;
                 this.dead = false; this.trail = [];
             }
-            update() {
+            update(speedMultiplier = 1) {
                 this.trail.push({ x: this.x, y: this.y });
                 if (this.trail.length > 6) this.trail.shift();
                 
@@ -3971,7 +4220,7 @@
                     this.dx = Math.cos(angle) * this.speed; this.dy = Math.sin(angle) * this.speed;
                 }
                 
-                this.x += this.dx; this.y += this.dy;
+                this.x += this.dx * speedMultiplier; this.y += this.dy * speedMultiplier;
                 
                 if (game.enemies.includes(this.target)) {
                     const distToTarget = Math.hypot(this.target.x - this.x, this.target.y - this.y);
@@ -4046,7 +4295,7 @@
                 this.dx = Math.cos(angle) * force; this.dy = Math.sin(angle) * force;
                 this.alpha = 1.0; this.decay = Math.random() * 0.04 + 0.02; this.size = (Math.random() * 2.5 + 1) * gameScale;
             }
-            update() { this.x += this.dx; this.y += this.dy; this.alpha -= this.decay; }
+            update(speedMultiplier = 1) { this.x += this.dx * speedMultiplier; this.y += this.dy * speedMultiplier; this.alpha -= this.decay * speedMultiplier; }
             draw() {
                 ctx.save(); ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color;
                 ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.restore();
@@ -4089,10 +4338,17 @@
             if (game.earthShield > 0) {
                 const remainingDamage = Math.max(0, incomingDamage - game.earthShield);
                 game.earthShield = Math.max(0, game.earthShield - incomingDamage);
-                if (remainingDamage > 0) game.earthHealth = Math.max(0, game.earthHealth - remainingDamage);
+                if (remainingDamage > 0) {
+                    game.earthHealth = Math.max(0, game.earthHealth - remainingDamage);
+                    game.cameraShake = Math.min(25, (game.cameraShake || 0) + 12 * screenShakeIntensity);
+                    game.damageOverlayAlpha = 0.8;
+                } else {
+                    game.cameraShake = Math.min(10, (game.cameraShake || 0) + 3 * screenShakeIntensity);
+                    game.shieldOverlayAlpha = 0.8;
+                }
                 playSynthSound(remainingDamage > 0 ? 'earth_hit' : 'shield_deflect');
             } else {
-                game.earthHealth = Math.max(0, game.earthHealth - incomingDamage); playSynthSound('earth_hit');
+                game.earthHealth = Math.max(0, game.earthHealth - incomingDamage); game.cameraShake = Math.min(25, (game.cameraShake || 0) + 12 * screenShakeIntensity); game.damageOverlayAlpha = 0.8; playSynthSound('earth_hit');
             }
             if (shieldBeforeHit > 0 && game.earthShield <= 0) {
                 const shockDamage = getDirectiveEffectValue('shieldBreakDamage', 0);
@@ -4174,31 +4430,80 @@
             ctx.fillStyle = limbShade;
             ctx.fillRect(-EARTH_RADIUS, -EARTH_RADIUS, EARTH_RADIUS * 2, EARTH_RADIUS * 2);
 
-            ctx.strokeStyle = activePalette.shield + '0.24)';
-            ctx.lineWidth = 1.5 * gameScale;
-            ctx.beginPath();
-            ctx.arc(0, 0, EARTH_RADIUS - 1, 0, Math.PI * 2);
-            ctx.stroke();
+            if (game.earthShield > 0) {
+                const shieldRatio = game.earthShield / game.earthMaxShield;
+                ctx.strokeStyle = activePalette.shield + (0.24 * shieldRatio) + ')';
+                ctx.lineWidth = 1.5 * gameScale;
+                ctx.beginPath();
+                ctx.arc(0, 0, EARTH_RADIUS - 1, 0, Math.PI * 2);
+                ctx.stroke();
+            }
             ctx.restore();
         }
 
         function drawEarth(centerX, centerY) {
             ctx.save(); ctx.translate(centerX, centerY);
             const activePalette = PLANET_THEMES[activeThemeKey];
-            const atmosphereAlpha = 0.15 + Math.abs(Math.sin(Date.now() / 900)) * 0.08;
-            ctx.save();
-            ctx.fillStyle = activePalette.shield + atmosphereAlpha + ')';
-            ctx.beginPath(); ctx.arc(0, 0, EARTH_RADIUS + 18 * gameScale, 0, Math.PI * 2); ctx.fill();
-            ctx.restore();
             if (game.earthShield > 0) {
+                const shieldRatio = game.earthShield / game.earthMaxShield;
+                const atmosphereAlpha = (0.15 + Math.abs(Math.sin(Date.now() / 900)) * 0.08) * shieldRatio;
+                ctx.save();
+                ctx.fillStyle = activePalette.shield + atmosphereAlpha + ')';
+                ctx.beginPath(); ctx.arc(0, 0, EARTH_RADIUS + 18 * gameScale, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+
                 const shieldPulse = Math.sin(Date.now() / 250) * 3 * gameScale;
-                ctx.save(); ctx.strokeStyle = activePalette.shield + (0.3 + (game.earthShield / game.earthMaxShield) * 0.4) + ')'; ctx.lineWidth = 2.5;
+                ctx.save(); ctx.strokeStyle = activePalette.shield + (0.3 + shieldRatio * 0.4) + ')'; 
+                ctx.lineWidth = Math.max(0.5, 3.5 * shieldRatio) * gameScale;
                 ctx.shadowBlur = 12; ctx.shadowColor = activePalette.coreStart;
                 ctx.beginPath(); ctx.arc(0, 0, EARTH_RADIUS + 10 * gameScale + shieldPulse, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
             }
             earthRotation += 0.003;
             drawTexturedPlanetSurface(activePalette);
             ctx.restore();
+        }
+        
+        function drawDamageOverlay(centerX, centerY) {
+            if (game.shieldOverlayAlpha > 0 && screenShakeIntensity > 0) {
+                ctx.save();
+                ctx.globalAlpha = game.shieldOverlayAlpha;
+                const grad = ctx.createRadialGradient(centerX, centerY, Math.min(canvas.width, canvas.height) * 0.3, centerX, centerY, Math.max(canvas.width, canvas.height) * 0.8);
+                grad.addColorStop(0, 'rgba(56, 189, 248, 0)');
+                grad.addColorStop(1, `rgba(56, 189, 248, ${0.7 * screenShakeIntensity})`);
+                ctx.fillStyle = grad;
+                ctx.fillRect(-30, -30, canvas.width + 60, canvas.height + 60);
+                ctx.restore();
+                if (game.running && !game.paused) {
+                    game.shieldOverlayAlpha -= 0.04;
+                    if (game.shieldOverlayAlpha < 0) game.shieldOverlayAlpha = 0;
+                }
+            }
+            
+            let redAlpha = game.damageOverlayAlpha;
+            let isCritical = false;
+            
+            if (game.mode === 'boss' && bossMode && bossMode.active) {
+                if (bossMode.player.maxHp > 0 && bossMode.player.hp > 0 && (bossMode.player.hp / bossMode.player.maxHp) <= 0.3) isCritical = true;
+            } else {
+                if (game.earthMaxHealth > 0 && game.earthHealth > 0 && (game.earthHealth / game.earthMaxHealth) <= 0.3) isCritical = true;
+            }
+            
+            if (isCritical) redAlpha = Math.max(redAlpha, 0.25 + Math.sin(Date.now() / 150) * 0.15);
+            
+            if (redAlpha > 0 && screenShakeIntensity > 0) {
+                ctx.save();
+                ctx.globalAlpha = redAlpha;
+                const grad = ctx.createRadialGradient(centerX, centerY, Math.min(canvas.width, canvas.height) * 0.3, centerX, centerY, Math.max(canvas.width, canvas.height) * 0.8);
+                grad.addColorStop(0, 'rgba(239, 68, 68, 0)');
+                grad.addColorStop(1, `rgba(239, 68, 68, ${0.7 * screenShakeIntensity})`);
+                ctx.fillStyle = grad;
+                ctx.fillRect(-30, -30, canvas.width + 60, canvas.height + 60);
+                ctx.restore();
+                if (game.running && !game.paused) {
+                    game.damageOverlayAlpha -= 0.04;
+                    if (game.damageOverlayAlpha < 0) game.damageOverlayAlpha = 0;
+                }
+            }
         }
 
         function getClosestSlot(mouseX, mouseY) {
@@ -4383,7 +4688,7 @@
             document.body.classList.remove('boss-mode-active');
             bossMode = {
                 active: false, phase: 'idle', wave: 0, frame: 0, spawnTimer: 0, spawned: 0, requiredKills: 0, kills: 0,
-                player: { x: canvas.width / 2, y: canvas.height - 120, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120, weapon: 'default', repairKits: game && game.bossRepairKits ? game.bossRepairKits : 0, invulnTimer: 0 }, gatekeeperSpawned: false,
+                player: { x: canvas.width / 2, y: canvas.height - 120, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120, weapon: 'default', repairKits: game && game.bossRepairKits ? game.bossRepairKits : 0, shieldUsed: false, shieldTimer: 0, invulnTimer: 0, lastTapTime: 0 }, gatekeeperSpawned: false,
                 enemies: [], projectiles: [], enemyProjectiles: [], boss: null, rewardOptions: [], victoryTimer: 0, defeatedBossName: '', drops: []
             };
             updateRepairButton();
@@ -4432,9 +4737,9 @@
                 bossMode.enemyProjectiles = [];
                 bossMode.drops = [];
                 const playTop = getBossPlayTop();
-                bossMode.player = { x: canvas.width / 2, y: canvas.height - 120, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120, weapon: 'default', repairKits: game.bossRepairKits || 0, invulnTimer: 0 };
+                bossMode.player = { x: canvas.width / 2, y: canvas.height - 120, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120, weapon: 'default', repairKits: game.bossRepairKits || 0, shieldUsed: false, shieldTimer: 0, invulnTimer: 0, lastTapTime: 0 };
                 bossMode.player.spriteSize = 58 * gameScale;
-                bossMode.player.hitRadius = bossMode.player.spriteSize * 0.34;
+                bossMode.player.hitRadius = bossMode.player.spriteSize * 0.08;
                 bossMode.boss = {
                     config,
                     x: canvas.width / 2,
@@ -4566,7 +4871,7 @@
         }
 
         function getPlayerFighterHitRadius() {
-            return bossMode.player.hitRadius || 22 * gameScale;
+            return bossMode.player.hitRadius || 4.6 * gameScale;
         }
 
         function killBossModeEnemy(eIndex) {
@@ -4612,12 +4917,40 @@
             player.targetX = Math.max(24, Math.min(canvas.width - 24, player.targetX));
             player.targetY = Math.max(playerTopLimit, Math.min(playerBottomLimit, player.targetY));
             const dragFollow = 0.24;
+
+            if (player.shieldTimer > 0) {
+                player.shieldTimer--;
+                if (player.shieldTimer === 0) {
+                    createExplosion(player.x, player.y, '#22d3ee', 25);
+                    playSynthSound('hit');
+                }
+            }
+
             player.x += (player.targetX - player.x) * dragFollow;
             player.y += (player.targetY - player.y) * dragFollow;
             player.x = Math.max(24, Math.min(canvas.width - 24, player.x));
             player.y = Math.max(playerTopLimit, Math.min(playerBottomLimit, player.y));
+            player.targetX = Math.max(24, Math.min(canvas.width - 24, player.targetX));
+            player.targetY = Math.max(playerTopLimit, Math.min(playerBottomLimit, player.targetY));
 
             if (player.invulnTimer > 0) player.invulnTimer--;
+            
+            const shieldBtn = document.getElementById('btn-boss-shield');
+            if (shieldBtn) {
+                if (player.shieldUsed) {
+                    shieldBtn.style.opacity = '0.3';
+                    shieldBtn.style.background = '#0f172a';
+                    shieldBtn.classList.remove('hover:bg-cyan-400', 'animate-pulse', 'ring-2', 'ring-cyan-200');
+                    shieldBtn.style.cursor = 'not-allowed';
+                } else {
+                    shieldBtn.style.opacity = '1';
+                    shieldBtn.style.background = '';
+                    shieldBtn.classList.add('hover:bg-cyan-400', 'animate-pulse', 'ring-2', 'ring-cyan-200');
+                    shieldBtn.style.cursor = '';
+                }
+            }
+            
+            const playerHitY = player.y + 2 * gameScale;
 
             if (player.fireCooldown > 0) player.fireCooldown--;
             if (player.fireCooldown <= 0) {
@@ -4848,12 +5181,14 @@
                     }
                 }
                 
-                if (Math.hypot(player.x - boss.x, player.y - boss.y) < getBossHitRadius() + getPlayerFighterHitRadius()) {
+                if (Math.hypot(player.x - boss.x, playerHitY - boss.y) < getBossHitRadius() + getPlayerFighterHitRadius()) {
                     if (!player.invulnTimer || player.invulnTimer <= 0) {
                         player.hp -= 35;
                         playSynthSound('earth_hit');
                         createExplosion(player.x, player.y, '#ef4444', 15);
                         player.invulnTimer = 60;
+                        game.cameraShake = Math.min(25, (game.cameraShake || 0) + 12 * screenShakeIntensity);
+                        game.damageOverlayAlpha = 0.8;
                         showGameNotice('<i class="fa-solid fa-triangle-exclamation mr-1"></i> Hull damaged by boss collision!', 2000);
                     }
                 }
@@ -4885,10 +5220,12 @@
                     }
                 }
                 
-                if (Math.hypot(enemy.x - player.x, enemy.y - player.y) < getBossEnemyHitRadius(enemy) + getPlayerFighterHitRadius()) {
+                if (Math.hypot(enemy.x - player.x, enemy.y - playerHitY) < getBossEnemyHitRadius(enemy) + getPlayerFighterHitRadius()) {
                     if (!player.invulnTimer || player.invulnTimer <= 0) {
                         player.hp -= enemy.damage;
                         player.invulnTimer = 30;
+                        game.cameraShake = Math.min(15, (game.cameraShake || 0) + 6 * screenShakeIntensity);
+                        game.damageOverlayAlpha = 0.6;
                     }
                     killBossModeEnemy(i);
                     playSynthSound('earth_hit');
@@ -4963,10 +5300,12 @@
             for (let i = bossMode.enemyProjectiles.length - 1; i >= 0; i--) {
                 const proj = bossMode.enemyProjectiles[i];
                 proj.x += proj.dx; proj.y += proj.dy;
-                if (Math.hypot(player.x - proj.x, player.y - proj.y) < getPlayerFighterHitRadius() + proj.r) {
+                if (Math.hypot(player.x - proj.x, playerHitY - proj.y) < getPlayerFighterHitRadius() + proj.r) {
                     if (!player.invulnTimer || player.invulnTimer <= 0) {
                         player.hp -= proj.damage;
                         player.invulnTimer = 15;
+                        game.cameraShake = Math.min(15, (game.cameraShake || 0) + 6 * screenShakeIntensity);
+                        game.damageOverlayAlpha = 0.6;
                     }
                     bossMode.enemyProjectiles.splice(i, 1);
                 } else if (proj.y > canvas.height + 30 || proj.x < -30 || proj.x > canvas.width + 30) {
@@ -4978,7 +5317,7 @@
                 const drop = bossMode.drops[i];
                 drop.y += 2 * gameScale;
                 
-                if (Math.hypot(player.x - drop.x, player.y - drop.y) < getPlayerFighterHitRadius() + 15 * gameScale) {
+                if (Math.hypot(player.x - drop.x, playerHitY - drop.y) < getPlayerFighterHitRadius() + 15 * gameScale) {
                     collectDrop(drop);
                     bossMode.drops.splice(i, 1);
                 } else if (drop.y > canvas.height + 30) {
@@ -5102,6 +5441,7 @@
         function updateRepairButton() {
             const btnRepair = document.getElementById('btn-boss-repair');
             const btnWeapon = document.getElementById('btn-boss-weapon-remove');
+            const btnShield = document.getElementById('btn-boss-shield');
             const count = document.getElementById('boss-repair-count');
             const panel = document.getElementById('boss-action-panel');
             if (bossMode.active) {
@@ -5118,6 +5458,7 @@
                 } else {
                     if (btnWeapon) btnWeapon.classList.add('hidden');
                 }
+                if (btnShield) btnShield.classList.remove('hidden');
             } else {
                 panel.classList.add('hidden');
             }
@@ -5257,12 +5598,37 @@
                 ctx.restore();
             }
             const playerSpriteSize = player.spriteSize || 58 * gameScale;
-            const isInvuln = player.invulnTimer > 0;
+            const playerHitY = player.y + 2 * gameScale;
+            const isInvuln = player.invulnTimer > 0 && player.shieldTimer <= 0;
             if (!isInvuln || bossMode.frame % 10 < 5) {
                 if (!drawSpriteImage(playerFighterSprite, player.x, player.y, playerSpriteSize, 0)) {
                     ctx.save(); ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.moveTo(player.x, player.y - 24 * gameScale); ctx.lineTo(player.x - 18 * gameScale, player.y + 20 * gameScale); ctx.lineTo(player.x + 18 * gameScale, player.y + 20 * gameScale); ctx.closePath(); ctx.fill(); ctx.restore();
                 }
+                
+                ctx.save();
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+                ctx.shadowBlur = 5;
+                ctx.shadowColor = '#38bdf8';
+                ctx.beginPath();
+                ctx.arc(player.x, playerHitY, getPlayerFighterHitRadius(), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
             }
+            
+            if (player.shieldTimer > 0) {
+                ctx.save();
+                ctx.strokeStyle = '#22d3ee';
+                ctx.fillStyle = 'rgba(34, 211, 238, 0.2)';
+                ctx.lineWidth = 2 * gameScale;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#22d3ee';
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, playerSpriteSize * 0.6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+            }
+            
             if (bossMode.phase !== 'boss-defeated') {
                 ctx.save();
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
@@ -5366,6 +5732,7 @@
             game.commandDirectives[card.id] = newLevel;
             game.bossRepairKits = bossMode.player.repairKits;
             applyDirectiveLevelUp(card, previousLevel, newLevel);
+            cosmicData += 20 * game.wave; saveSettings();
             const modal = document.getElementById('boss-card-modal');
             const hud = document.getElementById('boss-mode-hud');
             if (hud) hud.classList.add('hidden');
@@ -5384,8 +5751,128 @@
                 const mWDisp = document.getElementById('mobile-wave'); if (mWDisp) mWDisp.innerText = game.wave;
                 setWaveLaunchReady(true);
                 addGold(600 + game.wave * 30);
-                showGameNotice(`<i class="fa-solid fa-layer-group mr-1"></i> Command Directive upgraded: ${card.name} LVL ${newLevel}`, 3000);
+                showGameNotice(`<i class="fa-solid fa-layer-group mr-1"></i> Directive: ${card.name} LVL ${newLevel}<br><i class="fa-solid fa-star text-purple-400 mt-1"></i> Recovered ${20 * (game.wave - 1)} Cosmic Data!`, 4000);
             });
+        }
+
+        function handleEnemyCollisions(enemy, i) {
+            const centerX = canvas.width / 2; const centerY = canvas.height / 2;
+            const distToCenter = Math.hypot(centerX - enemy.x, centerY - enemy.y);
+
+            if (enemy.category === 'normal') {
+                let impactedTower = null;
+                for (const tower of game.towers) {
+                    const impactDistance = enemy.size + 16 * gameScale;
+                    if (Math.hypot(tower.x - enemy.x, tower.y - enemy.y) <= impactDistance) {
+                        impactedTower = tower;
+                        break;
+                    }
+                }
+                if (impactedTower) {
+                    const impactDamage = enemy.baseDamage + Math.max(0, Math.ceil(enemy.hp));
+                    damageSatellite(impactedTower, impactDamage, enemy.category);
+                    createExplosion(enemy.x, enemy.y, enemy.color, 14);
+                    playSynthSound('explosion');
+                    game.enemies.splice(i, 1);
+                    return;
+                }
+            }
+            
+            if (distToCenter < EARTH_RADIUS + 8) {
+                createExplosion(enemy.x, enemy.y, enemy.color, 12);
+                const damageMultiplier = Math.max(0.15, 1 - getDirectiveEffectValue('coreDamageReduction', 0) + (getDirectiveEffectValue('corePowered') ? getDirectiveEffectValue('corePowered').taken : 0));
+                const incomingDamage = Math.max(1, Math.floor(enemy.damage * damageMultiplier));
+                const shieldBeforeHit = game.earthShield;
+                if (game.earthShield > 0) {
+                    const remainingDamage = Math.max(0, incomingDamage - game.earthShield);
+                    game.earthShield = Math.max(0, game.earthShield - incomingDamage);
+                    if (remainingDamage > 0) {
+                        game.earthHealth = Math.max(0, game.earthHealth - remainingDamage);
+                        game.cameraShake = Math.min(25, (game.cameraShake || 0) + 12 * screenShakeIntensity);
+                        game.damageOverlayAlpha = 0.8;
+                    } else {
+                        game.cameraShake = Math.min(10, (game.cameraShake || 0) + 3 * screenShakeIntensity);
+                        game.shieldOverlayAlpha = 0.8;
+                    }
+                    playSynthSound(remainingDamage > 0 ? 'earth_hit' : 'shield_deflect');
+                } else {
+                    game.earthHealth = Math.max(0, game.earthHealth - incomingDamage); game.cameraShake = Math.min(25, (game.cameraShake || 0) + 12 * screenShakeIntensity); game.damageOverlayAlpha = 0.8; playSynthSound('earth_hit');
+                }
+                if (shieldBeforeHit > 0 && game.earthShield <= 0) {
+                    const shockDamage = getDirectiveEffectValue('shieldBreakDamage', 0);
+                    if (shockDamage) {
+                        for (const e of game.enemies) {
+                            e.hp -= shockDamage;
+                            if (shockDamage >= 320) {
+                                e.slowMultiplier = Math.min(e.slowMultiplier, shockDamage >= 460 ? 0.35 : 0.55);
+                                e.slowTimer = Math.max(e.slowTimer, 180);
+                            }
+                        }
+                        createExplosion(centerX, centerY, '#67e8f9', 35);
+                    }
+                }
+                syncPlanetBars();
+
+                game.enemies.splice(i, 1);
+
+                if (game.earthHealth <= 0) {
+                    game.running = false; 
+                    const finalWave = document.getElementById('final-wave'); const finalScore = document.getElementById('final-score');
+                    const finalTowers = document.getElementById('final-towers'); const gameoverModal = document.getElementById('gameover-modal');
+                    if (finalWave) finalWave.innerText = game.wave; 
+                    if (finalScore) finalScore.innerText = game.score;
+                    if (finalTowers) finalTowers.innerText = game.towersBuiltCount; 
+                    if (gameoverModal) gameoverModal.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if (enemy.hp <= 0) {
+                createExplosion(enemy.x, enemy.y, enemy.color, 16);
+                playSynthSound(enemy.category === 'normal' ? 'rock_destroy' : 'ship_destroy');
+                let rewardMultiplier = 1;
+                const riskContract = getDirectiveEffectValue('riskContract'); if (riskContract) rewardMultiplier += riskContract.reward;
+                const rewardHpTradeoff = getDirectiveEffectValue('rewardHpTradeoff'); if (rewardHpTradeoff) rewardMultiplier += rewardHpTradeoff.reward;
+                const rockRewardSpeed = getDirectiveEffectValue('rockRewardSpeed'); if (enemy.category === 'normal' && rockRewardSpeed) rewardMultiplier += rockRewardSpeed.reward;
+                const shipReward = getDirectiveEffectValue('shipReward'); if ((enemy.category === 'ship' || enemy.category === 'miniboss') && shipReward) rewardMultiplier += shipReward;
+                const eliteIncentive = getDirectiveEffectValue('eliteIncentive'); if (enemy.category === 'miniboss' && eliteIncentive) rewardMultiplier *= eliteIncentive.reward;
+                const reward = Math.floor(enemy.goldReward * rewardMultiplier);
+                addGold(reward); game.score += reward * 2; 
+                const shieldPerKill = getDirectiveEffectValue('shieldPerKill', 0);
+                const fragileShield = getDirectiveEffectValue('fragileShield');
+                const shieldGain = shieldPerKill + (fragileShield ? fragileShield.shieldKill : 0);
+                if (shieldGain > 0 && game.hazard !== 'Ion Storm') {
+                    game.earthShield = Math.min(game.earthMaxShield, game.earthShield + shieldGain);
+                    syncPlanetBars();
+                }
+                const scrap = getDirectiveEffectValue('scrapEveryKills');
+                if (scrap) {
+                    game.directiveKills++;
+                    if (game.directiveKills % scrap.kills === 0) addGold(scrap.gold);
+                }
+                const scoreDisplay = document.getElementById('score-display');
+                if (scoreDisplay) scoreDisplay.innerText = game.score;
+                
+                if (enemy.type === 'Rogue Comet') {
+                    cosmicData += 15;
+                    showGameNotice('<i class="fa-solid fa-star text-purple-400"></i> Recovered 15 Cosmic Data!', 3000);
+                    saveSettings();
+                } else if (enemy.type === 'Smuggler Ship') {
+                    cosmicData += 5;
+                    const pool = COMMAND_DIRECTIVES.filter(d => getDirectiveLevel(d.id) < 5);
+                    if (pool.length > 0) {
+                        const card = pool[Math.floor(Math.random() * pool.length)];
+                        const prev = getDirectiveLevel(card.id);
+                        const next = prev + 1;
+                        game.commandDirectives[card.id] = next;
+                        applyDirectiveLevelUp(card, prev, next);
+                        showGameNotice(`<i class="fa-solid fa-layer-group text-amber-400"></i> Smuggler Data Recovered: ${card.name} LVL ${next}`, 4000);
+                    }
+                    saveSettings();
+                }
+                
+                game.enemies.splice(i, 1);
+            }
         }
 
         // ----------------------------------------------------------------------
@@ -5415,6 +5902,13 @@
 
             let isMiniBossWave = game.wave >= 3 && game.wave % 3 === 0;
             let isThematic = game.wave > 5 && Math.random() < 0.2 && !isMiniBossWave;
+            
+            game.hazard = null;
+            if (!isMiniBossWave && !isThematic && game.wave > 3 && Math.random() < 0.25) {
+                const hazards = ['Solar Flare', 'Ion Storm', 'Debris Field'];
+                game.hazard = hazards[Math.floor(Math.random() * hazards.length)];
+            }
+
             let theme = null;
             let themeTitle = `Wave ${game.wave} Started`;
             let themeSubtitle = 'Enemy signatures inbound';
@@ -5435,9 +5929,23 @@
             } else if (isMiniBossWave) {
                 themeTitle = 'Mini-Boss Approaching';
                 themeSubtitle = 'High-threat vessel detected';
+            } else if (game.hazard === 'Solar Flare') {
+                themeTitle = 'Solar Flare Active'; themeSubtitle = 'Satellite fire rates reduced';
+            } else if (game.hazard === 'Ion Storm') {
+                themeTitle = 'Ion Storm Active'; themeSubtitle = 'Shield healing blocked';
+            } else if (game.hazard === 'Debris Field') {
+                themeTitle = 'Debris Field'; themeSubtitle = 'Satellite sensor range reduced';
             }
-            showWaveEvent(themeTitle, themeSubtitle, isThematic ? 'red' : (isMiniBossWave ? 'fuchsia' : 'amber'));
-            playSynthSound(isMiniBossWave || isThematic ? 'warning' : 'wave_start');
+            
+            if (!isMiniBossWave && game.wave > 2 && Math.random() < 0.15) {
+                const isComet = Math.random() < 0.5;
+                spawnQueue.push({ delay: 60, waveNum: game.wave, profileIndex: isComet ? 8 : 9, theme: null });
+                game.totalWaveEnemies++;
+                showGameNotice(`<i class="fa-solid fa-satellite-dish text-purple-400"></i> Deep Space Anomaly Detected!`, 4000);
+            }
+            
+            showWaveEvent(themeTitle, themeSubtitle, isThematic || game.hazard ? 'red' : (isMiniBossWave ? 'fuchsia' : 'amber'));
+            playSynthSound(isMiniBossWave || isThematic || game.hazard ? 'warning' : 'wave_start');
 
             let baseBudget = 15 + Math.floor(game.wave * 12);
             const riskContract = getDirectiveEffectValue('riskContract');
@@ -5521,10 +6029,12 @@
             
             if (isMiniBossWave && !isThematic) {
                 const warn = document.getElementById('warning-banner');
-                if (warn) { warn.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1 animate-ping"></i> MINI-BOSS DETECTED - WAVE ${game.wave}`; warn.classList.remove('hidden'); setTimeout(() => warn.classList.add('hidden'), 5000); }
+                const warnContent = document.getElementById('warning-banner-content');
+                if (warn && warnContent) { warnContent.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1 animate-ping"></i> MINI-BOSS DETECTED - WAVE ${game.wave}`; warn.classList.remove('hidden'); setTimeout(() => warn.classList.add('hidden'), 5000); }
             } else if (isThematic) {
                 const warn = document.getElementById('warning-banner');
-                if (warn) { warn.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1 animate-ping"></i> ${themeTitle.toUpperCase()}`; warn.classList.remove('hidden'); setTimeout(() => warn.classList.add('hidden'), 5000); }
+                const warnContent = document.getElementById('warning-banner-content');
+                if (warn && warnContent) { warnContent.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1 animate-ping"></i> ${themeTitle.toUpperCase()}`; warn.classList.remove('hidden'); setTimeout(() => warn.classList.add('hidden'), 5000); }
             }
         }
 
@@ -5558,17 +6068,21 @@
         function triggerCleanGameReset() {
             game.running = true; game.paused = false; game.score = 0; game.wave = 1; game.totalWaveEnemies = 10; game.enemiesSpawnedThisWave = 0;
             game.earthHealth = game.earthMaxHealth; game.earthShield = game.earthMaxShield; game.towers = []; game.enemies = []; game.projectiles = []; game.particles = [];
+            game.tactical = { laser: {cd:0, maxCd:1800, active:false, unlocked:false}, emp: {cd:0, maxCd:2400, unlocked:false}, overcharge: {cd:0, maxCd:3600, activeTime:0, unlocked:false} };
             game.selectedTower = null; game.selectedShopType = null; game.orbitGridHighlights = false;
             game.mode = 'defense'; game.commandDirectives = {}; game.directiveKills = 0;
             game.isTimeAttack = false;
             game.bossIndex = 0;
             game.bossRepairKits = 0;
+            game.fastForward = false; game.cameraShake = 0; game.damageOverlayAlpha = 0; game.shieldOverlayAlpha = 0;
+            updateFastForwardUI();
             firstDeploymentSlotHintShown = false;
             masterCommandTourSeen = false;
             masterCommandTourStep = 0;
             
             orbitLockStates = [false, true, true]; orbitSlotCapacities = [4, 4, 4]; orbitUpgradesCount = [0, 0, 0]; orbitRotations = [0, 0, 0];
-            shieldUpgradeLevel = 0; game.earthMaxShield = 100; game.earthShield = 100;
+            shieldUpgradeLevel = 0; game.earthMaxShield = 100 + research.baseShield * 25; game.earthShield = game.earthMaxShield;
+            addRandomOrbitSlots(research.startSlots);
             
             waveActive = false; spawnQueue = []; spawnTimer = 0; lightningArcsToDraw = []; shipAttackBeamsToDraw = [];
             resetBossMode();
@@ -5611,6 +6125,33 @@
             bossMode.player.targetY = coords.y - (bossMode.player.dragOffsetY || 0);
         }
 
+        function updateTacticalUI() {
+            const panel = document.getElementById('tactical-panel');
+            if (!panel) return;
+            
+            const anyUnlocked = game.tactical && (game.tactical.laser.unlocked || game.tactical.emp.unlocked || game.tactical.overcharge.unlocked);
+            if (!game.running || game.mode !== 'defense' || !anyUnlocked) {
+                panel.classList.add('hidden'); return;
+            }
+            
+            panel.classList.remove('hidden');
+            ['laser', 'emp', 'overcharge'].forEach(tac => {
+                const btn = document.getElementById(`btn-tac-${tac}`);
+                const bar = document.getElementById(`cd-tac-${tac}`);
+                if (bar && btn && game.tactical && game.tactical[tac]) {
+                    if (game.tactical[tac].unlocked) {
+                        btn.classList.remove('hidden');
+                        const cd = game.tactical[tac].cd; const max = game.tactical[tac].maxCd;
+                        bar.style.width = `${Math.max(0, (1 - cd/max)) * 100}%`;
+                        btn.classList.toggle('opacity-40', cd > 0); btn.classList.toggle('cursor-not-allowed', cd > 0);
+                        if (tac === 'laser') { btn.classList.toggle('ring-2', game.tactical.laser.active); btn.classList.toggle('ring-red-400', game.tactical.laser.active); }
+                    } else {
+                        btn.classList.add('hidden');
+                    }
+                }
+            });
+        }
+
         function handlePointerDown(e) {
             if (!game || !game.running) return; 
             if (game.mode === 'boss') return;
@@ -5620,6 +6161,21 @@
 
             const coords = getPointerCoords(e);
             
+            if (game.mode === 'defense' && game.tactical && game.tactical.laser.active) {
+                game.tactical.laser.active = false;
+                game.tactical.laser.cd = game.tactical.laser.maxCd;
+                createExplosion(coords.x, coords.y, '#f43f5e', 40);
+                playSynthSound('explosion');
+                game.cameraShake = Math.min(30, (game.cameraShake || 0) + 15 * screenShakeIntensity);
+                game.enemies.forEach((e, i) => {
+                    if (Math.hypot(e.x - coords.x, e.y - coords.y) < 150 * gameScale) {
+                        e.hp -= 450 * (1 + research.baseDamage * 0.05);
+                    }
+                });
+                shipAttackBeamsToDraw.push({ x1: canvas.width/2, y1: canvas.height/2, x2: coords.x, y2: coords.y, color: '#f43f5e', alpha: 1, width: 8 });
+                return;
+            }
+
             const centerX = canvas.width / 2; const centerY = canvas.height / 2;
             if (!game.selectedShopType && Math.hypot(coords.x - centerX, coords.y - centerY) < getPlanetTapRadius()) {
                 if (game.towers.length === 0) {
@@ -5733,7 +6289,7 @@
         // 10. ACTION BINDINGS MATRIX
         // ----------------------------------------------------------------------
         function hideTitleSubpanels() {
-            ['inline-settings-options', 'inline-encyclopedia-options', 'inline-install-options', 'inline-patch-notes-options', 'inline-boss-attack-options'].forEach(id => {
+            ['inline-settings-options', 'inline-encyclopedia-options', 'inline-install-options', 'inline-patch-notes-options', 'inline-boss-attack-options', 'inline-research-options'].forEach(id => {
                 const panel = document.getElementById(id);
                 if (panel) panel.classList.add('hidden');
             });
@@ -5827,6 +6383,13 @@
             if (panel) panel.classList.remove('hidden');
             playSynthSound('upgrade');
         });
+        bindButton('open-research-btn', () => {
+            hideTitleSubpanels();
+            updateResearchUI();
+            const panel = document.getElementById('inline-research-options');
+            if (panel) panel.classList.remove('hidden');
+            playSynthSound('upgrade');
+        });
         
         function closeSettingsPanel() {
             const settings = document.getElementById('inline-settings-options');
@@ -5866,6 +6429,8 @@
         bindButton('back-install-options-btn', () => { const installPanel = document.getElementById('inline-install-options'); if (installPanel) installPanel.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('close-boss-attack-btn', () => { const panel = document.getElementById('inline-boss-attack-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('back-boss-attack-btn', () => { const panel = document.getElementById('inline-boss-attack-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
+        bindButton('close-research-btn', () => { const panel = document.getElementById('inline-research-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
+        bindButton('back-research-btn', () => { const panel = document.getElementById('inline-research-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('android-install-btn', triggerAndroidInstall);
 
         bindButton('open-build-drawer-btn', () => {
@@ -5927,6 +6492,49 @@
         bindButton('settings-toggle-btn', triggerPauseToggle);
         bindButton('mobile-settings-toggle-btn', triggerPauseToggle);
         bindButton('boss-failed-return-btn', returnToBaseAfterBossFailure);
+        
+        bindButton('fast-forward-btn', () => {
+            game.fastForward = !game.fastForward;
+            updateFastForwardUI();
+            playSynthSound('upgrade');
+        });
+        bindButton('mobile-fast-forward-btn', () => {
+            game.fastForward = !game.fastForward;
+            updateFastForwardUI();
+            playSynthSound('upgrade');
+        });
+        
+        bindButton('btn-tac-laser', () => {
+            if (game.tactical && game.tactical.laser.cd <= 0) {
+                game.tactical.laser.active = !game.tactical.laser.active;
+                if (game.tactical.laser.active) {
+                    showGameNotice("<i class='fa-solid fa-crosshairs'></i> Select target for Orbital Strike!", 3000);
+                }
+            }
+        });
+        bindButton('btn-tac-emp', () => {
+            if (game.tactical && game.tactical.emp.cd <= 0) {
+                game.tactical.emp.cd = game.tactical.emp.maxCd;
+                game.enemies.forEach(e => {
+                    e.slowMultiplier = 0.1;
+                    e.slowTimer = 180;
+                });
+                createExplosion(canvas.width/2, canvas.height/2, '#38bdf8', 50);
+                game.cameraShake = Math.min(20, (game.cameraShake || 0) + 10 * screenShakeIntensity);
+                playSynthSound('shield_deflect');
+                showGameNotice("<i class='fa-solid fa-bolt text-cyan-400'></i> EMP Pulse Deployed!", 2000);
+            }
+        });
+        bindButton('btn-tac-overcharge', () => {
+            if (game.tactical && game.tactical.overcharge.cd <= 0) {
+                game.tactical.overcharge.cd = game.tactical.overcharge.maxCd;
+                game.tactical.overcharge.activeTime = 300;
+                game.earthShield = Math.min(game.earthMaxShield * 1.5, game.earthShield + game.earthMaxShield * 0.5);
+                createExplosion(canvas.width/2, canvas.height/2, '#34d399', 50);
+                syncPlanetBars(); playSynthSound('upgrade');
+                showGameNotice("<i class='fa-solid fa-shield-cat text-emerald-400'></i> Shield Overcharge & Weapons Hot!", 2000);
+            }
+        });
 
         bindButton('btn-boss-repair', () => {
             if (bossMode.player.repairKits > 0 && bossMode.player.hp < bossMode.player.maxHp) {
@@ -5946,6 +6554,19 @@
                 playSynthSound('hit');
             }
         });
+        
+        function triggerBossShield() {
+            const player = bossMode.player;
+            if (!player.shieldUsed) {
+                player.shieldUsed = true;
+                player.shieldTimer = 180;
+                player.invulnTimer = Math.max(player.invulnTimer || 0, 180);
+                playSynthSound('shield_deflect');
+                showGameNotice(`<i class="fa-solid fa-shield-halved text-cyan-400"></i> Proton Shield Activated!`, 2000);
+            }
+        }
+        
+        bindButton('btn-boss-shield', () => triggerBossShield());
 
 	        ['laser', 'plasma', 'missile', 'railgun', 'lasersentry', 'lightningsentry', 'magnetsentry'].forEach(type => {
 	            bindButton('shop-' + type, () => {
@@ -6005,6 +6626,28 @@
         }
         bindButton('accordion-orbits-btn', () => { setMasterAccordion('orbits'); });
         bindButton('accordion-directives-btn', () => { setMasterAccordion('directives'); });
+        bindButton('accordion-tactical-btn', () => { setMasterAccordion('tactical'); });
+        
+        ['laser', 'emp', 'overcharge'].forEach(tac => {
+            bindButton(`cmd-unlock-tactical-${tac}`, () => {
+                if (waveActive || game.mode === 'boss' || (game.tactical && game.tactical[tac].unlocked)) return;
+                const costs = { laser: 300, emp: 400, overcharge: 500 };
+                const cost = costs[tac];
+                if (game.gold >= cost) {
+                    spendGold(cost);
+                    game.tactical[tac].unlocked = true;
+                    playSynthSound('upgrade');
+                    createExplosion(canvas.width / 2, canvas.height / 2, tac === 'laser' ? '#ef4444' : (tac === 'emp' ? '#06b6d4' : '#10b981'), 20);
+                    const hint = document.getElementById('action-hint');
+                    if (hint) hint.innerHTML = `<span class="text-emerald-400 font-bold">Tactical System Online!</span>`;
+                    updateOrbitInspectorUI();
+                    updateTacticalUI();
+                } else {
+                    playSynthSound('hit');
+                }
+            });
+        });
+        
         bindButton('master-command-tour-skip', finishMasterCommandTour);
         bindButton('master-command-tour-next', () => {
             masterCommandTourStep++;
@@ -6012,7 +6655,7 @@
             else renderMasterCommandTour();
         });
 
-        bindButton('cmd-repair-shield', () => { const cost = 150; if (game.gold >= cost && game.earthShield < game.earthMaxShield) { spendGold(cost); game.earthShield = Math.min(game.earthMaxShield, game.earthShield + 40); const st = document.getElementById('shield-text'); const mst = document.getElementById('mobile-shield-text'); if (st) st.innerText = `${game.earthShield} / ${game.earthMaxShield}`; if (mst) mst.innerText = `${game.earthShield}/${game.earthMaxShield}`; const shieldWPercent = `${(game.earthShield / game.earthMaxShield) * 100}%`; const sb = document.getElementById('shield-bar'); const msb = document.getElementById('mobile-shield-bar'); if (sb) sb.style.width = shieldWPercent; if (msb) msb.style.width = shieldWPercent; playSynthSound('upgrade'); createExplosion(canvas.width/2, canvas.height/2, '#22d3ee', 15); const ah = document.getElementById('action-hint'); if (ah) ah.innerHTML = `<span class="text-emerald-400 font-bold">Shield integrity recharged!</span>`; } else { const ah = document.getElementById('action-hint'); if (ah) ah.innerHTML = game.earthShield >= game.earthMaxShield ? `<span class="text-red-400 font-bold">Shield is fully charged!</span>` : `<span class="text-red-400 font-bold">Need ${cost} Gold!</span>`; } });
+        bindButton('cmd-repair-shield', () => { if (game.hazard === 'Ion Storm') { const ah = document.getElementById('action-hint'); if (ah) ah.innerHTML = `<span class="text-red-400 font-bold">Ion Storm active! Shield healing is blocked.</span>`; return; } const cost = 150; if (game.gold >= cost && game.earthShield < game.earthMaxShield) { spendGold(cost); game.earthShield = Math.min(game.earthMaxShield, game.earthShield + 40); const st = document.getElementById('shield-text'); const mst = document.getElementById('mobile-shield-text'); if (st) st.innerText = `${game.earthShield} / ${game.earthMaxShield}`; if (mst) mst.innerText = `${game.earthShield}/${game.earthMaxShield}`; const shieldWPercent = `${(game.earthShield / game.earthMaxShield) * 100}%`; const sb = document.getElementById('shield-bar'); const msb = document.getElementById('mobile-shield-bar'); if (sb) sb.style.width = shieldWPercent; if (msb) msb.style.width = shieldWPercent; playSynthSound('upgrade'); createExplosion(canvas.width/2, canvas.height/2, '#22d3ee', 15); const ah = document.getElementById('action-hint'); if (ah) ah.innerHTML = `<span class="text-emerald-400 font-bold">Shield integrity recharged!</span>`; } else { const ah = document.getElementById('action-hint'); if (ah) ah.innerHTML = game.earthShield >= game.earthMaxShield ? `<span class="text-red-400 font-bold">Shield is fully charged!</span>` : `<span class="text-red-400 font-bold">Need ${cost} Gold!</span>`; } });
         bindButton('cmd-upgrade-shield', () => { 
             if (waveActive || game.mode === 'boss') {
                 showGameNotice('<i class="fa-solid fa-triangle-exclamation mr-1"></i> Upgrades are disabled while under attack.', 3000);
@@ -6034,6 +6677,12 @@
             e.preventDefault();
             if (game.mode === 'boss' && bossMode.active && bossMode.phase !== 'reward' && bossMode.phase !== 'failed') {
                 const coords = getPointerCoords(e);
+                const now = Date.now();
+                if (now - (bossMode.player.lastTapTime || 0) < 300) {
+                    triggerBossShield();
+                }
+                bossMode.player.lastTapTime = now;
+                
                 bossMode.player.dragging = true;
                 bossMode.player.dragOffsetX = coords.x - bossMode.player.x;
                 bossMode.player.dragOffsetY = coords.y - bossMode.player.y;
@@ -6066,6 +6715,14 @@
                 bossMode.player.dragOffsetY = 0;
             }
         });
+        window.addEventListener('keydown', (e) => {
+            if (game && game.mode === 'boss' && bossMode.active && !game.paused && bossMode.phase !== 'reward' && bossMode.phase !== 'failed') {
+                if (e.code === 'Space' || e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+                    e.preventDefault();
+                    triggerBossShield();
+                }
+            }
+        });
 
         bindDismissButton('close-inspect', closeInspector);
         bindDismissButton('close-orbit-inspect', closeOrbitInspector);
@@ -6087,28 +6744,98 @@
                 scheduleResizeCanvas();
             }
 
-            // Clear Screen
-            ctx.fillStyle = '#030712'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            drawCosmicBackground();
-
             const centerX = canvas.width / 2; const centerY = canvas.height / 2;
             updateTutorialTooltips();
 
-            if (game.mode === 'boss' && bossMode.active) {
-                if (!game.paused && !modeTransitionActive && bossMode.phase !== 'reward' && bossMode.phase !== 'failed' && bossMode.phase !== 'transition') updateBossMode();
-                drawBossMode();
-                for (let i = game.particles.length - 1; i >= 0; i--) {
-                    const part = game.particles[i];
-                    part.update();
-                    part.draw();
-                    if (part.alpha <= 0) game.particles.splice(i, 1);
+            const isWarping = game && game.mode === 'boss' && bossMode && bossMode.phase !== 'boss-defeated';
+            const steps = (game.fastForward && game.running && !game.paused && game.mode === 'defense') ? 2 : 1;
+
+            for (let step = 0; step < steps; step++) {
+                updateCosmicBackground(isWarping);
+
+                if (game.mode === 'boss' && bossMode.active) {
+                    if (!game.paused && !modeTransitionActive && bossMode.phase !== 'reward' && bossMode.phase !== 'failed' && bossMode.phase !== 'transition') {
+                        updateBossMode();
+                    }
+                    for (let i = game.particles.length - 1; i >= 0; i--) {
+                        game.particles[i].update();
+                        if (game.particles[i].alpha <= 0) game.particles.splice(i, 1);
+                    }
+                } else if (!modeTransitionActive) {
+                    for (let i = 0; i < ORBIT_PATHS.length; i++) {
+                        if (!orbitLockStates[i] && (!game.paused || !game.running)) orbitRotations[i] += 0.0015 / ((i + 1) * 0.6);
+                    }
+                    if (game.running && !game.paused) {
+                        if (game.tactical) {
+                            if (game.tactical.overcharge.activeTime > 0) game.tactical.overcharge.activeTime -= 1;
+                            if (game.tactical.laser.cd > 0) game.tactical.laser.cd -= 1;
+                            if (game.tactical.emp.cd > 0) game.tactical.emp.cd -= 1;
+                            if (game.tactical.overcharge.cd > 0) game.tactical.overcharge.cd -= 1;
+                        }
+                        updateTacticalUI();
+                        
+                        for (let tower of game.towers) tower.update(game.enemies);
+
+                        if (waveActive && spawnQueue.length > 0) {
+                            spawnTimer++;
+                            if (spawnTimer >= spawnQueue[0].delay) {
+                                const spawnData = spawnQueue.shift();
+                                game.enemies.push(new Enemy(spawnData.waveNum, spawnData.profileIndex, spawnData.theme, spawnData.isEscort, spawnData.escortIndex, spawnData.escortTotal)); 
+                                game.enemiesSpawnedThisWave++; spawnTimer = 0;
+                            }
+                        }
+
+                        for (let i = game.enemies.length - 1; i >= 0; i--) {
+                            game.enemies[i].update();
+                            handleEnemyCollisions(game.enemies[i], i);
+                        }
+
+                        if (waveActive && spawnQueue.length === 0 && game.enemies.length === 0) endWave();
+
+                        for (let i = game.projectiles.length - 1; i >= 0; i--) { const proj = game.projectiles[i]; proj.update(); if (proj.dead) game.projectiles.splice(i, 1); }
+                        for (let i = game.particles.length - 1; i >= 0; i--) { const part = game.particles[i]; part.update(); if (part.alpha <= 0) game.particles.splice(i, 1); }
+
+                        for (let index = lightningArcsToDraw.length - 1; index >= 0; index--) {
+                            lightningArcsToDraw[index].alpha -= 0.12; 
+                            if (lightningArcsToDraw[index].alpha <= 0) lightningArcsToDraw.splice(index, 1);
+                        }
+                        for (let index = shipAttackBeamsToDraw.length - 1; index >= 0; index--) {
+                            shipAttackBeamsToDraw[index].alpha -= 0.14;
+                            if (shipAttackBeamsToDraw[index].alpha <= 0) shipAttackBeamsToDraw.splice(index, 1);
+                        }
+                    }
                 }
+            }
+
+            // ----- DRAW PHASE -----
+            ctx.save();
+            if (game.running && !game.paused && game.cameraShake > 0) {
+                const shakeX = (Math.random() - 0.5) * game.cameraShake;
+                const shakeY = (Math.random() - 0.5) * game.cameraShake;
+                ctx.translate(shakeX, shakeY);
+                game.cameraShake *= 0.85;
+                if (game.cameraShake < 0.5) game.cameraShake = 0;
+            }
+
+            ctx.fillStyle = '#030712'; ctx.fillRect(-30, -30, canvas.width + 60, canvas.height + 60);
+            drawCosmicBackgroundOnly(isWarping);
+
+            if (game.mode === 'boss' && bossMode.active) {
+                drawBossMode();
+                for (let part of game.particles) part.draw();
+                drawDamageOverlay(centerX, centerY);
+                ctx.restore();
                 return;
             }
 
-            for (let i = 0; i < ORBIT_PATHS.length; i++) {
-                if (!orbitLockStates[i] && (!game.paused || !game.running)) orbitRotations[i] += 0.0015 / ((i + 1) * 0.6);
-            }
+            const totalRemaining = spawnQueue.length + game.enemies.length;
+            const enemiesCount = document.getElementById('enemies-count'); const enemiesRemaining = document.getElementById('enemies-remaining');
+            const mobileActive = document.getElementById('mobile-active'); const mobileRem = document.getElementById('mobile-rem');
+            
+            if (enemiesCount) enemiesCount.innerText = `${game.enemies.length} ACTIVE`; 
+            if (enemiesRemaining) enemiesRemaining.innerText = `REMAINING: ${totalRemaining}`;
+            if (mobileActive) mobileActive.innerText = game.enemies.length; 
+            if (mobileRem) mobileRem.innerText = totalRemaining;
 
             for (let i = 0; i < ORBIT_PATHS.length; i++) {
                 const radius = ORBIT_PATHS[i];
@@ -6163,7 +6890,6 @@
             drawFirstDeploymentSlotGuide(getFirstEmptyDeployableSlot());
 
             for (let tower of game.towers) {
-                if (game.running && !game.paused && !modeTransitionActive) tower.update(game.enemies);
                 tower.draw();
             }
 
@@ -6171,21 +6897,17 @@
                 for (let enemy of game.enemies) enemy.draw();
                 for (let proj of game.projectiles) proj.draw();
                 for (let part of game.particles) part.draw();
+                drawDamageOverlay(centerX, centerY);
+                ctx.restore();
                 return;
             }
 
-            // Draw active lightning chain jump lines with rapid fade decay
             for (let index = lightningArcsToDraw.length - 1; index >= 0; index--) {
                 const arc = lightningArcsToDraw[index];
                 ctx.save();
                 ctx.globalAlpha = arc.alpha;
                 drawLightningArc(ctx, arc.x1, arc.y1, arc.x2, arc.y2);
                 ctx.restore();
-                
-                arc.alpha -= 0.12; 
-                if (arc.alpha <= 0) {
-                    lightningArcsToDraw.splice(index, 1);
-                }
             }
 
             for (let index = shipAttackBeamsToDraw.length - 1; index >= 0; index--) {
@@ -6202,151 +6924,23 @@
                 ctx.lineTo(beam.x2, beam.y2);
                 ctx.stroke();
                 ctx.restore();
-
-                beam.alpha -= 0.14;
-                if (beam.alpha <= 0) {
-                    shipAttackBeamsToDraw.splice(index, 1);
-                }
             }
 
             if (!game.running || game.paused) {
                 for (let enemy of game.enemies) enemy.draw();
                 for (let proj of game.projectiles) proj.draw();
                 for (let part of game.particles) part.draw();
+                drawDamageOverlay(centerX, centerY);
+                ctx.restore();
                 return;
             }
 
-            if (waveActive && spawnQueue.length > 0) {
-                spawnTimer++;
-                if (spawnTimer >= spawnQueue[0].delay) {
-                    const spawnData = spawnQueue.shift();
-                    game.enemies.push(new Enemy(spawnData.waveNum, spawnData.profileIndex, spawnData.theme, spawnData.isEscort, spawnData.escortIndex, spawnData.escortTotal)); 
-                    game.enemiesSpawnedThisWave++; spawnTimer = 0;
-                }
-            }
-
-            for (let i = game.enemies.length - 1; i >= 0; i--) {
-                const enemy = game.enemies[i]; enemy.update(); enemy.draw();
-                const distToCenter = Math.hypot(centerX - enemy.x, centerY - enemy.y);
-
-                if (enemy.category === 'normal') {
-                    let impactedTower = null;
-                    for (const tower of game.towers) {
-                        const impactDistance = enemy.size + 16 * gameScale;
-                        if (Math.hypot(tower.x - enemy.x, tower.y - enemy.y) <= impactDistance) {
-                            impactedTower = tower;
-                            break;
-                        }
-                    }
-                    if (impactedTower) {
-                        const impactDamage = enemy.baseDamage + Math.max(0, Math.ceil(enemy.hp));
-                        damageSatellite(impactedTower, impactDamage, enemy.category);
-                        createExplosion(enemy.x, enemy.y, enemy.color, 14);
-                        playSynthSound('explosion');
-                        game.enemies.splice(i, 1);
-                        continue;
-                    }
-                }
-                
-	                if (distToCenter < EARTH_RADIUS + 8) {
-	                    createExplosion(enemy.x, enemy.y, enemy.color, 12);
-	                    const damageMultiplier = Math.max(0.15, 1 - getDirectiveEffectValue('coreDamageReduction', 0) + (getDirectiveEffectValue('corePowered') ? getDirectiveEffectValue('corePowered').taken : 0));
-	                    const incomingDamage = Math.max(1, Math.floor(enemy.damage * damageMultiplier));
-	                    const shieldBeforeHit = game.earthShield;
-	                    if (game.earthShield > 0) {
-	                        const remainingDamage = Math.max(0, incomingDamage - game.earthShield);
-	                        game.earthShield = Math.max(0, game.earthShield - incomingDamage);
-	                        if (remainingDamage > 0) game.earthHealth = Math.max(0, game.earthHealth - remainingDamage);
-	                        playSynthSound(remainingDamage > 0 ? 'earth_hit' : 'shield_deflect');
-	                    } else {
-	                        game.earthHealth = Math.max(0, game.earthHealth - incomingDamage); playSynthSound('earth_hit');
-	                    }
-	                    if (shieldBeforeHit > 0 && game.earthShield <= 0) {
-	                        const shockDamage = getDirectiveEffectValue('shieldBreakDamage', 0);
-	                        if (shockDamage) {
-	                            for (const e of game.enemies) {
-	                                e.hp -= shockDamage;
-	                                if (shockDamage >= 320) {
-	                                    e.slowMultiplier = Math.min(e.slowMultiplier, shockDamage >= 460 ? 0.35 : 0.55);
-	                                    e.slowTimer = Math.max(e.slowTimer, 180);
-	                                }
-	                            }
-	                            createExplosion(centerX, centerY, '#67e8f9', 35);
-	                        }
-	                    }
-
-                    const shieldWPercent = `${(game.earthShield / game.earthMaxShield) * 100}%`;
-                    const shieldText = document.getElementById('shield-text'); const mobileShieldText = document.getElementById('mobile-shield-text');
-                    const shieldBar = document.getElementById('shield-bar'); const mobileShieldBar = document.getElementById('mobile-shield-bar');
-                    if (shieldText) shieldText.innerText = `${game.earthShield} / ${game.earthMaxShield}`; 
-                    if (mobileShieldText) mobileShieldText.innerText = `${game.earthShield}/${game.earthMaxShield}`;
-                    if (shieldBar) shieldBar.style.width = shieldWPercent; 
-                    if (mobileShieldBar) mobileShieldBar.style.width = shieldWPercent;
-                    
-                    const healthWPercent = `${(game.earthHealth / game.earthMaxHealth) * 100}%`;
-                    const healthText = document.getElementById('health-text'); const mobileHealthText = document.getElementById('mobile-health-text');
-                    const healthBar = document.getElementById('health-bar'); const mobileHealthBar = document.getElementById('mobile-health-bar');
-                    if (healthText) healthText.innerText = `${game.earthHealth} / ${game.earthMaxHealth}`; 
-                    if (mobileHealthText) mobileHealthText.innerText = `${game.earthHealth}/${game.earthMaxHealth}`;
-                    if (healthBar) healthBar.style.width = healthWPercent; 
-                    if (mobileHealthBar) mobileHealthBar.style.width = healthWPercent;
-
-                    game.enemies.splice(i, 1);
-
-                    if (game.earthHealth <= 0) {
-                        game.running = false; 
-                        const finalWave = document.getElementById('final-wave'); const finalScore = document.getElementById('final-score');
-                        const finalTowers = document.getElementById('final-towers'); const gameoverModal = document.getElementById('gameover-modal');
-                        if (finalWave) finalWave.innerText = game.wave; 
-                        if (finalScore) finalScore.innerText = game.score;
-                        if (finalTowers) finalTowers.innerText = game.towersBuiltCount; 
-                        if (gameoverModal) gameoverModal.classList.remove('hidden');
-                    }
-                    continue;
-                }
-
-                if (enemy.hp <= 0) {
-                    createExplosion(enemy.x, enemy.y, enemy.color, 16);
-                    playSynthSound(enemy.category === 'normal' ? 'rock_destroy' : 'ship_destroy');
-                    let rewardMultiplier = 1;
-                    const riskContract = getDirectiveEffectValue('riskContract'); if (riskContract) rewardMultiplier += riskContract.reward;
-                    const rewardHpTradeoff = getDirectiveEffectValue('rewardHpTradeoff'); if (rewardHpTradeoff) rewardMultiplier += rewardHpTradeoff.reward;
-                    const rockRewardSpeed = getDirectiveEffectValue('rockRewardSpeed'); if (enemy.category === 'normal' && rockRewardSpeed) rewardMultiplier += rockRewardSpeed.reward;
-                    const shipReward = getDirectiveEffectValue('shipReward'); if ((enemy.category === 'ship' || enemy.category === 'miniboss') && shipReward) rewardMultiplier += shipReward;
-                    const eliteIncentive = getDirectiveEffectValue('eliteIncentive'); if (enemy.category === 'miniboss' && eliteIncentive) rewardMultiplier *= eliteIncentive.reward;
-                    const reward = Math.floor(enemy.goldReward * rewardMultiplier);
-                    addGold(reward); game.score += reward * 2; 
-                    const shieldPerKill = getDirectiveEffectValue('shieldPerKill', 0);
-                    const fragileShield = getDirectiveEffectValue('fragileShield');
-                    const shieldGain = shieldPerKill + (fragileShield ? fragileShield.shieldKill : 0);
-                    if (shieldGain > 0) {
-                        game.earthShield = Math.min(game.earthMaxShield, game.earthShield + shieldGain);
-                        syncPlanetBars();
-                    }
-                    const scrap = getDirectiveEffectValue('scrapEveryKills');
-                    if (scrap) {
-                        game.directiveKills++;
-                        if (game.directiveKills % scrap.kills === 0) addGold(scrap.gold);
-                    }
-                    const scoreDisplay = document.getElementById('score-display');
-                    if (scoreDisplay) scoreDisplay.innerText = game.score;
-                    game.enemies.splice(i, 1);
-                }
-            }
-
-            if (waveActive && spawnQueue.length === 0 && game.enemies.length === 0) endWave();
-
-            const totalRemaining = spawnQueue.length + game.enemies.length;
-            const enemiesCount = document.getElementById('enemies-count'); const enemiesRemaining = document.getElementById('enemies-remaining');
-            const mobileActive = document.getElementById('mobile-active'); const mobileRem = document.getElementById('mobile-rem');
+            for (let enemy of game.enemies) enemy.draw();
+            for (let proj of game.projectiles) proj.draw();
+            for (let part of game.particles) part.draw();
             
-            if (enemiesCount) enemiesCount.innerText = `${game.enemies.length} ACTIVE`; 
-            if (enemiesRemaining) enemiesRemaining.innerText = `REMAINING: ${totalRemaining}`;
-            if (mobileActive) mobileActive.innerText = game.enemies.length; 
-            if (mobileRem) mobileRem.innerText = totalRemaining;
-
-            for (let i = game.projectiles.length - 1; i >= 0; i--) { const proj = game.projectiles[i]; proj.update(); proj.draw(); if (proj.dead) game.projectiles.splice(i, 1); }
-            for (let i = game.particles.length - 1; i >= 0; i--) { const part = game.particles[i]; part.update(); part.draw(); if (part.alpha <= 0) game.particles.splice(i, 1); }
+            drawDamageOverlay(centerX, centerY);
+            ctx.restore();
         }
 
         // Run engine setup and kick off main execution pipeline
@@ -6384,6 +6978,20 @@
                 }
             });
         }
+        
+        const shakeVolInput = document.getElementById('settings-shake-intensity');
+        if (shakeVolInput) {
+            shakeVolInput.addEventListener('input', (e) => {
+                screenShakeIntensity = parseFloat(e.target.value);
+            });
+        }
+        const pShakeVolInput = document.getElementById('pause-settings-shake-intensity');
+        if (pShakeVolInput) {
+            pShakeVolInput.addEventListener('input', (e) => {
+                screenShakeIntensity = parseFloat(e.target.value);
+            });
+        }
+        
         const planetInput = document.getElementById('settings-planet-name');
         if (planetInput) {
             planetInput.addEventListener('input', (e) => {

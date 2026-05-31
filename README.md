@@ -4,7 +4,7 @@ Planetary Defense Command is a browser-based tower defense and boss intercept ga
 
 ## Current Version
 
-Current game version: `Alpha 0.9.46.113`
+Current game version: `Alpha 0.9.70.137`
 
 The project now uses an alpha version of modified semantic versioning:
 
@@ -42,6 +42,106 @@ http://127.0.0.1:8765/index.html
 ## Patch History
 
 These notes reconstruct the visible project history from the development thread. Earlier builds did not have formal release notes, so this list is maintained from build `47` forward.
+
+### Alpha 0.9.70.137
+
+- Aligned the Mini-Boss warning banner vertically with the other game notices.
+
+### Alpha 0.9.69.136
+
+- Fixed warning banner centering issue caused by animation transform overrides.
+- Removed the ghosting animation (debris persistence) of killed enemies.
+
+### Alpha 0.9.68.135
+
+- Restored the missing Research Lab UI panel that was accidentally removed in a previous patch.
+
+### Alpha 0.9.67.134
+
+- Tactical Abilities (Orbital Strike, EMP, Shield Surge) are now unlocked individually in Master Command.
+- Fixed a bug where Research Lab buttons were unresponsive to touch input.
+
+### Alpha 0.9.66.133
+
+- Tactical Abilities are now hidden at the start of a run and must be unlocked through the Master Command Center.
+
+### Alpha 0.9.65.132
+
+- Fixed a silent object-null crash that prevented the Research Lab button from opening when loading older save files.
+- Fixed an undeclared speed variable that caused the game to completely freeze when deploying Tactical Abilities or generating debris.
+
+### Alpha 0.9.63.130
+
+- Added Research Lab for persistent meta-progression using Cosmic Data.
+- Added Active Tactical Abilities (Orbital Laser, EMP, Surge) during defense waves.
+- Added Deep Space Anomalies (Rogue Comets, Smuggler Ships) to mid-wave events.
+- Added satellite damage states (smoking/sparking), destroyed debris persistence, and warp tunnel visual effects.
+
+### Alpha 0.9.62.129
+
+- Added a continuous, pulsing red visual warning overlay when the planet core or player fighter drops below 30% health.
+
+### Alpha 0.9.61.128
+
+- Adjusted planet shield visual thickness based on its current health. The shield is now invisible when depleted.
+
+### Alpha 0.9.60.127
+
+- Added a blue vignette overlay to indicate when the planet shield takes damage.
+
+### Alpha 0.9.59.126
+
+- Added a red visual vignette overlay to indicate when the planet core or the player fighter takes damage.
+
+### Alpha 0.9.58.125
+
+- Added an "Explosion/Screen Shake Intensity" slider to the Visuals & Gameplay settings menu to allow players to customize or disable screen shake.
+
+### Alpha 0.9.57.124
+
+- Added a dynamic screen shake effect when the planet core or shields take damage to drastically improve impact feel.
+
+### Alpha 0.9.56.123
+
+- Added a pulsing outline to the Proton Shield button during Boss Intercepts to clearly indicate when it is available for use.
+
+### Alpha 0.9.55.122
+
+- Added a visual shatter particle effect and audio cue when the Proton Shield expires instead of having it quietly fade away.
+
+### Alpha 0.9.54.121
+
+- Replaced Boss Intercept Dash with Proton Shield (one-time 3s invulnerability).
+- Fixed hitbox misalignment causing unfair damage during boss encounters by perfectly centering the collision point exactly over the visual core.
+
+### Alpha 0.9.53.120
+
+- Redesigned Boss Intercept Dash to use directional velocity vectors instead of pointer interpolation, solving usability issues with mouse and drag controls.
+- Added Double-Tap (Canvas) and Spacebar/Shift keyboard shortcuts to trigger Dash quickly without reaching for the UI button.
+
+### Alpha 0.9.52.119
+
+- Fixed an issue where the Mini-Boss warning banner was uncentered and completely hidden on mobile devices by migrating it into the global view space.
+
+### Alpha 0.9.51.118
+
+- Enhanced the active visual state of the Fast-Forward toggle to include a glowing background and pulsing icon.
+
+### Alpha 0.9.50.117
+
+- Shrank the player fighter collision hitbox during Boss Intercepts to a small central core, allowing for fair bullet-hell dodging.
+- Added a visual glowing core to the player ship to clearly telegraph the vulnerable hitbox.
+
+### Alpha 0.9.49.116
+
+- Restored missing collision detection function that caused the game to freeze during defense waves.
+
+### Alpha 0.9.47.114
+
+- Added Player Phase Dash active ability to Boss Intercepts.
+- Introduced Environmental Hazards (Solar Flares, Ion Storms, Debris Fields) that sporadically appear during defense waves to dynamically alter combat conditions.
+- Added Fast-Forward (2x speed) toggle for defense waves.
+- Refactored core game loop to cleanly separate physics updates from rendering.
 
 ### Alpha 0.9.46.113
 
