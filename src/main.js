@@ -2746,7 +2746,7 @@ import {
 
         function getBossHitRadius() {
             if (!state.bossMode.boss) return 0;
-            return state.bossMode.boss.hitRadius || state.bossMode.boss.size * (ENEMY_SPRITE_SCALE[state.bossMode.boss.name] || 7.2) * 0.34;
+            return state.bossMode.boss.hitRadius || state.bossMode.boss.size * (ENEMY_SPRITE_SCALE[state.bossMode.boss.config.name] || 7.2) * 0.34;
         }
 
         function getPlayerFighterHitRadius() {
@@ -2901,7 +2901,7 @@ import {
                         spawnGatekeeper();
                     } else if (state.bossMode.enemies.length === 0) {
                         state.bossMode.phase = 'boss';
-                        showGameNotice(`<i class="fa-solid fa-skull-crossbones mr-1"></i> ${state.bossMode.boss.name} has entered orbit`, 2400);
+                        showGameNotice(`<i class="fa-solid fa-skull-crossbones mr-1"></i> ${state.bossMode.boss.config.name} has entered orbit`, 2400);
                     }
                 }
             } else if (state.bossMode.phase === 'boss') {
@@ -2913,14 +2913,14 @@ import {
                     boss.x = canvas.width / 2 + Math.sin(boss.drift) * canvas.width * 0.22;
                     boss.cooldown--;
 
-                    if (boss.name === 'Dread Orchard' && state.bossMode.frame % 90 === 0) {
+                    if (boss.config.name === 'Dread Orchard' && state.bossMode.frame % 90 === 0) {
                         boss.hp = Math.min(boss.maxHp, boss.hp + 25);
                         createExplosion(boss.x, boss.y, '#10b981', 15);
                         boss.flashFrames = 15;
                     }
-                    if ((boss.name === 'Gravemind Carrier' || boss.name === 'Eclipse Foundry') && state.bossMode.frame % 180 === 0) {
+                    if ((boss.config.name === 'Gravemind Carrier' || boss.config.name === 'Eclipse Foundry') && state.bossMode.frame % 180 === 0) {
                         spawnBossMinion();
-                        createExplosion(boss.x, boss.y, boss.color, 25);
+                        createExplosion(boss.x, boss.y, boss.config.color, 25);
                         boss.flashFrames = 15;
                     }
 
@@ -2929,40 +2929,40 @@ import {
                     const projDamage = 12 + Math.floor(state.game.wave * 0.8);
                     const fireY = boss.y + 26 * state.gameScale;
 
-                    if (boss.name === 'Abyss Regent' && state.bossMode.frame % 300 < 60 && state.bossMode.frame % 15 === 0) {
+                    if (boss.config.name === 'Abyss Regent' && state.bossMode.frame % 300 < 60 && state.bossMode.frame % 15 === 0) {
                         if (state.bossMode.frame % 300 === 0) { boss.flashFrames = 15; createExplosion(boss.x, fireY, '#ffffff', 30); playSynthSound('explosion'); }
-                        for (let i = 0; i < 7; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 3) * 0.15, projSpeed * 1.2, projDamage, boss.color);
+                        for (let i = 0; i < 7; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 3) * 0.15, projSpeed * 1.2, projDamage, boss.config.color);
                         playSynthSound('missile');
-                    } else if (boss.name === 'Eclipse Foundry' && state.bossMode.frame % 240 === 0) {
+                    } else if (boss.config.name === 'Eclipse Foundry' && state.bossMode.frame % 240 === 0) {
                         boss.flashFrames = 15; createExplosion(boss.x, fireY, '#ffffff', 40); playSynthSound('explosion');
-                        for (let i = 0; i < 12; i++) fireBossProjectile(boss.x, fireY, i * Math.PI / 6, projSpeed * 0.85, projDamage, boss.color);
+                        for (let i = 0; i < 12; i++) fireBossProjectile(boss.x, fireY, i * Math.PI / 6, projSpeed * 0.85, projDamage, boss.config.color);
                         playSynthSound('missile');
-                    } else if (boss.name === 'Chronos Devourer' && state.bossMode.frame % 400 < 120 && state.bossMode.frame % 15 === 0) {
+                    } else if (boss.config.name === 'Chronos Devourer' && state.bossMode.frame % 400 < 120 && state.bossMode.frame % 15 === 0) {
                         if (state.bossMode.frame % 400 === 0) { boss.flashFrames = 15; createExplosion(boss.x, fireY, '#ffffff', 30); playSynthSound('explosion'); }
                         boss.chronosAngle = (boss.chronosAngle || 0) + 0.18;
-                        for (let i = 0; i < 8; i++) fireBossProjectile(boss.x, fireY, boss.chronosAngle + i * Math.PI / 4, projSpeed * 0.7, projDamage, boss.color);
+                        for (let i = 0; i < 8; i++) fireBossProjectile(boss.x, fireY, boss.chronosAngle + i * Math.PI / 4, projSpeed * 0.7, projDamage, boss.config.color);
                         playSynthSound('missile');
                     }
 
                     if (boss.cooldown <= 0) {
-                        switch (boss.name) {
+                        switch (boss.config.name) {
                             case 'Abyss Regent':
-                                for (let i = 0; i < 3; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 1) * 0.2, projSpeed, projDamage, boss.color);
-                                boss.cooldown = boss.fireRate;
+                                for (let i = 0; i < 3; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 1) * 0.2, projSpeed, projDamage, boss.config.color);
+                                boss.cooldown = boss.config.fireRate;
                                 break;
                             case 'Gravemind Carrier':
-                                fireBossProjectile(boss.x, fireY, baseAngle, projSpeed * 1.2, projDamage, boss.color, 8 * state.gameScale);
-                                fireBossProjectile(boss.x - 20 * state.gameScale, fireY, baseAngle - 0.15, projSpeed * 0.9, projDamage, boss.color);
-                                fireBossProjectile(boss.x + 20 * state.gameScale, fireY, baseAngle + 0.15, projSpeed * 0.9, projDamage, boss.color);
-                                boss.cooldown = boss.fireRate;
+                                fireBossProjectile(boss.x, fireY, baseAngle, projSpeed * 1.2, projDamage, boss.config.color, 8 * state.gameScale);
+                                fireBossProjectile(boss.x - 20 * state.gameScale, fireY, baseAngle - 0.15, projSpeed * 0.9, projDamage, boss.config.color);
+                                fireBossProjectile(boss.x + 20 * state.gameScale, fireY, baseAngle + 0.15, projSpeed * 0.9, projDamage, boss.config.color);
+                                boss.cooldown = boss.config.fireRate;
                                 break;
                             case 'Solar Warden':
                                 if (!boss.burstCount) boss.burstCount = 0;
                                 if (boss.burstCount === 0) { boss.flashFrames = 10; createExplosion(boss.x, fireY, '#ffffff', 15); }
-                                for (let i = 0; i < 3; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 1) * 0.1, projSpeed * 1.5, projDamage, boss.color);
+                                for (let i = 0; i < 3; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 1) * 0.1, projSpeed * 1.5, projDamage, boss.config.color);
                                 boss.burstCount++;
                                 if (boss.burstCount >= 3) {
-                                    boss.cooldown = Math.floor(boss.fireRate * 1.5);
+                                    boss.cooldown = Math.floor(boss.config.fireRate * 1.5);
                                     boss.burstCount = 0;
                                 } else {
                                     boss.cooldown = 12;
@@ -2970,46 +2970,46 @@ import {
                                 break;
                             case 'Null Engine':
                                 boss.sweepAngle = (boss.sweepAngle || 0) + 0.4;
-                                fireBossProjectile(boss.x, fireY, baseAngle + Math.sin(boss.sweepAngle) * 0.6, projSpeed * 1.8, Math.floor(projDamage * 0.7), boss.color);
-                                boss.cooldown = Math.floor(boss.fireRate * 0.3);
+                                fireBossProjectile(boss.x, fireY, baseAngle + Math.sin(boss.sweepAngle) * 0.6, projSpeed * 1.8, Math.floor(projDamage * 0.7), boss.config.color);
+                                boss.cooldown = Math.floor(boss.config.fireRate * 0.3);
                                 break;
                             case 'Iron Basilica':
                                 boss.flashFrames = 15; createExplosion(boss.x, fireY, '#94a3b8', 25);
-                                fireBossProjectile(boss.x, fireY, baseAngle, projSpeed * 0.65, projDamage * 3, boss.color, 16 * state.gameScale);
-                                boss.cooldown = Math.floor(boss.fireRate * 1.3);
+                                fireBossProjectile(boss.x, fireY, baseAngle, projSpeed * 0.65, projDamage * 3, boss.config.color, 16 * state.gameScale);
+                                boss.cooldown = Math.floor(boss.config.fireRate * 1.3);
                                 break;
                             case 'Dread Orchard':
-                                fireBossProjectile(boss.x, fireY, baseAngle, projSpeed, projDamage, boss.color);
-                                for (let i = 0; i < 4; i++) fireBossProjectile(boss.x, fireY, baseAngle + Math.PI / 4 + i * Math.PI / 2, projSpeed * 0.6, projDamage, boss.color);
-                                boss.cooldown = boss.fireRate;
+                                fireBossProjectile(boss.x, fireY, baseAngle, projSpeed, projDamage, boss.config.color);
+                                for (let i = 0; i < 4; i++) fireBossProjectile(boss.x, fireY, baseAngle + Math.PI / 4 + i * Math.PI / 2, projSpeed * 0.6, projDamage, boss.config.color);
+                                boss.cooldown = boss.config.fireRate;
                                 break;
                             case 'Vortex Saint':
                                 boss.spiralAngle = (boss.spiralAngle || 0) + 0.25;
-                                for (let i = 0; i < 4; i++) fireBossProjectile(boss.x, fireY, boss.spiralAngle + i * Math.PI / 2, projSpeed * 0.85, projDamage, boss.color);
-                                boss.cooldown = Math.floor(boss.fireRate * 0.45);
+                                for (let i = 0; i < 4; i++) fireBossProjectile(boss.x, fireY, boss.spiralAngle + i * Math.PI / 2, projSpeed * 0.85, projDamage, boss.config.color);
+                                boss.cooldown = Math.floor(boss.config.fireRate * 0.45);
                                 break;
                             case 'Eclipse Foundry':
-                                fireBossProjectile(boss.x - 15 * state.gameScale, fireY, baseAngle - 0.2, projSpeed, projDamage, boss.color);
-                                fireBossProjectile(boss.x + 15 * state.gameScale, fireY, baseAngle + 0.2, projSpeed, projDamage, boss.color);
-                                boss.cooldown = boss.fireRate;
+                                fireBossProjectile(boss.x - 15 * state.gameScale, fireY, baseAngle - 0.2, projSpeed, projDamage, boss.config.color);
+                                fireBossProjectile(boss.x + 15 * state.gameScale, fireY, baseAngle + 0.2, projSpeed, projDamage, boss.config.color);
+                                boss.cooldown = boss.config.fireRate;
                                 break;
                             case 'Omega Crucible':
                                 const isRage = boss.hp < boss.maxHp * 0.5;
                                 const shots = isRage ? 7 : 4;
                                 const spread = isRage ? 0.12 : 0.18;
                                 if (isRage) { boss.flashFrames = 5; createExplosion(boss.x, fireY, '#ef4444', 6); }
-                                for (let i = 0; i < shots; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - (shots - 1) / 2) * spread, projSpeed * (isRage ? 1.4 : 1.0), projDamage, boss.color);
-                                boss.cooldown = isRage ? Math.floor(boss.fireRate * 0.6) : boss.fireRate;
+                                for (let i = 0; i < shots; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - (shots - 1) / 2) * spread, projSpeed * (isRage ? 1.4 : 1.0), projDamage, boss.config.color);
+                                boss.cooldown = isRage ? Math.floor(boss.config.fireRate * 0.6) : boss.config.fireRate;
                                 break;
                             case 'Chronos Devourer':
                                 if (state.bossMode.frame % 400 >= 120) {
-                                    for (let i = 0; i < 5; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 2) * 0.1, projSpeed * 1.6, projDamage, boss.color);
+                                    for (let i = 0; i < 5; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 2) * 0.1, projSpeed * 1.6, projDamage, boss.config.color);
                                 }
-                                boss.cooldown = Math.floor(boss.fireRate * 0.85);
+                                boss.cooldown = Math.floor(boss.config.fireRate * 0.85);
                                 break;
                             default:
-                                for (let i = 0; i < 3; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 1) * 0.15, projSpeed, projDamage, boss.color);
-                                boss.cooldown = boss.fireRate;
+                                for (let i = 0; i < 3; i++) fireBossProjectile(boss.x, fireY, baseAngle + (i - 1) * 0.15, projSpeed, projDamage, boss.config.color);
+                                boss.cooldown = boss.config.fireRate;
                         }
                         playSynthSound('missile');
                     }
@@ -3219,15 +3219,15 @@ import {
             boss.defeated = true;
             state.bossMode.phase = 'boss-defeated';
             state.bossMode.victoryTimer = 0;
-            state.bossMode.defeatedBossName = boss.name;
+            state.bossMode.defeatedBossName = boss.config.name;
             state.bossMode.enemyProjectiles = [];
             state.bossMode.enemies = [];
             state.bossMode.projectiles = [];
             boss.defeatAlpha = 1;
             boss.defeatSpin = 0;
             playSynthSound('explosion');
-            showGameNotice(`<i class="fa-solid fa-trophy mr-1"></i> Congratulations, you destroyed the ${boss.name}!`, 3600);
-            createBossDeathBurst(boss.x, boss.y, boss.color, 1.85);
+            showGameNotice(`<i class="fa-solid fa-trophy mr-1"></i> Congratulations, you destroyed the ${boss.config.name}!`, 3600);
+            createBossDeathBurst(boss.x, boss.y, boss.config.color, 1.85);
             state.bossMode.player.dragging = false;
             state.bossMode.player.targetX = state.bossMode.player.x;
             state.bossMode.player.targetY = state.bossMode.player.y;
@@ -3255,7 +3255,7 @@ import {
                     const spread = (0.2 + Math.random() * 0.92) * radius;
                     const ex = boss.x + Math.cos(angle) * spread;
                     const ey = boss.y + Math.sin(angle) * spread * 0.62;
-                    createBossDeathBurst(ex, ey, boss.color, state.bossMode.victoryTimer % 16 === 0 ? 0.92 : 0.46);
+                    createBossDeathBurst(ex, ey, boss.config.color, state.bossMode.victoryTimer % 16 === 0 ? 0.92 : 0.46);
                 }
             }
 
@@ -3297,7 +3297,7 @@ import {
             const objective = document.getElementById('boss-mode-objective');
             if (!state.bossMode.boss) return;
             if (healthWrap) healthWrap.classList.remove('hidden');
-            if (healthName) healthName.innerText = state.bossMode.boss.name;
+            if (healthName) healthName.innerText = state.bossMode.boss.config.name;
 
             const BARS = 4;
             const hpPerBar = state.bossMode.boss.maxHp / BARS;
@@ -3314,7 +3314,7 @@ import {
                 ];
                 healthBar.className = `h-full w-full transition-all duration-150 ${layerColors[Math.min(BARS - 1, currentBarIndex)] || layerColors[0]}`;
             }
-            if (objective) objective.innerText = state.game.isTimeAttack ? 'Time Attack' : state.bossMode.boss.skill;
+            if (objective) objective.innerText = state.game.isTimeAttack ? 'Time Attack' : state.bossMode.boss.config.skill;
         }
 
         function updateRepairButton() {
@@ -3462,18 +3462,18 @@ import {
                 if (state.bossMode.boss.flashFrames > 0) {
                     ctx.save();
                     ctx.shadowBlur = 30;
-                    ctx.shadowColor = state.bossMode.boss.color;
+                    ctx.shadowColor = state.bossMode.boss.config.color;
                     ctx.globalAlpha = Math.min(1, state.bossMode.boss.flashFrames / 15);
                     ctx.globalCompositeOperation = 'screen';
-                    drawEnemySprite(ctx, state.bossMode.boss.name, state.bossMode.boss.x, state.bossMode.boss.y, state.bossMode.boss.size * 1.15, Math.PI / 2);
+                    drawEnemySprite(ctx, state.bossMode.boss.config.name, state.bossMode.boss.x, state.bossMode.boss.y, state.bossMode.boss.size * 1.15, Math.PI / 2);
                     ctx.restore();
                     state.bossMode.boss.flashFrames--;
                 }
-                drawEnemySprite(ctx, state.bossMode.boss.name, state.bossMode.boss.x, state.bossMode.boss.y, state.bossMode.boss.size, Math.PI / 2);
+                drawEnemySprite(ctx, state.bossMode.boss.config.name, state.bossMode.boss.x, state.bossMode.boss.y, state.bossMode.boss.size, Math.PI / 2);
             } else if (state.bossMode.phase === 'boss-defeated' && state.bossMode.boss && (state.bossMode.boss.defeatAlpha || 0) > 0) {
                 ctx.save();
                 ctx.globalAlpha = state.bossMode.boss.defeatAlpha;
-                drawEnemySprite(ctx, state.bossMode.boss.name, state.bossMode.boss.x, state.bossMode.boss.y, state.bossMode.boss.size, Math.PI / 2 + (state.bossMode.boss.defeatSpin || 0));
+                drawEnemySprite(ctx, state.bossMode.boss.config.name, state.bossMode.boss.x, state.bossMode.boss.y, state.bossMode.boss.size, Math.PI / 2 + (state.bossMode.boss.defeatSpin || 0));
                 ctx.restore();
             }
             const playerSpriteSize = player.spriteSize || 58 * state.gameScale;
@@ -3560,7 +3560,7 @@ import {
             const victoryTitle = document.getElementById('boss-victory-title');
             const victoryStory = document.getElementById('boss-victory-story');
             if (!modal || !container) return;
-            const bossName = state.bossMode.defeatedBossName || (state.bossMode.boss && state.bossMode.boss.name) || 'Boss Ship';
+            const bossName = state.bossMode.defeatedBossName || (state.bossMode.boss && state.bossMode.boss.config.name) || 'Boss Ship';
             if (victoryTitle) victoryTitle.innerText = `Congratulations, Commander. ${bossName} Has Been Destroyed.`;
             if (victoryStory) victoryStory.innerText = getBossVictoryStory(bossName);
             container.innerHTML = shuffled.map(card => {
