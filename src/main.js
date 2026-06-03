@@ -449,7 +449,7 @@ import {
             try {
                 const lbl = document.getElementById('lbl-cosmic-data');
                 if (lbl) lbl.innerText = state.cosmicData || 0;
-                const list = document.getElementById('state.research-upgrades-list');
+                const list = document.getElementById('research-upgrades-list');
                 if (!list) return;
                 if (!state.research) state.research = { startSlots: 0, baseShield: 0, baseDamage: 0 };
                 const sSlots = state.research.startSlots || 0;
@@ -459,15 +459,15 @@ import {
                 list.innerHTML = `
                     <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex justify-between items-center">
                         <div><div class="text-slate-200 text-xs font-black uppercase tracking-widest">Initial Orbit Slots</div><div class="text-slate-400 text-[9px] mt-0.5">Start runs with extra random slots. (Lvl ${sSlots}/10)</div></div>
-                        <button data-state.research="startSlots" data-cost="${costs.startSlots}" class="state.research-btn bg-purple-500 hover:bg-purple-400 active:scale-95 text-slate-950 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all pointer-events-auto select-none ${state.cosmicData >= costs.startSlots && sSlots < 10 ? '' : 'opacity-50 cursor-not-allowed'}">${sSlots >= 10 ? 'MAX' : costs.startSlots + ' CD'}</button>
+                        <button data-research="startSlots" data-cost="${costs.startSlots}" class="research-btn bg-purple-500 hover:bg-purple-400 active:scale-95 text-slate-950 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all pointer-events-auto select-none ${state.cosmicData >= costs.startSlots && sSlots < 10 ? '' : 'opacity-50 cursor-not-allowed'}">${sSlots >= 10 ? 'MAX' : costs.startSlots + ' CD'}</button>
                     </div>
                     <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex justify-between items-center mt-2">
                         <div><div class="text-slate-200 text-xs font-black uppercase tracking-widest">Reinforced Shielding</div><div class="text-slate-400 text-[9px] mt-0.5">Increase base shield by +25 per level. (Lvl ${sShield}/10)</div></div>
-                        <button data-state.research="baseShield" data-cost="${costs.baseShield}" class="state.research-btn bg-purple-500 hover:bg-purple-400 active:scale-95 text-slate-950 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all pointer-events-auto select-none ${state.cosmicData >= costs.baseShield && sShield < 10 ? '' : 'opacity-50 cursor-not-allowed'}">${sShield >= 10 ? 'MAX' : costs.baseShield + ' CD'}</button>
+                        <button data-research="baseShield" data-cost="${costs.baseShield}" class="research-btn bg-purple-500 hover:bg-purple-400 active:scale-95 text-slate-950 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all pointer-events-auto select-none ${state.cosmicData >= costs.baseShield && sShield < 10 ? '' : 'opacity-50 cursor-not-allowed'}">${sShield >= 10 ? 'MAX' : costs.baseShield + ' CD'}</button>
                     </div>
                     <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex justify-between items-center mt-2">
                         <div><div class="text-slate-200 text-xs font-black uppercase tracking-widest">Weapons Calibration</div><div class="text-slate-400 text-[9px] mt-0.5">Increase all satellite damage by +5% per level. (Lvl ${sDmg}/10)</div></div>
-                        <button data-state.research="baseDamage" data-cost="${costs.baseDamage}" class="state.research-btn bg-purple-500 hover:bg-purple-400 active:scale-95 text-slate-950 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all pointer-events-auto select-none ${state.cosmicData >= costs.baseDamage && sDmg < 10 ? '' : 'opacity-50 cursor-not-allowed'}">${sDmg >= 10 ? 'MAX' : costs.baseDamage + ' CD'}</button>
+                        <button data-research="baseDamage" data-cost="${costs.baseDamage}" class="research-btn bg-purple-500 hover:bg-purple-400 active:scale-95 text-slate-950 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all pointer-events-auto select-none ${state.cosmicData >= costs.baseDamage && sDmg < 10 ? '' : 'opacity-50 cursor-not-allowed'}">${sDmg >= 10 ? 'MAX' : costs.baseDamage + ' CD'}</button>
                     </div>
                 `;
 
@@ -475,7 +475,7 @@ import {
                     btn.addEventListener('pointerdown', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        const key = btn.getAttribute('data-state.research');
+                        const key = btn.getAttribute('data-research');
                         const cost = parseInt(btn.getAttribute('data-cost'), 10);
                         const currentLvl = state.research[key] || 0;
                         if (state.cosmicData >= cost && currentLvl < 10) {
@@ -485,7 +485,7 @@ import {
                         }
                     });
                 });
-            } catch (e) { console.warn("Error updating state.research UI", e); }
+            } catch (e) { console.warn("Error updating research UI", e); }
         }
 
         function scrollEncyclopediaTo(sectionKey) {
@@ -4203,7 +4203,7 @@ import {
         // 10. ACTION BINDINGS MATRIX
         // ----------------------------------------------------------------------
         function hideTitleSubpanels() {
-            ['inline-settings-options', 'inline-encyclopedia-options', 'inline-install-options', 'inline-patch-notes-options', 'inline-boss-attack-options', 'inline-state.research-options'].forEach(id => {
+            ['inline-settings-options', 'inline-encyclopedia-options', 'inline-install-options', 'inline-patch-notes-options', 'inline-boss-attack-options', 'inline-research-options'].forEach(id => {
                 const panel = document.getElementById(id);
                 if (panel) panel.classList.add('hidden');
             });
@@ -4297,10 +4297,10 @@ import {
             if (panel) panel.classList.remove('hidden');
             playSynthSound('upgrade');
         });
-        bindButton('open-state.research-btn', () => {
+        bindButton('open-research-btn', () => {
             hideTitleSubpanels();
             updateResearchUI();
-            const panel = document.getElementById('inline-state.research-options');
+            const panel = document.getElementById('inline-research-options');
             if (panel) panel.classList.remove('hidden');
             playSynthSound('upgrade');
         });
@@ -4343,8 +4343,8 @@ import {
         bindButton('back-install-options-btn', () => { const installPanel = document.getElementById('inline-install-options'); if (installPanel) installPanel.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('close-boss-attack-btn', () => { const panel = document.getElementById('inline-boss-attack-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('back-boss-attack-btn', () => { const panel = document.getElementById('inline-boss-attack-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
-        bindButton('close-state.research-btn', () => { const panel = document.getElementById('inline-state.research-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
-        bindButton('back-state.research-btn', () => { const panel = document.getElementById('inline-state.research-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
+        bindButton('close-research-btn', () => { const panel = document.getElementById('inline-research-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
+        bindButton('back-research-btn', () => { const panel = document.getElementById('inline-research-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('android-install-btn', triggerAndroidInstall);
         bindButton('check-update-btn', triggerCheckUpdate);
 
