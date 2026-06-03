@@ -1,4 +1,4 @@
-const CACHE_NAME = 'planetary-defense-alpha-0-9-72-142';
+const CACHE_NAME = 'planetary-defense-alpha-0-9-72-143';
 const CORE_ASSETS = [
   './',
   './index.html',

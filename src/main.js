@@ -17,7 +17,12 @@ import {
         // ----------------------------------------------------------------------
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-
+        state.canvas = canvas;
+        state.ctx = ctx;
+        state.playSynthSound = playSynthSound;
+        state.createExplosion = createExplosion;
+        state.getDirectiveEffectValue = getDirectiveEffectValue;
+        
         let lastLoopTimestamp = 0;
 
 
