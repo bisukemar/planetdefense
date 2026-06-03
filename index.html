@@ -59,21 +59,8 @@
         </div>
     </div>
 
-    <!-- ERROR BANNER IF OPENED LOCALLY -->
-    <div id="local-file-error" class="hidden fixed inset-0 z-[200] bg-red-950 flex flex-col items-center justify-center p-5 pointer-events-auto text-center">
-        <i class="fa-solid fa-triangle-exclamation text-red-500 text-6xl mb-4 animate-bounce"></i>
-        <h1 class="text-white text-2xl font-black uppercase tracking-widest">Local File Detected</h1>
-        <p class="text-red-200 mt-4 max-w-md font-bold leading-relaxed">
-            Because we upgraded to a modular Vite setup, you cannot open <code>index.html</code> directly from your file system.<br><br>
-            Please open your terminal, run <code>npm run dev</code>, and click the <code>http://localhost:3000</code> link to play the game!
-        </p>
-    </div>
-    
     <script>
-        if (window.location.protocol === 'file:') {
-            document.getElementById('boot-loader').style.display = 'none';
-            document.getElementById('local-file-error').classList.remove('hidden');
-        }
+        // No local file error check anymore, because dist/index.html is a single file build that works locally.
     </script>
 
     <!-- MAIN GAME CANVAS -->
