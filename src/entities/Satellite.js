@@ -1,6 +1,8 @@
 import { state } from '../state.js';
 import * as config from '../config.js';
 import { getSatelliteMaxHp, getTargetedDamageMultiplier, drawSatelliteSprite } from '../main.js';
+import { Projectile } from './Projectile.js';
+import { Particle } from './Particle.js';
 
 export class Satellite {
             constructor(type, orbitIndex, slotIndex) {
