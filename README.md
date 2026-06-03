@@ -4,7 +4,7 @@ Planetary Defense Command is a browser-based tower defense and boss intercept ga
 
 ## Current Version
 
-Current game version: `Alpha 0.9.70.137`
+Current game version: `Alpha 0.9.72.139`
 
 The project now uses an alpha version of modified semantic versioning:
 
@@ -42,6 +42,17 @@ http://127.0.0.1:8765/index.html
 ## Patch History
 
 These notes reconstruct the visible project history from the development thread. Earlier builds did not have formal release notes, so this list is maintained from build `47` forward.
+
+### Alpha 0.9.72.139
+
+- Massive architectural refactoring: Migrated the project to Vite for ES Module support.
+- Extracted game entities (Enemy, Satellite, Projectile, Particle) into standalone modules.
+- Centralized mutable global variables into a state module to improve maintainability and performance.
+
+### Alpha 0.9.71.138
+
+- Boss waves now occur every 10 waves.
+- Mini-Boss waves now occur every 5 waves.
 
 ### Alpha 0.9.70.137
 

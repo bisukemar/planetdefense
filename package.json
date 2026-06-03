@@ -1,0 +1,29 @@
+{
+  "name": "pdefense",
+  "version": "1.0.0",
+  "description": "Planetary Defense Command is a browser-based tower defense and boss intercept game built as a single-page HTML5 canvas app. The game supports mobile install flows, responsive touch controls, orbital satellite deployment, boss rounds, Command Directives, texture and sprite assets, background music, and an in-game encyclopedia.",
+  "main": "sw.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bisukemar/planetdefense.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/bisukemar/planetdefense/issues"
+  },
+  "homepage": "https://github.com/bisukemar/planetdefense#readme",
+  "devDependencies": {
+    "vite": "^8.0.16"
+  },
+  "dependencies": {
+    "puppeteer": "^25.1.0"
+  }
+}

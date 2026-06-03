@@ -1,0 +1,163 @@
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: #030712;
+        }
+
+        body {
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (min-width: 768px) {
+            .md\:flex {
+                display: flex !important;
+            }
+
+            .md\:inline {
+                display: inline !important;
+            }
+
+            .md\:block {
+                display: block !important;
+            }
+
+            .md\:hidden {
+                display: none !important;
+            }
+        }
+
+        #boot-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem;
+            background: #020617;
+            color: #e2e8f0;
+            text-align: center;
+        }
+
+        #boot-loader-panel {
+            width: min(100%, 24rem);
+        }
+
+        #boot-loader-mark {
+            width: 4rem;
+            height: 4rem;
+            margin: 0 auto;
+            border-radius: 9999px;
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 28px rgba(16, 185, 129, 0.32);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: bootPulse 1.35s ease-in-out infinite;
+        }
+
+        #boot-loader-mark::before {
+            content: "";
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            border: 3px solid rgba(52, 211, 153, 0.95);
+            border-top-color: rgba(103, 232, 249, 0.18);
+            animation: bootSpin 1.05s linear infinite;
+        }
+
+        #boot-loader-title {
+            margin: 1rem 0 0;
+            color: #6ee7b7;
+            font-size: 1.125rem;
+            font-weight: 900;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            text-shadow: 0 0 8px rgba(16, 185, 129, 0.58);
+        }
+
+        #boot-loader-status {
+            margin: 0.5rem 0 0;
+            color: #94a3b8;
+            font-size: 0.625rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        #boot-loader-track {
+            height: 0.5rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(16, 185, 129, 0.22);
+            border-radius: 9999px;
+            background: #0f172a;
+            overflow: hidden;
+        }
+
+        #boot-loader-bar {
+            width: var(--load-progress, 0%);
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #67e8f9);
+            transition: width 0.2s ease;
+        }
+
+        #boot-loader-count {
+            margin-top: 0.5rem;
+            color: #64748b;
+            font-size: 0.5625rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        #boot-loader-retry {
+            display: none;
+            width: 100%;
+            margin-top: 1rem;
+            border: 0;
+            border-radius: 0.75rem;
+            padding: 0.85rem 1rem;
+            background: #f59e0b;
+            color: #020617;
+            font-size: 0.75rem;
+            font-weight: 900;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        #boot-loader-retry:not(.hidden) {
+            display: block;
+        }
+
+        .boot-loader-hidden {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+
+        @keyframes bootSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes bootPulse {
+
+            0%,
+            100% {
+                filter: brightness(1);
+            }
+
+            50% {
+                filter: brightness(1.2);
+            }
+        }
