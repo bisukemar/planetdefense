@@ -2570,9 +2570,11 @@ import {
             const hud = document.getElementById('boss-mode-hud');
             const modal = document.getElementById('boss-card-modal');
             const failedModal = document.getElementById('boss-failed-modal');
+            const actionPanel = document.getElementById('bottom-action-panel');
             if (hud) hud.classList.add('hidden');
             if (modal) modal.classList.add('hidden');
             if (failedModal) failedModal.classList.add('hidden');
+            if (actionPanel) actionPanel.classList.remove('hidden');
         }
 
         function getBossPlayTop() {
@@ -2636,6 +2638,8 @@ import {
                 const title = document.getElementById('boss-mode-title');
                 const timeAttackInfo = document.getElementById('boss-time-attack-info');
                 const timeAttackSkill = document.getElementById('boss-time-attack-skill');
+                const actionPanel = document.getElementById('bottom-action-panel');
+                if (actionPanel) actionPanel.classList.add('hidden');
                 if (hud) hud.classList.remove('hidden');
                 if (title) title.innerText = `Boss Round ${state.game.wave}: ${bossConfig.name}`;
                 if (timeAttackInfo && state.game.isTimeAttack) {
