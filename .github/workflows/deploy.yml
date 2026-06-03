@@ -36,10 +36,6 @@ jobs:
       - name: Build project
         run: npm run build
 
-      # Copy the elements folder so the images work in the built game!
-      - name: Include elements folder
-        run: cp -r elements dist/
-
       - name: Setup Pages
         uses: actions/configure-pages@v4
 

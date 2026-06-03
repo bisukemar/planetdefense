@@ -2581,7 +2581,7 @@ import {
         function startBossMode() {
             const bossIndex = state.game.isTimeAttack ? state.game.timeAttackBossIndex : Math.min(config.BOSS_SHIPS.length - 1, state.game.bossIndex);
             if (bossIndex < 0 || state.modeTransitionActive) return;
-            const config = config.BOSS_SHIPS[bossIndex];
+            const bossConfig = config.BOSS_SHIPS[bossIndex];
             state.waveActive = false;
             setWaveLaunchReady(false);
             setBuildControlEnabled(false);
@@ -2597,7 +2597,7 @@ import {
                 state.bossMode.frame = 0;
                 state.bossMode.spawnTimer = 0;
                 state.bossMode.spawned = 0;
-                state.bossMode.requiredKills = state.game.isTimeAttack ? 0 : config.minions;
+                state.bossMode.requiredKills = state.game.isTimeAttack ? 0 : bossConfig.minions;
                 state.bossMode.kills = 0;
                 state.bossMode.gatekeeperSpawned = false;
                 state.bossMode.enemies = [];
@@ -2609,15 +2609,15 @@ import {
                 state.bossMode.player.spriteSize = 58 * state.gameScale;
                 state.bossMode.player.hitRadius = state.bossMode.player.spriteSize * 0.08;
                 state.bossMode.boss = {
-                    config,
+                    config: bossConfig,
                     x: canvas.width / 2,
                     y: playTop + 46 * state.gameScale,
                     size: 42 * state.gameScale,
-                    hp: Math.floor(config.maxHp * (1 + state.game.wave * 0.03)),
-                    maxHp: Math.floor(config.maxHp * (1 + state.game.wave * 0.03)),
-                    cooldown: config.fireRate,
+                    hp: Math.floor(bossConfig.maxHp * (1 + state.game.wave * 0.03)),
+                    maxHp: Math.floor(bossConfig.maxHp * (1 + state.game.wave * 0.03)),
+                    cooldown: bossConfig.fireRate,
                     drift: 0,
-                    hitRadius: 42 * state.gameScale * (ENEMY_SPRITE_SCALE[config.name] || 7.2) * 0.34,
+                    hitRadius: 42 * state.gameScale * (ENEMY_SPRITE_SCALE[bossConfig.name] || 7.2) * 0.34,
                     state: 'normal',
                     stateTimer: 0,
                     diveStartX: 0,
@@ -2630,10 +2630,10 @@ import {
                 const timeAttackInfo = document.getElementById('boss-time-attack-info');
                 const timeAttackSkill = document.getElementById('boss-time-attack-skill');
                 if (hud) hud.classList.remove('hidden');
-                if (title) title.innerText = `Boss Round ${state.game.wave}: ${config.name}`;
+                if (title) title.innerText = `Boss Round ${state.game.wave}: ${bossConfig.name}`;
                 if (timeAttackInfo && state.game.isTimeAttack) {
                     timeAttackInfo.classList.remove('hidden');
-                    if (timeAttackSkill) timeAttackSkill.innerText = config.skill;
+                    if (timeAttackSkill) timeAttackSkill.innerText = bossConfig.skill;
                 } else if (timeAttackInfo) {
                     timeAttackInfo.classList.add('hidden');
                 }
