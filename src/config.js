@@ -1,4 +1,4 @@
-export const APP_VERSION = 'Alpha 0.9.73.146';
+export const APP_VERSION = 'Alpha 0.9.73.147';
 export const TARGET_FRAME_MS = 1000 / 60;
 
 export const PATCH_NOTES = [

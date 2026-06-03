@@ -928,27 +928,29 @@ import {
         }
 
         async function checkForAppUpdate(registration) {
-            if (!canUsePwaFeatures()) return;
+            if (!canUsePwaFeatures()) return false;
             if (registration) state.swRegistration = registration;
             try {
                 const response = await fetch(`./version.json?ts=${Date.now()}`, {
                     cache: 'no-store',
                     headers: { 'Cache-Control': 'no-cache' }
                 });
-                if (!response.ok) return;
+                if (!response.ok) return false;
 
                 const data = await response.json();
-                if (!data.version || data.version === APP_VERSION) return;
+                if (!data.version || data.version === APP_VERSION) return false;
 
                 // If the state.game is actively running, set a flag and apply the update later
                 if (state.game && state.game.running) {
                     state.pendingAppUpdate = true;
-                    return;
+                    return true;
                 }
 
                 applyAppUpdate();
+                return true;
             } catch (error) {
                 console.warn('App update check failed:', error);
+                return false;
             }
         }
 
@@ -1006,6 +1008,39 @@ import {
             await state.deferredInstallPrompt.userChoice;
             state.deferredInstallPrompt = null;
             syncInstallUI();
+        }
+
+        function triggerCheckUpdate() {
+            const btn = document.getElementById('check-update-btn');
+            if (!btn) return;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> CHECKING...';
+            btn.disabled = true;
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistration().then(registration => {
+                    if (registration) {
+                        checkForAppUpdate(registration).then(hasUpdate => {
+                            setTimeout(() => {
+                                btn.innerHTML = originalText;
+                                btn.disabled = false;
+                                if (!hasUpdate) showGameNotice('You are already on the latest version.', 2500);
+                            }, 800);
+                        });
+                    } else {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        showGameNotice('Service worker not registered.', 2500);
+                    }
+                }).catch(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
+            } else {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                showGameNotice('Updates not supported in this browser.', 2500);
+            }
         }
 
         function playSynthSound(type) {
@@ -4311,6 +4346,7 @@ import {
         bindButton('close-state.research-btn', () => { const panel = document.getElementById('inline-state.research-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('back-state.research-btn', () => { const panel = document.getElementById('inline-state.research-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('android-install-btn', triggerAndroidInstall);
+        bindButton('check-update-btn', triggerCheckUpdate);
 
         bindButton('open-build-drawer-btn', () => {
             if (state.waveActive || state.game.mode === 'boss') {
