@@ -1,5 +1,6 @@
 import { state } from '../state.js';
 import * as config from '../config.js';
+import { damageSatellite, damageEarth, showGameNotice, drawEnemySprite } from '../main.js';
 
 export class Enemy {
             constructor(wave, profileIndex, theme, isEscort = false, escortIndex = 0, escortTotal = 1) {

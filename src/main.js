@@ -38,7 +38,7 @@ import {
         const playerFighterSprite = new Image();
         playerFighterSprite.src = 'elements/player-fighter.png';
 
-        function drawSatelliteSprite(ctx, type, x, y, size, angle = 0) {
+        export function drawSatelliteSprite(ctx, type, x, y, size, angle = 0) {
             const sprite = satelliteSprites[type];
             if (sprite && sprite.complete && sprite.naturalWidth > 0 && sprite.naturalHeight > 0) {
                 const maxSide = size * 2.7;
@@ -204,7 +204,7 @@ import {
             'Smuggler Ship': 4.6
         };
 
-        function drawEnemySprite(ctx, type, x, y, size, angle = 0) {
+        export function drawEnemySprite(ctx, type, x, y, size, angle = 0) {
             const sprite = enemySprites[type];
             if (!sprite || !sprite.complete || sprite.naturalWidth <= 0 || sprite.naturalHeight <= 0) return false;
 
@@ -1761,7 +1761,7 @@ import {
             return Math.floor(SATELLITE_CONFIGS[tower.type].cost * 0.75 * (tower.level || 1) * multiplier);
         }
 
-        function getSatelliteMaxHp(type) {
+        export function getSatelliteMaxHp(type) {
             const baseHp = 85 + SATELLITE_CONFIGS[type].cost * 0.28;
             let multiplier = 1 + getDirectiveEffectValue('satelliteHp', 0);
             const glass = getDirectiveEffectValue('glassCannon');
@@ -1919,7 +1919,7 @@ import {
                 : 'No command directives acquired.';
         }
 
-        function getTargetedDamageMultiplier(enemy, weaponType = '') {
+        export function getTargetedDamageMultiplier(enemy, weaponType = '') {
             let multiplier = 1;
             if (enemy.category === 'ship' || enemy.category === 'miniboss') multiplier += getDirectiveEffectValue('shipDamage', 0);
             if (enemy.category === 'normal') multiplier += getDirectiveEffectValue('rockDamage', 0);
@@ -2054,7 +2054,7 @@ import {
             }
         }
 
-        function showGameNotice(message, duration = 2400) {
+        export function showGameNotice(message, duration = 2400) {
             const notice = document.getElementById('game-notice');
             if (!notice) return;
             notice.innerHTML = message;
@@ -2179,7 +2179,7 @@ import {
             for (let i = 0; i < count; i++) state.game.particles.push(new Particle(x, y, color));
         }
 
-        function damageSatellite(tower, amount, enemyCategory = null) {
+        export function damageSatellite(tower, amount, enemyCategory = null) {
             if (!tower || !state.game.towers.includes(tower)) return;
 
             let multiplier = 1;
@@ -2201,7 +2201,7 @@ import {
             }
         }
 
-        function damageEarth(incomingBaseDamage) {
+        export function damageEarth(incomingBaseDamage) {
             const damageMultiplier = Math.max(0.15, 1 - getDirectiveEffectValue('coreDamageReduction', 0) + (getDirectiveEffectValue('corePowered') ? getDirectiveEffectValue('corePowered').taken : 0));
             const incomingDamage = Math.max(1, Math.floor(incomingBaseDamage * damageMultiplier));
             const shieldBeforeHit = state.game.earthShield;

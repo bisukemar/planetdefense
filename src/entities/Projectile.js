@@ -1,5 +1,6 @@
 import { state } from '../state.js';
 import * as config from '../config.js';
+import { getTargetedDamageMultiplier } from '../main.js';
 
 export class Projectile {
             constructor(startX, startY, target, type, damage, speed, range) {
