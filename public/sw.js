@@ -1,4 +1,4 @@
-const CACHE_NAME = 'planetary-defense-alpha-0-9-70-137';
+const CACHE_NAME = 'planetary-defense-alpha-0-9-72-139';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -80,8 +80,10 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        const responseCopy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseCopy));
+        if (response && response.status === 200 && response.type === 'basic') {
+            const responseCopy = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseCopy));
+        }
         return response;
       })
       .catch(() => caches.match(event.request))
