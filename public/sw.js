@@ -1,8 +1,7 @@
-const CACHE_NAME = 'planetary-defense-alpha-0-9-72-139';
+const CACHE_NAME = 'planetary-defense-alpha-0-9-72-140';
 const CORE_ASSETS = [
   './',
   './index.html',
-  './styles.css',
   './version.json',
   './manifest.webmanifest',
   './elements/pd_icon.png',
