@@ -2053,7 +2053,7 @@ import {
         }
 
         function showGameNotice(message, duration = 2400) {
-            const notice = document.getElementById('state.game-notice');
+            const notice = document.getElementById('game-notice');
             if (!notice) return;
             notice.innerHTML = message;
             notice.classList.remove('hidden', 'notice-pop');
@@ -4212,7 +4212,7 @@ import {
             playSynthSound('hit');
         }
 
-        bindButton('start-state.game-btn', () => { initAudio(); const introModal = document.getElementById('intro-modal'); if (introModal) introModal.classList.add('hidden'); triggerCleanGameReset(); });
+        bindButton('start-game-btn', () => { initAudio(); const introModal = document.getElementById('intro-modal'); if (introModal) introModal.classList.add('hidden'); triggerCleanGameReset(); });
 
         bindButton('open-settings-options-btn', () => {
             hideTitleSubpanels();
@@ -4350,11 +4350,11 @@ import {
             }
             playSynthSound('upgrade');
         });
-
-        bindButton('resume-state.game-btn', () => { state.game.paused = false; syncBgm(); const pm = document.getElementById('pause-modal'); if (pm) pm.classList.add('hidden'); playSynthSound('upgrade'); });
-        bindButton('pause-restart-state.game-btn', () => { const pm = document.getElementById('pause-modal'); if (pm) pm.classList.add('hidden'); triggerCleanGameReset(); playSynthSound('upgrade'); });
+        bindButton('resume-game-btn', () => { state.game.paused = false; syncBgm(); const pm = document.getElementById('pause-modal'); if (pm) pm.classList.add('hidden'); playSynthSound('upgrade'); });
+        bindButton('pause-restart-game-btn', () => { const pm = document.getElementById('pause-modal'); if (pm) pm.classList.add('hidden'); triggerCleanGameReset(); playSynthSound('upgrade'); });
+        bindButton('pause-encyclopedia-btn', () => { const pm = document.getElementById('pause-modal'); if (pm) pm.classList.add('hidden'); toggleEncyclopedia(); playSynthSound('upgrade'); });
         bindButton('quit-to-menu-btn', () => { state.game.running = false; state.game.paused = false; state.game.mode = 'defense'; resetBossMode(); setBuildControlEnabled(true); switchBgm('default'); const pm = document.getElementById('pause-modal'); if (pm) pm.classList.add('hidden'); const im = document.getElementById('intro-modal'); if (im) im.classList.remove('hidden'); playSynthSound('earth_hit'); checkPendingUpdates(); });
-        bindButton('restart-state.game-btn', triggerCleanGameReset);
+        bindButton('restart-game-btn', triggerCleanGameReset);
         bindButton('gameover-quit-btn', () => { state.game.running = false; state.game.paused = false; state.game.mode = 'defense'; resetBossMode(); setBuildControlEnabled(true); switchBgm('default'); const gm = document.getElementById('gameover-modal'); if (gm) gm.classList.add('hidden'); const im = document.getElementById('intro-modal'); if (im) im.classList.remove('hidden'); playSynthSound('earth_hit'); checkPendingUpdates(); });
         bindButton('mobile-launch-btn', startNextWave);
         bindButton('settings-toggle-btn', triggerPauseToggle);
