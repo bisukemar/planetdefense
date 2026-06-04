@@ -446,36 +446,107 @@ import {
                 .join('');
         }
 
+        const RESEARCH_NODES = {
+            startSlots: { name: 'Initial Orbit Slots', desc: 'Start runs with extra random slots.', tier: 1, costBase: 15, costScale: 20, capstone: 'Start with Level 2 satellite in slot 1.' },
+            baseShield: { name: 'Reinforced Shielding', desc: 'Increase base shield by +25 per level.', tier: 1, costBase: 10, costScale: 15, capstone: 'Planet slowly regenerates 1 shield per second.' },
+            baseDamage: { name: 'Weapons Calibration', desc: 'Increase Tactical Ability damage by +5% per level.', tier: 1, costBase: 20, costScale: 30, capstone: 'Tactical abilities AoE size +15%.' },
+            economyBounty: { name: 'Bounty Hunter', desc: 'Increase gold bounty from enemies by +2% per level.', tier: 2, costBase: 30, costScale: 25, capstone: 'Start each run with a bonus 500 Gold.' },
+            tacticalCooldown: { name: 'Tactical Efficiency', desc: 'Reduce Tactical Ability cooldowns by -2% per level.', tier: 2, costBase: 40, costScale: 35, capstone: 'Tactical abilities start fully charged.' },
+            fighterSpeed: { name: 'Interceptor Engines', desc: 'Increase Boss Fighter speed by +2% per level.', tier: 2, costBase: 25, costScale: 20, capstone: 'Fighter gains 2s invulnerability when damaged.' },
+            cosmicScavenger: { name: 'Cosmic Scavenger', desc: 'Increase Cosmic Data drops by +5% per level.', tier: 3, costBase: 50, costScale: 40, capstone: 'Bosses drop double Cosmic Data.' },
+            fighterHull: { name: 'Reinforced Hull', desc: 'Increase Boss Fighter Max HP by +5% per level.', tier: 3, costBase: 50, costScale: 40, capstone: 'Fighter automatically repairs 1 HP every second.' }
+        };
+
+        function refundResearch() {
+            let refunded = 0;
+            if (!state.research) return;
+            for (const key in state.research) {
+                const node = RESEARCH_NODES[key];
+                if (!node) continue;
+                const lvl = state.research[key];
+                for (let i = 0; i < lvl; i++) {
+                    refunded += node.costBase + (i * node.costScale);
+                }
+                state.research[key] = 0;
+            }
+            state.cosmicData += refunded;
+            saveSettings();
+            updateResearchUI();
+            playSynthSound('upgrade');
+        }
+
         function updateResearchUI() {
             try {
                 const lbl = document.getElementById('lbl-cosmic-data');
                 if (lbl) lbl.innerText = state.cosmicData || 0;
                 const list = document.getElementById('research-upgrades-list');
                 if (!list) return;
-                if (!state.research) state.research = { startSlots: 0, baseShield: 0, baseDamage: 0 };
-                const sSlots = state.research.startSlots || 0;
-                const sShield = state.research.baseShield || 0;
-                const sDmg = state.research.baseDamage || 0;
-                const costs = { startSlots: 15 + sSlots * 20, baseShield: 10 + sShield * 15, baseDamage: 20 + sDmg * 30 };
-                list.innerHTML = `
-                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex justify-between items-center">
-                        <div><div class="text-slate-200 text-xs font-black uppercase tracking-widest">Initial Orbit Slots</div><div class="text-slate-400 text-[9px] mt-0.5">Start runs with extra random slots. (Lvl ${sSlots}/10)</div></div>
-                        <button data-research="startSlots" data-cost="${costs.startSlots}" class="research-btn bg-purple-500 hover:bg-purple-400 active:scale-95 text-slate-950 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all pointer-events-auto select-none ${state.cosmicData >= costs.startSlots && sSlots < 10 ? '' : 'opacity-50 cursor-not-allowed'}">${sSlots >= 10 ? 'MAX' : costs.startSlots + ' CD'}</button>
-                    </div>
-                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex justify-between items-center mt-2">
-                        <div><div class="text-slate-200 text-xs font-black uppercase tracking-widest">Reinforced Shielding</div><div class="text-slate-400 text-[9px] mt-0.5">Increase base shield by +25 per level. (Lvl ${sShield}/10)</div></div>
-                        <button data-research="baseShield" data-cost="${costs.baseShield}" class="research-btn bg-purple-500 hover:bg-purple-400 active:scale-95 text-slate-950 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all pointer-events-auto select-none ${state.cosmicData >= costs.baseShield && sShield < 10 ? '' : 'opacity-50 cursor-not-allowed'}">${sShield >= 10 ? 'MAX' : costs.baseShield + ' CD'}</button>
-                    </div>
-                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex justify-between items-center mt-2">
-                        <div><div class="text-slate-200 text-xs font-black uppercase tracking-widest">Weapons Calibration</div><div class="text-slate-400 text-[9px] mt-0.5">Increase all satellite damage by +5% per level. (Lvl ${sDmg}/10)</div></div>
-                        <button data-research="baseDamage" data-cost="${costs.baseDamage}" class="research-btn bg-purple-500 hover:bg-purple-400 active:scale-95 text-slate-950 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all pointer-events-auto select-none ${state.cosmicData >= costs.baseDamage && sDmg < 10 ? '' : 'opacity-50 cursor-not-allowed'}">${sDmg >= 10 ? 'MAX' : costs.baseDamage + ' CD'}</button>
+
+                if (!state.research) state.research = {};
+                for (const key in RESEARCH_NODES) if (typeof state.research[key] === 'undefined') state.research[key] = 0;
+
+                let totalSpent = 0;
+                for (const key in state.research) totalSpent += state.research[key];
+
+                const tierReq = { 1: 0, 2: 5, 3: 15 };
+
+                let html = `
+                    <div class="mb-3 text-right">
+                        <button id="btn-refund-research" class="bg-red-900/40 hover:bg-red-600/60 border border-red-500/50 text-red-200 px-3 py-1.5 rounded text-[10px] font-black uppercase transition-all">
+                            <i class="fa-solid fa-skull mr-1"></i> Wipe Memory Banks (Refund All)
+                        </button>
                     </div>
                 `;
+
+                for (let t = 1; t <= 3; t++) {
+                    const isLocked = totalSpent < tierReq[t];
+                    html += `<div class="mb-2 mt-4"><span class="text-xs font-black text-slate-300 uppercase tracking-widest border-b border-slate-700 pb-1 w-full flex items-center">
+                                Tier ${t} Upgrades ${isLocked ? `<span class="text-[9px] text-red-400 ml-2"><i class="fa-solid fa-lock mr-1"></i> Requires ${tierReq[t]} Total Levels</span>` : ''}
+                             </span></div>`;
+
+                    for (const key in RESEARCH_NODES) {
+                        const node = RESEARCH_NODES[key];
+                        if (node.tier !== t) continue;
+
+                        const lvl = state.research[key];
+                        const cost = node.costBase + (lvl * node.costScale);
+                        const isMax = lvl >= 10;
+                        const canAfford = state.cosmicData >= cost && !isMax && !isLocked;
+
+                        html += `
+                            <div class="bg-slate-900 border ${isMax ? 'border-purple-500/50 shadow-[0_0_10px_rgba(168,85,247,0.2)]' : 'border-slate-800'} rounded-lg p-3 flex flex-col mt-2 relative overflow-hidden ${isLocked ? 'opacity-50 grayscale' : ''}">
+                                ${isMax ? '<div class="absolute top-0 right-0 bg-purple-600 text-white text-[8px] font-black px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">Capstone Active</div>' : ''}
+                                <div class="flex justify-between items-center w-full">
+                                    <div class="pr-2">
+                                        <div class="text-slate-200 text-xs font-black uppercase tracking-widest ${isMax ? 'text-purple-300' : ''}">${node.name}</div>
+                                        <div class="text-slate-400 text-[9px] mt-0.5">${node.desc} (Lvl ${lvl}/10)</div>
+                                        <div class="text-[9px] font-bold ${isMax ? 'text-emerald-400' : 'text-slate-500'} mt-1 flex items-center"><i class="fa-solid fa-crown mr-1"></i> ${node.capstone}</div>
+                                    </div>
+                                    <button data-research="${key}" data-cost="${cost}" class="research-btn shrink-0 bg-purple-500 hover:bg-purple-400 active:scale-95 text-slate-950 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all pointer-events-auto select-none ${canAfford ? '' : 'opacity-50 cursor-not-allowed'}" ${isLocked ? 'disabled' : ''}>
+                                        ${isMax ? 'MAX' : cost + ' CD'}
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                list.innerHTML = html;
+
+                const refundBtn = document.getElementById('btn-refund-research');
+                if (refundBtn) refundBtn.addEventListener('click', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    if (confirm('Are you sure you want to refund all research upgrades? 100% of your Cosmic Data will be returned.')) {
+                        refundResearch();
+                    }
+                });
 
                 document.querySelectorAll('.research-btn').forEach(btn => {
                     btn.addEventListener('pointerdown', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
+                        if (btn.hasAttribute('disabled')) return;
+                        
                         const key = btn.getAttribute('data-research');
                         const cost = parseInt(btn.getAttribute('data-cost'), 10);
                         const currentLvl = state.research[key] || 0;
