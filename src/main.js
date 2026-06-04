@@ -2967,13 +2967,28 @@ import {
                 
                 if (state.bossMode.boss) {
                     const finalY = getBossPlayTop() + 46 * state.gameScale;
-                    const startY = -150 * state.gameScale;
-                    const progress = 1 - (state.bossMode.bossTimer / 180);
-                    const easeOut = 1 - Math.pow(1 - progress, 3);
-                    state.bossMode.boss.y = startY + (finalY - startY) * easeOut;
+                    const startY = -250 * state.gameScale;
                     
-                    state.bossMode.boss.drift = (state.bossMode.boss.drift || 0) + 0.011;
-                    state.bossMode.boss.x = canvas.width / 2 + Math.sin(state.bossMode.boss.drift) * canvas.width * 0.22;
+                    if (state.bossMode.bossTimer > 100) {
+                        state.bossMode.boss.y = startY;
+                    } else if (state.bossMode.bossTimer > 70) {
+                        const dropProgress = 1 - ((state.bossMode.bossTimer - 70) / 30);
+                        const easeIn = Math.pow(dropProgress, 3);
+                        state.bossMode.boss.y = startY + (finalY - startY) * easeIn;
+                    } else {
+                        if (state.bossMode.bossTimer === 70) {
+                            state.game.cameraShake = 45;
+                            state.bossMode.flashAlpha = 1.0;
+                            playSynthSound('earth_hit');
+                            playSynthSound('explosion');
+                            for (let i = 0; i < 12; i++) {
+                                createExplosion(state.bossMode.boss.x + (Math.random()-0.5)*200, state.bossMode.boss.y + (Math.random()-0.5)*150, '#ef4444', 35);
+                            }
+                        }
+                        state.bossMode.boss.y = finalY;
+                        state.bossMode.boss.drift = (state.bossMode.boss.drift || 0) + 0.011;
+                        state.bossMode.boss.x = canvas.width / 2 + Math.sin(state.bossMode.boss.drift) * canvas.width * 0.22;
+                    }
                 }
 
                 if (state.bossMode.bossTimer <= 0) {
@@ -3622,6 +3637,13 @@ import {
                     ctx.fillRect(drop.x - 10 * state.gameScale, drop.y - 4 * state.gameScale, 20 * state.gameScale, 8 * state.gameScale);
                 }
                 ctx.restore();
+            }
+            if (state.bossMode.flashAlpha > 0) {
+                ctx.save();
+                ctx.fillStyle = `rgba(255, 255, 255, ${state.bossMode.flashAlpha})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.restore();
+                state.bossMode.flashAlpha -= 0.03;
             }
         }
 
