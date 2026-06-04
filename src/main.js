@@ -210,7 +210,8 @@ import {
         };
 
         export function drawEnemySprite(ctx, type, x, y, size, angle = 0) {
-            const sprite = enemySprites[type];
+            const src = ENEMY_SPRITE_FILES[type];
+            const sprite = (window.loadedImagesCache && window.loadedImagesCache[src]) ? window.loadedImagesCache[src] : enemySprites[type];
             if (!sprite || !sprite.complete || sprite.naturalWidth <= 0 || sprite.naturalHeight <= 0) return false;
 
             const maxSide = size * (ENEMY_SPRITE_SCALE[type] || 3.2);
@@ -3434,12 +3435,9 @@ import {
             if (state.modeTransitionActive) return;
             const failedModal = document.getElementById('boss-failed-modal');
             showModeTransition('Returning To Defense Grid', 'Orbital command restored', 'fa-satellite', 1450, () => {
-                if (failedModal) failedModal.classList.add('hidden');
-                state.bossMode.active = false;
-                state.bossMode.phase = 'idle';
                 state.game.mode = 'defense';
-                document.body.classList.remove('boss-mode-active');
                 switchBgm('default');
+                resetBossMode();
                 setBuildControlEnabled(true);
                 suppressStarterTooltips(false);
                 state.game.wave++;
@@ -3658,12 +3656,9 @@ import {
             if (hud) hud.classList.add('hidden');
             state.bossMode.phase = 'transition';
             showModeTransition('Returning To Defense Grid', 'Command Directive uploaded', 'fa-satellite', 1450, () => {
-                if (modal) modal.classList.add('hidden');
-                state.bossMode.active = false;
-                updateRepairButton();
                 state.game.mode = 'defense';
-                document.body.classList.remove('boss-mode-active');
                 switchBgm('default');
+                resetBossMode();
                 setBuildControlEnabled(true);
                 suppressStarterTooltips(false);
                 state.game.wave++;

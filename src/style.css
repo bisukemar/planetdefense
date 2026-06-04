@@ -161,3 +161,5 @@
                 filter: brightness(1.2);
             }
         }
+
+body.boss-mode-active #bottom-action-panel, body.boss-mode-active #inspector-panel, body.boss-mode-active #orbit-inspector-panel, body.boss-mode-active #top-hud, body.boss-mode-active #mobile-hud { display: none !important; }
