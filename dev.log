@@ -29,3 +29,6 @@ Port 3000 is in use, trying another one...
 8:54:28 AM [vite] (client) [console.warn] cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
 8:58:00 AM [vite] (client) [console.warn] cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
 8:59:15 AM [vite] (client) [console.warn] cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+2:19:25 PM [vite] (client) page reload index.html
+2:20:11 PM [vite] (client) hmr update /styles.css?direct
+2:21:11 PM [vite] (client) page reload index.html

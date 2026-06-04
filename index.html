@@ -1049,12 +1049,21 @@
                             class="text-slate-400 hover:text-white p-2 text-sm select-none"><i
                                 class="fa-solid fa-xmark"></i></button>
                     </div>
-                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center mb-2">
-                        <div class="text-slate-400 text-[10px] uppercase tracking-widest">Available Cosmic Data</div>
-                        <div class="text-purple-300 text-xl font-black mt-1"><span id="lbl-cosmic-data">0</span> <i
-                                class="fa-solid fa-star text-sm"></i></div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center mb-2 shrink-0 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-900/20 via-slate-900/0 to-transparent"></div>
+                        <div class="text-slate-400 text-[10px] uppercase tracking-widest relative z-10">Available Cosmic Data</div>
+                        <div class="text-purple-300 text-xl font-black mt-1 relative z-10"><span id="lbl-cosmic-data">0</span> <i class="fa-solid fa-star text-sm"></i></div>
                     </div>
-                    <div class="space-y-2" id="research-upgrades-list"></div>
+                    
+                    <div class="flex-1 relative bg-slate-950 border border-slate-800 rounded-xl overflow-hidden" id="skill-tree-viewport">
+                        <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(#4f46e5 1px, transparent 1px); background-size: 20px 20px;"></div>
+                        <svg id="skill-tree-lines" class="absolute inset-0 w-full h-full pointer-events-none z-0"></svg>
+                        <div id="research-upgrades-list" class="relative z-10 w-full h-full overflow-auto p-8 flex justify-center gap-12 sm:gap-24"></div>
+                    </div>
+                    
+                    <button id="btn-wipe-memory" class="mt-auto shrink-0 w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-[10px] uppercase tracking-widest font-bold text-slate-400 hover:text-red-400 transition-colors">
+                        <i class="fa-solid fa-skull mr-1"></i> Wipe Memory Banks
+                    </button>
                 </div>
             </div>
             <div class="text-center text-[10px] text-slate-500 select-none font-bold">
@@ -1314,6 +1323,7 @@
     </div>
 
     <!-- MAIN CONSOLIDATED SCRIPT BLOCK -->
+    <div id="skill-tooltip" class="fixed z-[100] bg-slate-900 border border-slate-700 p-3 rounded-lg shadow-2xl pointer-events-none hidden max-w-xs transition-opacity duration-100 opacity-0"></div>
     <script type="module" src="/src/main.js"></script>
 </body>
 

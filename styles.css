@@ -376,3 +376,103 @@ body.boss-mode-active .notice-safe-top {
     18% { opacity: 1; }
     100% { transform: translateX(90%) rotate(10deg); opacity: 0; }
 }
+
+/* Skill Tree Overhaul Styles */
+.skill-node {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    border: 3px solid #334155;
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.skill-node:hover {
+    transform: scale(1.05);
+    border-color: #64748b;
+}
+
+.skill-node-locked {
+    filter: grayscale(1) opacity(0.5);
+    cursor: not-allowed;
+}
+
+.skill-node-active {
+    border-color: #a855f7;
+    background: #3b0764;
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+.skill-node-max {
+    border-color: #fbbf24;
+    background: #78350f;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
+}
+
+.skill-node-icon {
+    font-size: 1.5rem;
+    color: #cbd5e1;
+    transition: color 0.2s;
+}
+
+.skill-node-active .skill-node-icon {
+    color: #e9d5ff;
+}
+
+.skill-node-max .skill-node-icon {
+    color: #fde68a;
+}
+
+.skill-node-level {
+    position: absolute;
+    bottom: -8px;
+    right: -8px;
+    background: #0f172a;
+    border: 2px solid #334155;
+    color: #cbd5e1;
+    font-size: 0.6rem;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 9999px;
+    pointer-events: none;
+}
+
+.skill-node-active .skill-node-level {
+    border-color: #a855f7;
+    color: #e9d5ff;
+}
+
+.skill-node-max .skill-node-level {
+    border-color: #fbbf24;
+    color: #fde68a;
+    background: #451a03;
+}
+
+.skill-tree-line {
+    stroke: #334155;
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: stroke 0.3s ease;
+}
+
+.skill-tree-line-active {
+    stroke: #a855f7;
+    stroke-width: 4;
+    filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.6));
+}
+
+@keyframes node-upgrade-flash {
+    0% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 255, 255, 0); border-color: #fff; }
+    50% { transform: scale(1.15); box-shadow: 0 0 30px rgba(168, 85, 247, 0.8); border-color: #e9d5ff; background: #9333ea; }
+    100% { transform: scale(1); }
+}
+
+.animate-node-upgrade {
+    animation: node-upgrade-flash 0.4s ease-out forwards;
+}

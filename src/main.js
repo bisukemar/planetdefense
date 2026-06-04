@@ -447,14 +447,16 @@ import {
         }
 
         const RESEARCH_NODES = {
-            startSlots: { name: 'Initial Orbit Slots', desc: 'Start runs with extra random slots.', tier: 1, costBase: 15, costScale: 20, capstone: 'Start with Level 2 satellite in slot 1.' },
-            baseShield: { name: 'Reinforced Shielding', desc: 'Increase base shield by +25 per level.', tier: 1, costBase: 10, costScale: 15, capstone: 'Planet slowly regenerates 1 shield per second.' },
-            baseDamage: { name: 'Weapons Calibration', desc: 'Increase Tactical Ability damage by +5% per level.', tier: 1, costBase: 20, costScale: 30, capstone: 'Tactical abilities AoE size +15%.' },
-            economyBounty: { name: 'Bounty Hunter', desc: 'Increase gold bounty from enemies by +2% per level.', tier: 2, costBase: 30, costScale: 25, capstone: 'Start each run with a bonus 500 Gold.' },
-            tacticalCooldown: { name: 'Tactical Efficiency', desc: 'Reduce Tactical Ability cooldowns by -2% per level.', tier: 2, costBase: 40, costScale: 35, capstone: 'Tactical abilities start fully charged.' },
-            fighterSpeed: { name: 'Interceptor Engines', desc: 'Increase Boss Fighter speed by +2% per level.', tier: 2, costBase: 25, costScale: 20, capstone: 'Fighter gains 2s invulnerability when damaged.' },
-            cosmicScavenger: { name: 'Cosmic Scavenger', desc: 'Increase Cosmic Data drops by +5% per level.', tier: 3, costBase: 50, costScale: 40, capstone: 'Bosses drop double Cosmic Data.' },
-            fighterHull: { name: 'Reinforced Hull', desc: 'Increase Boss Fighter Max HP by +5% per level.', tier: 3, costBase: 50, costScale: 40, capstone: 'Fighter automatically repairs 1 HP every second.' }
+            baseShield: { name: 'Reinforced Shielding', desc: 'Increase base shield by +25 per level.', branch: 0, row: 0, costBase: 10, costScale: 15, capstone: 'Planet slowly regenerates 1 shield per second.', icon: 'fa-shield-halved' },
+            fighterSpeed: { name: 'Interceptor Engines', desc: 'Increase Boss Fighter speed by +2% per level.', branch: 0, row: 1, costBase: 25, costScale: 20, capstone: 'Fighter gains 2s invulnerability when damaged.', parent: 'baseShield', reqLevel: 5, icon: 'fa-gauge-high' },
+            fighterHull: { name: 'Reinforced Hull', desc: 'Increase Boss Fighter Max HP by +5% per level.', branch: 0, row: 2, costBase: 50, costScale: 40, capstone: 'Fighter automatically repairs 1 HP every second.', parent: 'fighterSpeed', reqLevel: 5, icon: 'fa-hammer' },
+
+            baseDamage: { name: 'Weapons Calibration', desc: 'Increase Tactical Ability damage by +5% per level.', branch: 1, row: 0, costBase: 20, costScale: 30, capstone: 'Tactical abilities AoE size +15%.', icon: 'fa-crosshairs' },
+            tacticalCooldown: { name: 'Tactical Efficiency', desc: 'Reduce Tactical Ability cooldowns by -2% per level.', branch: 1, row: 1, costBase: 40, costScale: 35, capstone: 'Tactical abilities start fully charged.', parent: 'baseDamage', reqLevel: 5, icon: 'fa-stopwatch' },
+            cosmicScavenger: { name: 'Cosmic Scavenger', desc: 'Increase Cosmic Data drops by +5% per level.', branch: 1, row: 2, costBase: 50, costScale: 40, capstone: 'Bosses drop double Cosmic Data.', parent: 'tacticalCooldown', reqLevel: 5, icon: 'fa-meteor' },
+
+            startSlots: { name: 'Initial Orbit Slots', desc: 'Start runs with extra random slots.', branch: 2, row: 0, costBase: 15, costScale: 20, capstone: 'Start with Level 2 satellite in slot 1.', icon: 'fa-satellite' },
+            economyBounty: { name: 'Bounty Hunter', desc: 'Increase gold bounty from enemies by +2% per level.', branch: 2, row: 1, costBase: 30, costScale: 25, capstone: 'Start each run with a bonus 500 Gold.', parent: 'startSlots', reqLevel: 5, icon: 'fa-sack-dollar' }
         };
 
         function refundResearch() {
@@ -485,81 +487,200 @@ import {
                 if (!state.research) state.research = {};
                 for (const key in RESEARCH_NODES) if (typeof state.research[key] === 'undefined') state.research[key] = 0;
 
-                let totalSpent = 0;
-                for (const key in state.research) totalSpent += state.research[key];
+                let html = '';
+                
+                // Group nodes by branch
+                const branches = [[], [], []];
+                for (const key in RESEARCH_NODES) {
+                    const node = RESEARCH_NODES[key];
+                    node.id = key;
+                    branches[node.branch].push(node);
+                }
+                
+                // Sort each branch by row
+                branches.forEach(b => b.sort((a, b) => a.row - b.row));
 
-                const tierReq = { 1: 0, 2: 5, 3: 15 };
-
-                let html = `
-                    <div class="mb-3 text-right">
-                        <button id="btn-refund-research" class="bg-red-900/40 hover:bg-red-600/60 border border-red-500/50 text-red-200 px-3 py-1.5 rounded text-[10px] font-black uppercase transition-all">
-                            <i class="fa-solid fa-skull mr-1"></i> Wipe Memory Banks (Refund All)
-                        </button>
-                    </div>
-                `;
-
-                for (let t = 1; t <= 3; t++) {
-                    const isLocked = totalSpent < tierReq[t];
-                    html += `<div class="mb-2 mt-4"><span class="text-xs font-black text-slate-300 uppercase tracking-widest border-b border-slate-700 pb-1 w-full flex items-center">
-                                Tier ${t} Upgrades ${isLocked ? `<span class="text-[9px] text-red-400 ml-2"><i class="fa-solid fa-lock mr-1"></i> Requires ${tierReq[t]} Total Levels</span>` : ''}
-                             </span></div>`;
-
-                    for (const key in RESEARCH_NODES) {
-                        const node = RESEARCH_NODES[key];
-                        if (node.tier !== t) continue;
-
-                        const lvl = state.research[key];
-                        const cost = node.costBase + (lvl * node.costScale);
+                branches.forEach((branchNodes, bIndex) => {
+                    html += `<div class="flex flex-col items-center gap-16 relative z-10 w-20">`;
+                    
+                    branchNodes.forEach((node) => {
+                        const lvl = state.research[node.id];
                         const isMax = lvl >= 10;
+                        const cost = node.costBase + (lvl * node.costScale);
+                        
+                        let isLocked = false;
+                        if (node.parent) {
+                            const parentLvl = state.research[node.parent] || 0;
+                            if (parentLvl < node.reqLevel) isLocked = true;
+                        }
+                        
                         const canAfford = state.cosmicData >= cost && !isMax && !isLocked;
+                        
+                        let stateClass = 'skill-node-locked';
+                        if (!isLocked) {
+                            if (isMax) stateClass = 'skill-node-max';
+                            else if (lvl > 0) stateClass = 'skill-node-active';
+                            else stateClass = '';
+                        }
+
+                        // We pass tooltip data as attributes to be read by JS
+                        const tooltipData = encodeURIComponent(JSON.stringify({
+                            name: node.name,
+                            desc: node.desc,
+                            lvl: lvl,
+                            capstone: node.capstone,
+                            isLocked: isLocked,
+                            reqNodeName: node.parent ? RESEARCH_NODES[node.parent].name : '',
+                            reqLevel: node.reqLevel,
+                            isMax: isMax,
+                            cost: cost
+                        }));
 
                         html += `
-                            <div class="bg-slate-900 border ${isMax ? 'border-purple-500/50 shadow-[0_0_10px_rgba(168,85,247,0.2)]' : 'border-slate-800'} rounded-lg p-3 flex flex-col mt-2 relative overflow-hidden ${isLocked ? 'opacity-50 grayscale' : ''}">
-                                ${isMax ? '<div class="absolute top-0 right-0 bg-purple-600 text-white text-[8px] font-black px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">Capstone Active</div>' : ''}
-                                <div class="flex justify-between items-center w-full">
-                                    <div class="pr-2">
-                                        <div class="text-slate-200 text-xs font-black uppercase tracking-widest ${isMax ? 'text-purple-300' : ''}">${node.name}</div>
-                                        <div class="text-slate-400 text-[9px] mt-0.5">${node.desc} (Lvl ${lvl}/10)</div>
-                                        <div class="text-[9px] font-bold ${isMax ? 'text-emerald-400' : 'text-slate-500'} mt-1 flex items-center"><i class="fa-solid fa-crown mr-1"></i> ${node.capstone}</div>
-                                    </div>
-                                    <button data-research="${key}" data-cost="${cost}" class="research-btn shrink-0 bg-purple-500 hover:bg-purple-400 active:scale-95 text-slate-950 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all pointer-events-auto select-none ${canAfford ? '' : 'opacity-50 cursor-not-allowed'}" ${isLocked ? 'disabled' : ''}>
-                                        ${isMax ? 'MAX' : cost + ' CD'}
-                                    </button>
-                                </div>
+                            <div id="node-${node.id}" data-research="${node.id}" data-cost="${cost}" data-locked="${isLocked}" data-tooltip="${tooltipData}"
+                                class="skill-node ${stateClass} group pointer-events-auto">
+                                ${isLocked ? '<i class="fa-solid fa-lock absolute text-slate-400 text-3xl z-20"></i>' : ''}
+                                <i class="fa-solid ${node.icon} skill-node-icon ${isLocked ? 'opacity-20' : ''}"></i>
+                                <div class="skill-node-level ${isLocked ? 'hidden' : ''}">${lvl}/10</div>
                             </div>
                         `;
-                    }
-                }
+                    });
+                    
+                    html += `</div>`;
+                });
 
                 list.innerHTML = html;
 
-                const refundBtn = document.getElementById('btn-refund-research');
-                if (refundBtn) refundBtn.addEventListener('click', (e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    if (confirm('Are you sure you want to refund all research upgrades? 100% of your Cosmic Data will be returned.')) {
-                        refundResearch();
-                    }
-                });
+                const refundBtn = document.getElementById('btn-wipe-memory');
+                if (refundBtn) {
+                    const newBtn = refundBtn.cloneNode(true);
+                    refundBtn.parentNode.replaceChild(newBtn, refundBtn);
+                    newBtn.addEventListener('click', (e) => {
+                        e.preventDefault(); e.stopPropagation();
+                        if (confirm('Are you sure you want to refund all research upgrades? 100% of your Cosmic Data will be returned.')) {
+                            refundResearch();
+                        }
+                    });
+                }
 
-                document.querySelectorAll('.research-btn').forEach(btn => {
-                    btn.addEventListener('pointerdown', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (btn.hasAttribute('disabled')) return;
+                // Tooltip Logic
+                const tooltipEl = document.getElementById('skill-tooltip');
+                document.querySelectorAll('.skill-node').forEach(nodeEl => {
+                    nodeEl.addEventListener('mouseenter', () => {
+                        if (!tooltipEl) return;
+                        const data = JSON.parse(decodeURIComponent(nodeEl.getAttribute('data-tooltip')));
+                        const rect = nodeEl.getBoundingClientRect();
                         
-                        const key = btn.getAttribute('data-research');
-                        const cost = parseInt(btn.getAttribute('data-cost'), 10);
-                        const currentLvl = state.research[key] || 0;
-                        if (state.cosmicData >= cost && currentLvl < 10) {
-                            state.cosmicData -= cost; state.research[key] = currentLvl + 1; saveSettings(); updateResearchUI(); playSynthSound('upgrade');
+                        let statusHtml = '';
+                        if (data.isLocked) {
+                            statusHtml = `<div class="text-[10px] text-red-400 font-bold"><i class="fa-solid fa-lock mr-1"></i> Requires ${data.reqNodeName} Lvl ${data.reqLevel}</div>`;
+                        } else if (data.isMax) {
+                            statusHtml = `<div class="text-[10px] text-purple-400 font-bold">Max Level Reached</div>`;
                         } else {
-                            if (currentLvl < 10) showGameNotice('<i class="fa-solid fa-triangle-exclamation mr-1"></i> Not enough Cosmic Data', 2000);
-                            playSynthSound('hit');
+                            statusHtml = `<div class="text-[10px] text-purple-300 font-bold">Cost: ${data.cost} CD</div>`;
+                        }
+
+                        tooltipEl.innerHTML = `
+                            <div class="text-xs font-black text-white uppercase tracking-widest mb-1">${data.name}</div>
+                            <div class="text-[10px] text-slate-400 mb-2 leading-tight">${data.desc}</div>
+                            <div class="text-[10px] font-bold text-emerald-400 mb-2"><i class="fa-solid fa-crown mr-1"></i> ${data.capstone}</div>
+                            ${statusHtml}
+                        `;
+                        
+                        const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+                        let left = rect.right + 16;
+                        if (left + 250 > vw) left = rect.left - 266; // Flip to left side if no space
+                        
+                        tooltipEl.style.left = left + 'px';
+                        tooltipEl.style.top = rect.top + 'px';
+                        tooltipEl.classList.remove('hidden');
+                        requestAnimationFrame(() => tooltipEl.classList.remove('opacity-0'));
+                    });
+                    
+                    nodeEl.addEventListener('mouseleave', () => {
+                        if (tooltipEl) {
+                            tooltipEl.classList.add('opacity-0');
+                            setTimeout(() => tooltipEl.classList.add('hidden'), 100);
+                        }
+                    });
+
+                    nodeEl.addEventListener('pointerdown', (e) => {
+                        e.preventDefault(); e.stopPropagation();
+                        if (nodeEl.getAttribute('data-locked') === 'true') {
+                            playSynthSound('error');
+                            return;
+                        }
+                        
+                        const key = nodeEl.getAttribute('data-research');
+                        const cost = parseInt(nodeEl.getAttribute('data-cost'), 10);
+                        const currentLvl = state.research[key] || 0;
+                        
+                        if (state.cosmicData >= cost && currentLvl < 10) {
+                            state.cosmicData -= cost;
+                            state.research[key]++;
+                            saveSettings();
+                            playSynthSound('upgrade');
+                            nodeEl.classList.add('animate-node-upgrade');
+                            setTimeout(() => {
+                                updateResearchUI();
+                            }, 400); // Wait for animation before re-rendering
+                        } else {
+                            playSynthSound('error');
+                            if (currentLvl < 10) {
+                                showGameNotice('<i class="fa-solid fa-triangle-exclamation mr-1"></i> Not enough Cosmic Data', 2000);
+                            }
                         }
                     });
                 });
-            } catch (e) { console.warn("Error updating research UI", e); }
+
+                requestAnimationFrame(() => {
+                    drawSkillTreeLines();
+                    // Add window resize listener to redraw lines if viewport changes
+                    window.addEventListener('resize', drawSkillTreeLines, { passive: true });
+                });
+
+            } catch (err) {
+                console.error("Error updating research UI:", err);
+            }
         }
+
+        window.drawSkillTreeLines = function() {
+            const svg = document.getElementById('skill-tree-lines');
+            const viewport = document.getElementById('skill-tree-viewport');
+            if (!svg || !viewport) return;
+            
+            svg.innerHTML = '';
+            const viewportRect = viewport.getBoundingClientRect();
+            
+            for (const key in RESEARCH_NODES) {
+                const node = RESEARCH_NODES[key];
+                if (node.parent) {
+                    const childEl = document.getElementById(`node-${key}`);
+                    const parentEl = document.getElementById(`node-${node.parent}`);
+                    if (!childEl || !parentEl) continue;
+                    
+                    const cRect = childEl.getBoundingClientRect();
+                    const pRect = parentEl.getBoundingClientRect();
+                    
+                    const x1 = pRect.left + pRect.width / 2 - viewportRect.left;
+                    const y1 = pRect.top + pRect.height / 2 - viewportRect.top;
+                    const x2 = cRect.left + cRect.width / 2 - viewportRect.left;
+                    const y2 = cRect.top + cRect.height / 2 - viewportRect.top;
+                    
+                    const parentLvl = state.research[node.parent] || 0;
+                    const isUnlocked = parentLvl >= node.reqLevel;
+                    
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', x1);
+                    line.setAttribute('y1', y1);
+                    line.setAttribute('x2', x2);
+                    line.setAttribute('y2', y2);
+                    line.setAttribute('class', `skill-tree-line ${isUnlocked ? 'skill-tree-line-active' : ''}`);
+                    
+                    svg.appendChild(line);
+                }
+            }
+        };
 
         function scrollEncyclopediaTo(sectionKey) {
             const scrollBody = document.getElementById('encyclopedia-scroll-body');
