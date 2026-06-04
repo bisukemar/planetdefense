@@ -2797,8 +2797,21 @@ import {
 
         function killBossModeEnemy(eIndex) {
             const enemy = state.bossMode.enemies[eIndex];
-            createExplosion(enemy.x, enemy.y, enemy.color, 8);
-            playSynthSound(enemy.category === 'normal' ? 'rock_destroy' : 'ship_destroy');
+            
+            if (enemy.category === 'gatekeeper') {
+                createExplosion(enemy.x, enemy.y, enemy.color, 25);
+                playSynthSound('ship_destroy');
+                for (let i = 1; i <= 5; i++) {
+                    setTimeout(() => {
+                        if (!state.game.running || !state.bossMode.active) return;
+                        createExplosion(enemy.x + (Math.random() - 0.5) * 80 * state.gameScale, enemy.y + (Math.random() - 0.5) * 80 * state.gameScale, '#fbbf24', 15);
+                        playSynthSound('rock_destroy');
+                    }, i * 250);
+                }
+            } else {
+                createExplosion(enemy.x, enemy.y, enemy.color, 8);
+                playSynthSound(enemy.category === 'normal' ? 'rock_destroy' : 'ship_destroy');
+            }
 
             if ((enemy.category === 'ship' || enemy.category === 'miniboss' || enemy.category === 'gatekeeper') && Math.random() < (enemy.category === 'gatekeeper' ? 1.0 : 0.25)) {
                 state.bossMode.drops.push({ x: enemy.x, y: enemy.y, type: 'weapon', enhancement: BOSS_WEAPON_ENHANCEMENTS[Math.floor(Math.random() * BOSS_WEAPON_ENHANCEMENTS.length)] });
@@ -2951,6 +2964,18 @@ import {
                 }
             } else if (state.bossMode.phase === 'boss-approach') {
                 state.bossMode.bossTimer--;
+                
+                if (state.bossMode.boss) {
+                    const finalY = getBossPlayTop() + 46 * state.gameScale;
+                    const startY = -150 * state.gameScale;
+                    const progress = 1 - (state.bossMode.bossTimer / 180);
+                    const easeOut = 1 - Math.pow(1 - progress, 3);
+                    state.bossMode.boss.y = startY + (finalY - startY) * easeOut;
+                    
+                    state.bossMode.boss.drift = (state.bossMode.boss.drift || 0) + 0.011;
+                    state.bossMode.boss.x = canvas.width / 2 + Math.sin(state.bossMode.boss.drift) * canvas.width * 0.22;
+                }
+
                 if (state.bossMode.bossTimer <= 0) {
                     state.bossMode.phase = 'boss';
                     showGameNotice(`<i class="fa-solid fa-skull-crossbones mr-1"></i> ${state.bossMode.boss.config.name} has entered orbit`, 2400);
@@ -3496,7 +3521,7 @@ import {
                     ctx.restore();
                 }
             }
-            if (state.bossMode.phase === 'boss' && state.bossMode.boss) {
+            if ((state.bossMode.phase === 'boss' || state.bossMode.phase === 'boss-approach') && state.bossMode.boss) {
                 if (state.bossMode.boss.state === 'telegraph') {
                     ctx.save();
                     ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
