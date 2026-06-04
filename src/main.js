@@ -2752,8 +2752,8 @@ import {
             state.bossMode.enemies.push({
                 type: profile.type, category: 'gatekeeper', color: '#fbbf24',
                 x: canvas.width / 2, y: playTop - 40 * state.gameScale, size, hitRadius: size * spriteScale * 0.34,
-                hp: Math.floor(profile.maxHp * 8 * (1 + state.game.wave * 0.05)),
-                maxHp: Math.floor(profile.maxHp * 8 * (1 + state.game.wave * 0.05)),
+                hp: Math.floor(profile.maxHp * 4 * (1 + state.game.wave * 0.05)),
+                maxHp: Math.floor(profile.maxHp * 4 * (1 + state.game.wave * 0.05)),
                 speed: profile.speed * state.gameScale * 0.4, damage: profile.damage * 2, cooldown: 45,
                 id: Math.random().toString(36).substring(2, 9), isGatekeeper: true
             });
@@ -3176,7 +3176,7 @@ import {
                         enemy.y += enemy.speed;
                     } else {
                         enemy.y = bossTargetY;
-                        enemy.drift = (enemy.drift || 0) + 0.015;
+                        enemy.drift = (enemy.drift || 0) + 0.007;
                         enemy.x = canvas.width / 2 + Math.sin(enemy.drift) * canvas.width * 0.22;
                     }
                 } else {
