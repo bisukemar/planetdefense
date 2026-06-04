@@ -620,17 +620,6 @@ import {
                 }
             }
 
-            if (isWarping) {
-                ctx.translate(w / 2, h / 2);
-                ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)';
-                ctx.lineWidth = 2 * state.gameScale;
-                ctx.setLineDash([40, 20]);
-                ctx.lineDashOffset = -((Date.now() / 20) % 20);
-                for (let i = 0; i < 16; i++) {
-                    ctx.rotate((Math.PI * 2) / 16);
-                    ctx.beginPath(); ctx.moveTo(60 * state.gameScale, 0); ctx.lineTo(Math.max(w, h), 0); ctx.stroke();
-                }
-            }
             ctx.globalAlpha = 1;
             ctx.restore();
         }
@@ -3215,7 +3204,6 @@ import {
                     continue;
                 }
                 if (enemy.y > canvas.height + 40) {
-                    player.hp -= enemy.damage;
                     state.bossMode.enemies.splice(i, 1);
                 }
             }
