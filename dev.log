@@ -1,0 +1,26 @@
+
+> pdefense@1.0.0 dev
+> vite
+
+Port 3000 is in use, trying another one...
+
+  VITE v8.0.16  ready in 64 ms
+
+  ➜  Local:   http://localhost:3001/
+  ➜  Network: use --host to expose
+8:26:55 AM [vite] (client) [console.warn] cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+8:26:55 AM [vite] (client) [console.warn] cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+8:27:18 AM [vite] (client) [Unhandled error] ReferenceError: gameScale is not defined
+ > updateBossMode src/main.js:3125:51
+    3123 |                      if (enemy.cooldown <= 0) {
+    3124 |                          const isGk = enemy.category === 'gatekeeper';
+    3125 |                          const pSpeed = isGk ? 8 * gameScale : 6 * state.gameScale;
+         |                                                     ^
+    3126 |                          const pRadius = isGk ? 6 * gameScale : 4 * state.gameScale;
+    3127 |                          fireBossProjectile(enemy.x, enemy.y + enemy.size, Math.PI / 2, pSpeed, enemy.damage, enemy.co...
+ > loop src/main.js:4673:25
+
+8:28:47 AM [vite] (client) [console.warn] cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+8:28:47 AM [vite] (client) [console.warn] cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+8:31:47 AM [vite] (client) [console.warn] cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+8:31:49 AM [vite] (client) [console.warn] cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation

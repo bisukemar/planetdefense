@@ -481,6 +481,7 @@ import {
                         if (state.cosmicData >= cost && currentLvl < 10) {
                             state.cosmicData -= cost; state.research[key] = currentLvl + 1; saveSettings(); updateResearchUI(); playSynthSound('upgrade');
                         } else {
+                            if (currentLvl < 10) showGameNotice('<i class="fa-solid fa-triangle-exclamation mr-1"></i> Not enough Cosmic Data', 2000);
                             playSynthSound('hit');
                         }
                     });
@@ -927,7 +928,7 @@ import {
             setTimeout(() => window.location.reload(), 100);
         }
 
-        async function checkForAppUpdate(registration) {
+        async function checkForAppUpdate(registration, forceApply = false) {
             if (!canUsePwaFeatures()) return false;
             if (registration) state.swRegistration = registration;
             try {
@@ -940,8 +941,8 @@ import {
                 const data = await response.json();
                 if (!data.version || data.version === APP_VERSION) return false;
 
-                // If the state.game is actively running, set a flag and apply the update later
-                if (state.game && state.game.running) {
+                // If the state.game is actively running and not forced, set a flag and apply the update later
+                if (!forceApply && state.game && state.game.running) {
                     state.pendingAppUpdate = true;
                     return true;
                 }
@@ -1020,11 +1021,16 @@ import {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistration().then(registration => {
                     if (registration) {
-                        checkForAppUpdate(registration).then(hasUpdate => {
+                        checkForAppUpdate(registration, true).then(hasUpdate => {
                             setTimeout(() => {
                                 btn.innerHTML = originalText;
                                 btn.disabled = false;
-                                if (!hasUpdate) showGameNotice('You are already on the latest version.', 2500);
+                                if (!hasUpdate) {
+                                    showGameNotice('You are already on the latest version.', 2500);
+                                } else {
+                                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> RESTARTING...';
+                                    btn.disabled = true;
+                                }
                             }, 800);
                         });
                     } else {
@@ -3122,8 +3128,8 @@ import {
                     enemy.cooldown--;
                     if (enemy.cooldown <= 0) {
                         const isGk = enemy.category === 'gatekeeper';
-                        const pSpeed = isGk ? 8 * gameScale : 6 * state.gameScale;
-                        const pRadius = isGk ? 6 * gameScale : 4 * state.gameScale;
+                        const pSpeed = isGk ? 8 * state.gameScale : 6 * state.gameScale;
+                        const pRadius = isGk ? 6 * state.gameScale : 4 * state.gameScale;
                         fireBossProjectile(enemy.x, enemy.y + enemy.size, Math.PI / 2, pSpeed, enemy.damage, enemy.color, pRadius);
                         if (isGk) {
                             fireBossProjectile(enemy.x - 15 * state.gameScale, enemy.y + enemy.size, Math.PI / 2 + 0.15, pSpeed * 0.9, enemy.damage, enemy.color, pRadius * 0.8);
@@ -4929,3 +4935,4 @@ import {
             });
         }
         bootGame();
+window.state = state; window.startBossMode = startBossMode; window.collectDrop = collectDrop;

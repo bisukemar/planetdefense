@@ -1,7 +1,9 @@
-export const APP_VERSION = 'Alpha 0.9.73.148';
+export const APP_VERSION = 'Alpha 0.9.73.149';
 export const TARGET_FRAME_MS = 1000 / 60;
 
 export const PATCH_NOTES = [
+    { version: 'Alpha 0.9.73.149', notes: ['Fixed a critical freeze that occurred when the Boss Gatekeeper spawned while the player had a weapon upgrade.', 'Improved "Check for Update" button to force an immediate reload upon finding an update.'] },
+    { version: 'Alpha 0.9.73.148', notes: ['Added "Check for Update" button in the Install panel.'] },
     { version: 'Alpha 0.9.73.144', notes: ['Fixed critical ES Module migration bugs that prevented variables from being accessed across files.', 'Fixed an issue where satellites failed to render and fire due to missing utility function imports.', 'Fixed a crash during startup caused by the unassigned canvas state object.'] },
     { version: 'Alpha 0.9.72.139', notes: ['Massive architectural refactoring: Migrated the project to Vite for ES Module support.', 'Extracted game entities (Enemy, Satellite, Projectile, Particle) into standalone modules.', 'Centralized mutable global variables into a state module to improve maintainability and performance.'] },
     { version: 'Alpha 0.9.71.138', notes: ['Aligned the Mini-Boss warning banner vertically with the other game notices.'] },
