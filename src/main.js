@@ -2716,7 +2716,14 @@ import {
                 state.bossMode.enemyProjectiles = [];
                 state.bossMode.drops = [];
                 const playTop = getBossPlayTop();
-                state.bossMode.player = { x: canvas.width / 2, y: canvas.height - 120, hp: 100, maxHp: 100, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120, weapon: 'default', repairKits: state.game.bossRepairKits || 0, shieldUsed: false, shieldTimer: 0, invulnTimer: 0, lastTapTime: 0 };
+                
+                let playerHpMultiplier = 1;
+                if (state.research && state.research.fighterHull) {
+                    playerHpMultiplier += state.research.fighterHull * 0.05;
+                }
+                const playerMaxHp = Math.floor(100 * playerHpMultiplier);
+                
+                state.bossMode.player = { x: canvas.width / 2, y: canvas.height - 120, hp: playerMaxHp, maxHp: playerMaxHp, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120, weapon: 'default', repairKits: state.game.bossRepairKits || 0, shieldUsed: false, shieldTimer: 0, invulnTimer: 0, lastTapTime: 0 };
                 state.bossMode.player.spriteSize = 58 * state.gameScale;
                 state.bossMode.player.hitRadius = state.bossMode.player.spriteSize * 0.08;
                 state.bossMode.boss = {
@@ -2910,7 +2917,11 @@ import {
             if (typeof player.targetY !== 'number') player.targetY = player.y;
             player.targetX = Math.max(24, Math.min(canvas.width - 24, player.targetX));
             player.targetY = Math.max(playerTopLimit, Math.min(playerBottomLimit, player.targetY));
-            const dragFollow = 0.24;
+            
+            let dragFollow = 0.24;
+            if (state.research && state.research.fighterSpeed) {
+                dragFollow *= (1 + state.research.fighterSpeed * 0.02);
+            }
 
             if (player.shieldTimer > 0) {
                 player.shieldTimer--;
@@ -3216,7 +3227,8 @@ import {
                         player.hp -= 35;
                         playSynthSound('earth_hit');
                         createExplosion(player.x, player.y, '#ef4444', 15);
-                        player.invulnTimer = 60;
+                        let bonus = 0; if (state.research && state.research.fighterSpeed >= 10) bonus = 120;
+                        player.invulnTimer = 60 + bonus;
                         state.game.cameraShake = Math.min(25, (state.game.cameraShake || 0) + 12 * state.screenShakeIntensity);
                         state.game.damageOverlayAlpha = 0.8;
                         showGameNotice('<i class="fa-solid fa-triangle-exclamation mr-1"></i> Hull damaged by boss collision!', 2000);
@@ -3266,7 +3278,8 @@ import {
                 if (Math.hypot(enemy.x - player.x, enemy.y - playerHitY) < getBossEnemyHitRadius(enemy) + getPlayerFighterHitRadius()) {
                     if (!player.invulnTimer || player.invulnTimer <= 0) {
                         player.hp -= enemy.damage;
-                        player.invulnTimer = 30;
+                        let bonus = 0; if (state.research && state.research.fighterSpeed >= 10) bonus = 120;
+                        player.invulnTimer = 30 + bonus;
                         state.game.cameraShake = Math.min(15, (state.game.cameraShake || 0) + 6 * state.screenShakeIntensity);
                         state.game.damageOverlayAlpha = 0.6;
                     }
@@ -3345,7 +3358,8 @@ import {
                 if (Math.hypot(player.x - proj.x, playerHitY - proj.y) < getPlayerFighterHitRadius() + proj.r) {
                     if (!player.invulnTimer || player.invulnTimer <= 0) {
                         player.hp -= proj.damage;
-                        player.invulnTimer = 15;
+                        let bonus = 0; if (state.research && state.research.fighterSpeed >= 10) bonus = 120;
+                        player.invulnTimer = 15 + bonus;
                         state.game.cameraShake = Math.min(15, (state.game.cameraShake || 0) + 6 * state.screenShakeIntensity);
                         state.game.damageOverlayAlpha = 0.6;
                     }
@@ -3778,7 +3792,13 @@ import {
             state.game.commandDirectives[card.id] = newLevel;
             state.game.bossRepairKits = state.bossMode.player.repairKits;
             applyDirectiveLevelUp(card, previousLevel, newLevel);
-            state.cosmicData += 20 * state.game.wave; saveSettings();
+            let dropMultiplier = 1;
+            if (state.research && state.research.cosmicScavenger) {
+                dropMultiplier += state.research.cosmicScavenger * 0.05;
+                if (state.research.cosmicScavenger >= 10) dropMultiplier *= 2;
+            }
+            const gainedData = Math.floor(20 * state.game.wave * dropMultiplier);
+            state.cosmicData += gainedData; saveSettings();
             const modal = document.getElementById('boss-card-modal');
             const hud = document.getElementById('boss-mode-hud');
             if (hud) hud.classList.add('hidden');
@@ -3794,7 +3814,7 @@ import {
                 const mWDisp = document.getElementById('mobile-wave'); if (mWDisp) mWDisp.innerText = state.game.wave;
                 setWaveLaunchReady(true);
                 addGold(600 + state.game.wave * 30);
-                showGameNotice(`<i class="fa-solid fa-layer-group mr-1"></i> Directive: ${card.name} LVL ${newLevel}<br><i class="fa-solid fa-star text-purple-400 mt-1"></i> Recovered ${20 * (state.game.wave - 1)} Cosmic Data!`, 4000);
+                showGameNotice(`<i class="fa-solid fa-layer-group mr-1"></i> Directive: ${card.name} LVL ${newLevel}<br><i class="fa-solid fa-star text-purple-400 mt-1"></i> Recovered ${gainedData} Cosmic Data!`, 4000);
             });
         }
 
@@ -3874,6 +3894,9 @@ import {
                 createExplosion(enemy.x, enemy.y, enemy.color, 16);
                 playSynthSound(enemy.category === 'normal' ? 'rock_destroy' : 'ship_destroy');
                 let rewardMultiplier = 1;
+                if (state.research && state.research.economyBounty) {
+                    rewardMultiplier += state.research.economyBounty * 0.02;
+                }
                 const riskContract = getDirectiveEffectValue('riskContract'); if (riskContract) rewardMultiplier += riskContract.reward;
                 const rewardHpTradeoff = getDirectiveEffectValue('rewardHpTradeoff'); if (rewardHpTradeoff) rewardMultiplier += rewardHpTradeoff.reward;
                 const rockRewardSpeed = getDirectiveEffectValue('rockRewardSpeed'); if (enemy.category === 'normal' && rockRewardSpeed) rewardMultiplier += rockRewardSpeed.reward;
@@ -3896,12 +3919,20 @@ import {
                 const scoreDisplay = document.getElementById('score-display');
                 if (scoreDisplay) scoreDisplay.innerText = state.game.score;
 
+                let cosmicDropMultiplier = 1;
+                if (state.research && state.research.cosmicScavenger) {
+                    cosmicDropMultiplier += state.research.cosmicScavenger * 0.05;
+                    if (state.research.cosmicScavenger >= 10) cosmicDropMultiplier *= 2;
+                }
+
                 if (enemy.type === 'Rogue Comet') {
-                    state.cosmicData += 15;
-                    showGameNotice('<i class="fa-solid fa-star text-purple-400"></i> Recovered 15 Cosmic Data!', 3000);
+                    const drop = Math.floor(15 * cosmicDropMultiplier);
+                    state.cosmicData += drop;
+                    showGameNotice(`<i class="fa-solid fa-star text-purple-400"></i> Recovered ${drop} Cosmic Data!`, 3000);
                     saveSettings();
                 } else if (enemy.type === 'Smuggler Ship') {
-                    state.cosmicData += 5;
+                    const drop = Math.floor(5 * cosmicDropMultiplier);
+                    state.cosmicData += drop;
                     const pool = COMMAND_DIRECTIVES.filter(d => getDirectiveLevel(d.id) < 5);
                     if (pool.length > 0) {
                         const card = pool[Math.floor(Math.random() * pool.length)];
@@ -3934,6 +3965,12 @@ import {
             if (isBossWave(state.game.wave)) {
                 startBossMode();
                 return;
+            }
+            if (state.research && state.research.tacticalCooldown >= 10 && state.game.tactical) {
+                if (state.game.tactical.laser) state.game.tactical.laser.cd = 0;
+                if (state.game.tactical.emp) state.game.tactical.emp.cd = 0;
+                if (state.game.tactical.overcharge) state.game.tactical.overcharge.cd = 0;
+                updateTacticalUI();
             }
             state.waveActive = true;
             setWaveLaunchReady(false);
@@ -4112,7 +4149,16 @@ import {
             state.game.running = true; state.game.paused = false; state.game.score = 0; state.game.wave = 1; state.game.totalWaveEnemies = 10; state.game.enemiesSpawnedThisWave = 0;
             state.game.earthHealth = state.game.earthMaxHealth; state.game.earthShield = state.game.earthMaxShield; state.game.towers = []; state.game.enemies = []; state.game.projectiles = []; state.game.particles = [];
             state.game.tactical = { laser: { cd: 0, maxCd: 1800, active: false, unlocked: false }, emp: { cd: 0, maxCd: 2400, unlocked: false }, overcharge: { cd: 0, maxCd: 3600, activeTime: 0, unlocked: false } };
-            state.game.selectedTower = null; state.game.selectedShopType = null; state.game.orbitGridHighlights = false;
+            
+            let cooldownMult = 1;
+            if (state.research && state.research.tacticalCooldown) {
+                cooldownMult = Math.max(0.1, 1 - (state.research.tacticalCooldown * 0.02));
+            }
+            state.game.tactical.laser.maxCd = Math.floor(1800 * cooldownMult);
+            state.game.tactical.emp.maxCd = Math.floor(2400 * cooldownMult);
+            state.game.tactical.overcharge.maxCd = Math.floor(3600 * cooldownMult);
+            
+            state.game.timeAttackBossIndex = 0; state.game.selectedTower = null; state.game.selectedShopType = null; state.game.orbitGridHighlights = false;
             state.game.mode = 'defense'; state.game.commandDirectives = {}; state.game.directiveKills = 0;
             state.game.isTimeAttack = false;
             state.game.bossIndex = 0;
@@ -4124,8 +4170,23 @@ import {
             state.masterCommandTourStep = 0;
 
             state.orbitLockStates = [false, true, true]; state.orbitSlotCapacities = [4, 4, 4]; state.orbitUpgradesCount = [0, 0, 0]; state.orbitRotations = [0, 0, 0];
-            state.shieldUpgradeLevel = 0; state.game.earthMaxShield = 100 + state.research.baseShield * 25; state.game.earthShield = state.game.earthMaxShield;
-            addRandomOrbitSlots(state.research.startSlots);
+            state.shieldUpgradeLevel = 0; state.game.earthMaxShield = 100 + (state.research ? state.research.baseShield * 25 : 0); state.game.earthShield = state.game.earthMaxShield;
+            addRandomOrbitSlots(state.research ? state.research.startSlots : 0);
+            
+            if (state.research && state.research.startSlots >= 10) {
+                for (let o = 0; o < state.orbitSlotCapacities.length; o++) {
+                    if (state.orbitSlotCapacities[o] > 0) {
+                        const newSat = new Satellite('laser', o, 0);
+                        newSat.level = 2;
+                        newSat.investedGold = 250;
+                        state.game.towers.push(newSat);
+                        break;
+                    }
+                }
+            }
+            if (state.research && state.research.economyBounty >= 10) {
+                state.game.gold += 500;
+            }
 
             state.waveActive = false; state.spawnQueue = []; state.spawnTimer = 0; state.lightningArcsToDraw = []; state.shipAttackBeamsToDraw = [];
             resetBossMode();
@@ -4210,9 +4271,11 @@ import {
                 createExplosion(coords.x, coords.y, '#f43f5e', 40);
                 playSynthSound('explosion');
                 state.game.cameraShake = Math.min(30, (state.game.cameraShake || 0) + 15 * state.screenShakeIntensity);
+                let strikeRadius = 150 * state.gameScale;
+                if (state.research && state.research.baseDamage >= 10) strikeRadius *= 1.15;
                 state.game.enemies.forEach((e, i) => {
-                    if (Math.hypot(e.x - coords.x, e.y - coords.y) < 150 * state.gameScale) {
-                        e.hp -= 450 * (1 + state.research.baseDamage * 0.05);
+                    if (Math.hypot(e.x - coords.x, e.y - coords.y) < strikeRadius) {
+                        e.hp -= 450 * (1 + (state.research ? state.research.baseDamage * 0.05 : 0));
                     }
                 });
                 state.shipAttackBeamsToDraw.push({ x1: canvas.width / 2, y1: canvas.height / 2, x2: coords.x, y2: coords.y, color: '#f43f5e', alpha: 1, width: 8 });
@@ -4559,9 +4622,11 @@ import {
         bindButton('btn-tac-emp', () => {
             if (state.game.tactical && state.game.tactical.emp.cd <= 0) {
                 state.game.tactical.emp.cd = state.game.tactical.emp.maxCd;
+                let empDuration = 180;
+                if (state.research && state.research.baseDamage >= 10) empDuration *= 1.15;
                 state.game.enemies.forEach(e => {
                     e.slowMultiplier = 0.1;
-                    e.slowTimer = 180;
+                    e.slowTimer = empDuration;
                 });
                 createExplosion(canvas.width / 2, canvas.height / 2, '#38bdf8', 50);
                 state.game.cameraShake = Math.min(20, (state.game.cameraShake || 0) + 10 * state.screenShakeIntensity);
@@ -4572,7 +4637,9 @@ import {
         bindButton('btn-tac-overcharge', () => {
             if (state.game.tactical && state.game.tactical.overcharge.cd <= 0) {
                 state.game.tactical.overcharge.cd = state.game.tactical.overcharge.maxCd;
-                state.game.tactical.overcharge.activeTime = 300;
+                let ocDuration = 300;
+                if (state.research && state.research.baseDamage >= 10) ocDuration *= 1.15;
+                state.game.tactical.overcharge.activeTime = ocDuration;
                 state.game.earthShield = Math.min(state.game.earthMaxShield * 1.5, state.game.earthShield + state.game.earthMaxShield * 0.5);
                 createExplosion(canvas.width / 2, canvas.height / 2, '#34d399', 50);
                 syncPlanetBars(); playSynthSound('upgrade');
@@ -4795,6 +4862,23 @@ import {
             const steps = (state.game.fastForward && state.game.running && !state.game.paused && state.game.mode === 'defense') ? 2 : 1;
 
             for (let step = 0; step < steps; step++) {
+                state.game.ticks = (state.game.ticks || 0) + 1;
+                if (state.game.running && !state.game.paused) {
+                    if (state.game.mode === 'defense') {
+                        if (state.research && state.research.baseShield >= 10 && state.game.ticks % 60 === 0) {
+                            if (state.game.earthShield < state.game.earthMaxShield) {
+                                state.game.earthShield = Math.min(state.game.earthMaxShield, state.game.earthShield + 1);
+                                if (state.game.ticks % 180 === 0) syncPlanetBars(); // Only sync sometimes to save performance
+                            }
+                        }
+                    } else if (state.game.mode === 'boss' && state.bossMode && state.bossMode.active && state.bossMode.player) {
+                        if (state.research && state.research.fighterHull >= 10 && state.game.ticks % 60 === 0) {
+                            const p = state.bossMode.player;
+                            if (p.hp < p.maxHp) p.hp = Math.min(p.maxHp, p.hp + 1);
+                        }
+                    }
+                }
+                
                 updateCosmicBackground(isWarping);
 
                 if (state.game.mode === 'boss' && state.bossMode.active) {
