@@ -3117,9 +3117,22 @@ import {
                 if (boss.hp <= 0) handleBossDestroyed();
             }
 
+            const bossTargetY = getBossPlayTop() + 46 * state.gameScale;
+
             for (let i = state.bossMode.enemies.length - 1; i >= 0; i--) {
                 const enemy = state.bossMode.enemies[i];
-                enemy.y += enemy.speed;
+                
+                if (enemy.category === 'gatekeeper') {
+                    if (enemy.y < bossTargetY) {
+                        enemy.y += enemy.speed;
+                    } else {
+                        enemy.y = bossTargetY;
+                        enemy.drift = (enemy.drift || 0) + 0.015;
+                        enemy.x = canvas.width / 2 + Math.sin(enemy.drift) * canvas.width * 0.22;
+                    }
+                } else {
+                    enemy.y += enemy.speed;
+                }
 
                 if (enemy.category === 'ship' || enemy.category === 'gatekeeper') {
                     if (enemy.category === 'ship') {
