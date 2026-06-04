@@ -2832,7 +2832,7 @@ import {
             }
             const player = state.bossMode.player;
             const playerTopLimit = getBossPlayTop() + 32;
-            const playerBottomLimit = isMobileBuildView() ? canvas.height - 150 : canvas.height - 80;
+            const playerBottomLimit = canvas.height - 40;
             if (typeof player.targetX !== 'number') player.targetX = player.x;
             if (typeof player.targetY !== 'number') player.targetY = player.y;
             player.targetX = Math.max(24, Math.min(canvas.width - 24, player.targetX));
@@ -2942,9 +2942,18 @@ import {
                         state.bossMode.gatekeeperSpawned = true;
                         spawnGatekeeper();
                     } else if (state.bossMode.enemies.length === 0) {
-                        state.bossMode.phase = 'boss';
-                        showGameNotice(`<i class="fa-solid fa-skull-crossbones mr-1"></i> ${state.bossMode.boss.config.name} has entered orbit`, 2400);
+                        if (state.bossMode.phase === 'minions') {
+                            state.bossMode.phase = 'boss-approach';
+                            state.bossMode.bossTimer = 180;
+                            playSynthSound('warning');
+                        }
                     }
+                }
+            } else if (state.bossMode.phase === 'boss-approach') {
+                state.bossMode.bossTimer--;
+                if (state.bossMode.bossTimer <= 0) {
+                    state.bossMode.phase = 'boss';
+                    showGameNotice(`<i class="fa-solid fa-skull-crossbones mr-1"></i> ${state.bossMode.boss.config.name} has entered orbit`, 2400);
                 }
             } else if (state.bossMode.phase === 'boss') {
                 updateBossHud();
@@ -3251,7 +3260,7 @@ import {
                 const drop = state.bossMode.drops[i];
                 drop.y += 2 * state.gameScale;
 
-                if (Math.hypot(player.x - drop.x, playerHitY - drop.y) < getPlayerFighterHitRadius() + 15 * state.gameScale) {
+                if (Math.hypot(player.x - drop.x, playerHitY - drop.y) < getPlayerFighterHitRadius() + 30 * state.gameScale) {
                     collectDrop(drop);
                     state.bossMode.drops.splice(i, 1);
                 } else if (drop.y > canvas.height + 30) {
@@ -3574,18 +3583,18 @@ import {
                     ctx.fillStyle = '#a855f7';
                     ctx.shadowColor = '#a855f7';
                     ctx.shadowBlur = 10;
-                    ctx.beginPath(); ctx.arc(drop.x, drop.y, 10 * state.gameScale, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(drop.x, drop.y, 16 * state.gameScale, 0, Math.PI * 2); ctx.fill();
                     ctx.fillStyle = '#fff';
-                    ctx.font = `bold ${12 * state.gameScale}px sans-serif`;
+                    ctx.font = `bold ${18 * state.gameScale}px sans-serif`;
                     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                     ctx.shadowBlur = 0;
                     ctx.fillText('W', drop.x, drop.y);
                 } else if (drop.type === 'repair') {
                     ctx.fillStyle = '#10b981'; ctx.shadowColor = '#10b981'; ctx.shadowBlur = 10;
-                    ctx.fillRect(drop.x - 10 * state.gameScale, drop.y - 10 * state.gameScale, 20 * state.gameScale, 20 * state.gameScale);
+                    ctx.fillRect(drop.x - 14 * state.gameScale, drop.y - 14 * state.gameScale, 28 * state.gameScale, 28 * state.gameScale);
                     ctx.fillStyle = '#fff'; ctx.shadowBlur = 0;
-                    ctx.fillRect(drop.x - 3 * state.gameScale, drop.y - 7 * state.gameScale, 6 * state.gameScale, 14 * state.gameScale);
-                    ctx.fillRect(drop.x - 7 * state.gameScale, drop.y - 3 * state.gameScale, 14 * state.gameScale, 6 * state.gameScale);
+                    ctx.fillRect(drop.x - 4 * state.gameScale, drop.y - 10 * state.gameScale, 8 * state.gameScale, 20 * state.gameScale);
+                    ctx.fillRect(drop.x - 10 * state.gameScale, drop.y - 4 * state.gameScale, 20 * state.gameScale, 8 * state.gameScale);
                 }
                 ctx.restore();
             }
