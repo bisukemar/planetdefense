@@ -3015,7 +3015,7 @@ import {
                 }
                 const playerMaxHp = Math.floor(100 * playerHpMultiplier);
                 
-                state.bossMode.player = { x: canvas.width / 2, y: canvas.height - 120, hp: playerMaxHp, maxHp: playerMaxHp, fireCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120, weapon: 'default', repairKits: state.game.bossRepairKits || 0, shieldUsed: false, shieldTimer: 0, invulnTimer: 0, lastTapTime: 0 };
+                state.bossMode.player = { x: canvas.width / 2, y: canvas.height - 120, hp: playerMaxHp, maxHp: playerMaxHp, primaryCooldown: 0, secondaryCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120, primaryWeapon: 'default', secondaryWeapon: 'none', repairKits: state.game.bossRepairKits || 0, shieldUsed: false, shieldTimer: 0, invulnTimer: 0, lastTapTime: 0 };
                 state.bossMode.player.spriteSize = 58 * state.gameScale;
                 state.bossMode.player.hitRadius = state.bossMode.player.spriteSize * 0.08;
                 state.bossMode.boss = {
@@ -3184,9 +3184,17 @@ import {
 
         function collectDrop(drop) {
             if (drop.type === 'weapon') {
-                state.bossMode.player.weapon = drop.enhancement;
+                if (state.bossMode.player.primaryWeapon === 'default') {
+                    state.bossMode.player.primaryWeapon = drop.enhancement;
+                    showGameNotice(`<i class="fa-solid fa-bolt text-purple-400"></i> Primary Weapon: ${drop.enhancement.toUpperCase()}`, 2000);
+                } else if (state.bossMode.player.secondaryWeapon === 'none') {
+                    state.bossMode.player.secondaryWeapon = drop.enhancement;
+                    showGameNotice(`<i class="fa-solid fa-bolt text-purple-400"></i> Secondary Weapon: ${drop.enhancement.toUpperCase()}`, 2000);
+                } else {
+                    state.bossMode.player.primaryWeapon = drop.enhancement;
+                    showGameNotice(`<i class="fa-solid fa-bolt text-purple-400"></i> Primary Overwritten: ${drop.enhancement.toUpperCase()}`, 2000);
+                }
                 updateRepairButton();
-                showGameNotice(`<i class="fa-solid fa-bolt text-purple-400"></i> Weapon Enhanced: ${drop.enhancement.toUpperCase()}`, 2000);
                 playSynthSound('upgrade');
             } else if (drop.type === 'repair') {
                 state.bossMode.player.repairKits++;
@@ -3275,55 +3283,72 @@ import {
 
             const playerHitY = player.y + 2 * state.gameScale;
 
-            if (player.fireCooldown > 0) player.fireCooldown--;
-            if (player.fireCooldown <= 0) {
-                const baseDamage = 18 + Math.floor(state.game.wave * 1.5);
-                const baseDy = -7.2 * state.gameScale;
-                const baseR = 5.5 * state.gameScale;
-                const px = player.x;
-                const py = player.y - 28 * state.gameScale;
-                let cd = 10;
+            if (player.primaryCooldown > 0) player.primaryCooldown--;
+            if (player.secondaryCooldown > 0) player.secondaryCooldown--;
 
-                switch (player.weapon) {
-                    case 'twin':
-                        const twinOffset = 30 * state.gameScale;
-                        state.bossMode.projectiles.push({ x: px - twinOffset, y: py, dy: baseDy, r: baseR, damage: baseDamage });
-                        state.bossMode.projectiles.push({ x: px + twinOffset, y: py, dy: baseDy, r: baseR, damage: baseDamage });
-                        break;
-                    case 'spread':
-                        const spreadOffset = 30 * state.gameScale;
-                        state.bossMode.projectiles.push({ x: px - spreadOffset, y: py, dx: -2 * state.gameScale, dy: baseDy * 0.9, r: baseR, damage: baseDamage });
-                        state.bossMode.projectiles.push({ x: px, y: py, dx: 0, dy: baseDy, r: baseR, damage: baseDamage });
-                        state.bossMode.projectiles.push({ x: px + spreadOffset, y: py, dx: 2 * state.gameScale, dy: baseDy * 0.9, r: baseR, damage: baseDamage });
-                        break;
-                    case 'heavy':
-                        state.bossMode.projectiles.push({ x: px, y: py, dy: baseDy * 0.7, r: baseR * 2.5, damage: baseDamage * 3 }); cd = 20; break;
-                    case 'rapid':
-                        state.bossMode.projectiles.push({ x: px, y: py, dy: baseDy * 1.2, r: baseR, damage: baseDamage * 0.8 }); cd = 4; break;
-                    case 'homing':
-                        state.bossMode.projectiles.push({ x: px, y: py, dy: baseDy, r: baseR, damage: baseDamage, homing: true }); break;
-                    case 'explosive':
-                        state.bossMode.projectiles.push({ x: px, y: py, dy: baseDy, r: baseR * 1.2, damage: baseDamage, explosive: true }); cd = 15; break;
-                    case 'wave':
-                        state.bossMode.projectiles.push({ x: px, y: py, dy: baseDy, r: baseR, damage: baseDamage, width: 80 * state.gameScale }); cd = 15; break;
-                    case 'side':
-                        state.bossMode.projectiles.push({ x: px, y: py, dy: baseDy, r: baseR, damage: baseDamage });
-                        state.bossMode.projectiles.push({ x: px, y: py, dx: baseDy * 0.8, dy: 0, r: baseR, damage: baseDamage });
-                        state.bossMode.projectiles.push({ x: px, y: py, dx: -baseDy * 0.8, dy: 0, r: baseR, damage: baseDamage });
-                        break;
-                    case 'ring':
-                        for (let i = 0; i < 8; i++) { const angle = (i / 8) * Math.PI * 2; state.bossMode.projectiles.push({ x: px, y: py, dx: Math.cos(angle) * Math.abs(baseDy) * 0.8, dy: Math.sin(angle) * Math.abs(baseDy) * 0.8, r: baseR, damage: baseDamage }); } cd = 30; break;
-                    case 'rear':
-                        state.bossMode.projectiles.push({ x: px, y: py, dy: baseDy, r: baseR, damage: baseDamage });
-                        state.bossMode.projectiles.push({ x: px, y: player.y + 28 * state.gameScale, dy: Math.abs(baseDy), r: baseR, damage: baseDamage });
-                        break;
-                    default:
-                        state.bossMode.projectiles.push({ x: px, y: py, dy: baseDy, r: baseR, damage: baseDamage });
+            const baseDamage = 18 + Math.floor(state.game.wave * 1.5);
+            const baseDy = -7.2 * state.gameScale;
+            const baseR = 5.5 * state.gameScale;
+            const py = player.y - 28 * state.gameScale;
+            let firedSound = false;
+
+            function fireSlot(weapon, isSecondary) {
+                if (weapon === 'none') return;
+                
+                let px = player.x;
+                let cd = 10;
+                let offsets = [0];
+                if (isSecondary) {
+                    offsets = [-30 * state.gameScale, 30 * state.gameScale];
                 }
 
-                player.fireCooldown = cd;
-                playSynthSound('laser');
+                for (let ox of offsets) {
+                    let cx = px + ox;
+                    switch (weapon) {
+                        case 'twin':
+                            const twinOffset = 10 * state.gameScale;
+                            state.bossMode.projectiles.push({ x: cx - twinOffset, y: py, dy: baseDy, r: baseR, damage: baseDamage });
+                            state.bossMode.projectiles.push({ x: cx + twinOffset, y: py, dy: baseDy, r: baseR, damage: baseDamage });
+                            break;
+                        case 'spread':
+                            state.bossMode.projectiles.push({ x: cx, y: py, dx: -2 * state.gameScale, dy: baseDy * 0.9, r: baseR, damage: baseDamage });
+                            state.bossMode.projectiles.push({ x: cx, y: py, dx: 0, dy: baseDy, r: baseR, damage: baseDamage });
+                            state.bossMode.projectiles.push({ x: cx, y: py, dx: 2 * state.gameScale, dy: baseDy * 0.9, r: baseR, damage: baseDamage });
+                            break;
+                        case 'heavy':
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy * 0.7, r: baseR * 2.5, damage: baseDamage * 3 }); cd = 20; break;
+                        case 'rapid':
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy * 1.2, r: baseR, damage: baseDamage * 0.8 }); cd = 4; break;
+                        case 'homing':
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR, damage: baseDamage, homing: true }); break;
+                        case 'explosive':
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR * 1.2, damage: baseDamage, explosive: true }); cd = 15; break;
+                        case 'wave':
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR, damage: baseDamage, width: 80 * state.gameScale }); cd = 15; break;
+                        case 'side':
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR, damage: baseDamage });
+                            state.bossMode.projectiles.push({ x: cx, y: py, dx: baseDy * 0.8, dy: 0, r: baseR, damage: baseDamage });
+                            state.bossMode.projectiles.push({ x: cx, y: py, dx: -baseDy * 0.8, dy: 0, r: baseR, damage: baseDamage });
+                            break;
+                        case 'ring':
+                            for (let i = 0; i < 8; i++) { const angle = (i / 8) * Math.PI * 2; state.bossMode.projectiles.push({ x: cx, y: py, dx: Math.cos(angle) * Math.abs(baseDy) * 0.8, dy: Math.sin(angle) * Math.abs(baseDy) * 0.8, r: baseR, damage: baseDamage }); } cd = 30; break;
+                        case 'rear':
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR, damage: baseDamage });
+                            state.bossMode.projectiles.push({ x: cx, y: player.y + 28 * state.gameScale, dy: Math.abs(baseDy), r: baseR, damage: baseDamage });
+                            break;
+                        default:
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR, damage: baseDamage });
+                    }
+                }
+                
+                if (isSecondary) player.secondaryCooldown = cd;
+                else player.primaryCooldown = cd;
+                firedSound = true;
             }
+
+            if (player.primaryCooldown <= 0) fireSlot(player.primaryWeapon, false);
+            if (player.secondaryCooldown <= 0) fireSlot(player.secondaryWeapon, true);
+            if (firedSound) playSynthSound('laser');
 
             if (state.bossMode.phase === 'minions') {
                 const objective = document.getElementById('boss-mode-objective');
@@ -3816,7 +3841,8 @@ import {
 
         function updateRepairButton() {
             const btnRepair = document.getElementById('btn-boss-repair');
-            const btnWeapon = document.getElementById('btn-boss-weapon-remove');
+            const btnPrimary = document.getElementById('btn-boss-eject-primary');
+            const btnSecondary = document.getElementById('btn-boss-eject-secondary');
             const btnShield = document.getElementById('btn-boss-shield');
             const count = document.getElementById('boss-repair-count');
             const panel = document.getElementById('boss-action-panel');
@@ -3829,10 +3855,16 @@ import {
                     if (btnRepair) btnRepair.classList.add('hidden');
                 }
 
-                if (state.bossMode.player.weapon !== 'default') {
-                    if (btnWeapon) btnWeapon.classList.remove('hidden');
+                if (state.bossMode.player.primaryWeapon !== 'default') {
+                    if (btnPrimary) btnPrimary.classList.remove('hidden');
                 } else {
-                    if (btnWeapon) btnWeapon.classList.add('hidden');
+                    if (btnPrimary) btnPrimary.classList.add('hidden');
+                }
+                
+                if (state.bossMode.player.secondaryWeapon !== 'none') {
+                    if (btnSecondary) btnSecondary.classList.remove('hidden');
+                } else {
+                    if (btnSecondary) btnSecondary.classList.add('hidden');
                 }
                 if (btnShield) btnShield.classList.remove('hidden');
             } else {
@@ -3997,8 +4029,8 @@ import {
                 }
                 ctx.restore();
 
-                // Companion Drones for Non-Default Weapons
-                if (player.weapon !== 'default') {
+                // Companion Drones for Secondary Weapons
+                if (player.secondaryWeapon !== 'none') {
                     const droneOffset = 30 * state.gameScale;
                     const hoverY = Math.sin(state.bossMode.frame * 0.1) * 4 * state.gameScale;
                     ctx.save();
@@ -5129,11 +5161,20 @@ import {
             }
         });
 
-        bindButton('btn-boss-weapon-remove', () => {
-            if (state.bossMode.player.weapon !== 'default') {
-                state.bossMode.player.weapon = 'default';
+        bindButton('btn-boss-eject-primary', () => {
+            if (state.bossMode.player.primaryWeapon !== 'default') {
+                state.bossMode.player.primaryWeapon = 'default';
                 updateRepairButton();
-                showGameNotice(`<i class="fa-solid fa-eject text-slate-400"></i> Weapon Add-on Ejected`, 2000);
+                showGameNotice(`<i class="fa-solid fa-eject text-slate-400"></i> Primary Weapon Ejected`, 2000);
+                playSynthSound('hit');
+            }
+        });
+
+        bindButton('btn-boss-eject-secondary', () => {
+            if (state.bossMode.player.secondaryWeapon !== 'none') {
+                state.bossMode.player.secondaryWeapon = 'none';
+                updateRepairButton();
+                showGameNotice(`<i class="fa-solid fa-eject text-slate-400"></i> Secondary Weapon Ejected`, 2000);
                 playSynthSound('hit');
             }
         });
