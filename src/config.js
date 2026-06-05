@@ -1,7 +1,8 @@
-export const APP_VERSION = 'Alpha 0.9.76.153';
+export const APP_VERSION = 'Alpha 0.9.77.154';
 export const TARGET_FRAME_MS = 1000 / 60;
 
 export const PATCH_NOTES = [
+    { version: 'Alpha 0.9.77.154', notes: ['Redesigned the desktop HUD into a unified, space-efficient command dashboard.', 'Moved resource counters (Credits and Score) to the top header for better tactical awareness.', 'Compact side-by-side health and shield integrity status bars.', 'Optimized vertical play area clearance and notice alert positioning.'] },
     { version: 'Alpha 0.9.76.153', notes: ['Under-the-hood performance optimizations to wave spawning routines.', 'Optimized the cache reload system to resolve intermittent service worker loops.', 'Addressed minor UI layout scaling issues on various viewport sizes.'] },
     { version: 'Alpha 0.9.75.152', notes: ['Added Tier Surge system: every 5 waves all enemies receive a stacking stat boost (+12% HP, +10% damage, +4% speed per tier). Tier 1 activates at Wave 5, Tier 2 at Wave 10, etc.', 'Added in-game Tier Surge notice that appears at the start of each milestone wave, color-coded by tier severity.', 'Gold rewards scale proportionally with tiers (+10% per tier) to keep progression fair.'] },
     { version: 'Alpha 0.9.74.151', notes: ['Introduced the Enemy Affix System: Every 10 waves, a milestone wave triggers, applying a wave-wide universal affix to all spawned enemies (e.g. Shielded, Reactive, Glacial, Volatile).', 'Added 11 unique enemy affixes with bespoke behavioral modifiers, stat scaling, and custom visual overlays/VFX.', 'Added the Affixes catalog to the Space Encyclopedia to provide details on each wave modifier.'] },

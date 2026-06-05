@@ -3223,8 +3223,34 @@ import {
                 }
             }
 
-            player.x += (player.targetX - player.x) * dragFollow;
+            if (player.rollTimer > 0) {
+                player.rollTimer--;
+                player.rollAngle = (1 - (player.rollTimer / 30)) * Math.PI * 2;
+                dragFollow = 0.6; // Speed burst during dodge roll
+            } else {
+                player.rollAngle = 0;
+            }
+
+            const targetDx = player.targetX - player.x;
+            player.x += targetDx * dragFollow;
             player.y += (player.targetY - player.y) * dragFollow;
+            
+            const maxBankAngle = Math.PI / 8; // 22.5 degrees
+            player.bankAngle = (targetDx * dragFollow * 0.035);
+            player.bankAngle = Math.max(-maxBankAngle, Math.min(maxBankAngle, player.bankAngle));
+
+            // Persistent Exhaust Trails
+            if (state.bossMode.frame % 3 === 0) {
+                state.game.particles.push(new Particle(player.x - 8 * state.gameScale, player.y + 12 * state.gameScale, '#fb923c'));
+                state.game.particles.push(new Particle(player.x + 8 * state.gameScale, player.y + 12 * state.gameScale, '#fb923c'));
+            }
+
+            // Dynamic Damage States (Smoke/Sparks)
+            const hpPercent = player.hp / player.maxHp;
+            if (hpPercent <= 0.5 && Math.random() < 0.1) {
+                state.game.particles.push(new Particle(player.x + (Math.random()-0.5)*20, player.y + (Math.random()-0.5)*20, hpPercent <= 0.25 ? '#ef4444' : '#64748b'));
+            }
+
             player.x = Math.max(24, Math.min(canvas.width - 24, player.x));
             player.y = Math.max(playerTopLimit, Math.min(playerBottomLimit, player.y));
             player.targetX = Math.max(24, Math.min(canvas.width - 24, player.targetX));
@@ -3260,13 +3286,15 @@ import {
 
                 switch (player.weapon) {
                     case 'twin':
-                        state.bossMode.projectiles.push({ x: px - 10 * state.gameScale, y: py, dy: baseDy, r: baseR, damage: baseDamage });
-                        state.bossMode.projectiles.push({ x: px + 10 * state.gameScale, y: py, dy: baseDy, r: baseR, damage: baseDamage });
+                        const twinOffset = 30 * state.gameScale;
+                        state.bossMode.projectiles.push({ x: px - twinOffset, y: py, dy: baseDy, r: baseR, damage: baseDamage });
+                        state.bossMode.projectiles.push({ x: px + twinOffset, y: py, dy: baseDy, r: baseR, damage: baseDamage });
                         break;
                     case 'spread':
-                        state.bossMode.projectiles.push({ x: px, y: py, dx: -2 * state.gameScale, dy: baseDy * 0.9, r: baseR, damage: baseDamage });
+                        const spreadOffset = 30 * state.gameScale;
+                        state.bossMode.projectiles.push({ x: px - spreadOffset, y: py, dx: -2 * state.gameScale, dy: baseDy * 0.9, r: baseR, damage: baseDamage });
                         state.bossMode.projectiles.push({ x: px, y: py, dx: 0, dy: baseDy, r: baseR, damage: baseDamage });
-                        state.bossMode.projectiles.push({ x: px, y: py, dx: 2 * state.gameScale, dy: baseDy * 0.9, r: baseR, damage: baseDamage });
+                        state.bossMode.projectiles.push({ x: px + spreadOffset, y: py, dx: 2 * state.gameScale, dy: baseDy * 0.9, r: baseR, damage: baseDamage });
                         break;
                     case 'heavy':
                         state.bossMode.projectiles.push({ x: px, y: py, dy: baseDy * 0.7, r: baseR * 2.5, damage: baseDamage * 3 }); cd = 20; break;
@@ -3946,14 +3974,54 @@ import {
             const playerHitY = player.y + 2 * state.gameScale;
             const isInvuln = player.invulnTimer > 0 && player.shieldTimer <= 0;
             if (!isInvuln || state.bossMode.frame % 10 < 5) {
-                if (!drawSpriteImage(playerFighterSprite, player.x, player.y, playerSpriteSize, 0)) {
-                    ctx.save(); ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.moveTo(player.x, player.y - 24 * state.gameScale); ctx.lineTo(player.x - 18 * state.gameScale, player.y + 20 * state.gameScale); ctx.lineTo(player.x + 18 * state.gameScale, player.y + 20 * state.gameScale); ctx.closePath(); ctx.fill(); ctx.restore();
+                ctx.save();
+                ctx.translate(player.x, player.y);
+                const totalAngle = (player.rollAngle || 0) + (player.bankAngle || 0);
+                ctx.rotate(totalAngle);
+
+                // Draw Thruster Flames
+                const thrustLength = 15 + Math.random() * 10 + (player.targetY < player.y ? 10 : 0);
+                ctx.fillStyle = '#f97316';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#fb923c';
+                ctx.beginPath();
+                ctx.moveTo(-8 * state.gameScale, 16 * state.gameScale);
+                ctx.lineTo(8 * state.gameScale, 16 * state.gameScale);
+                ctx.lineTo(0, 16 * state.gameScale + thrustLength * state.gameScale);
+                ctx.closePath();
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                if (!drawSpriteImage(playerFighterSprite, 0, 0, playerSpriteSize, 0)) {
+                    ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.moveTo(0, -24 * state.gameScale); ctx.lineTo(-18 * state.gameScale, 20 * state.gameScale); ctx.lineTo(18 * state.gameScale, 20 * state.gameScale); ctx.closePath(); ctx.fill();
+                }
+                ctx.restore();
+
+                // Companion Drones for Non-Default Weapons
+                if (player.weapon !== 'default') {
+                    const droneOffset = 30 * state.gameScale;
+                    const hoverY = Math.sin(state.bossMode.frame * 0.1) * 4 * state.gameScale;
+                    ctx.save();
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.shadowColor = '#38bdf8';
+                    ctx.shadowBlur = 5;
+                    ctx.beginPath();
+                    ctx.arc(player.x - droneOffset, player.y + hoverY, 4 * state.gameScale, 0, Math.PI * 2);
+                    ctx.arc(player.x + droneOffset, player.y + hoverY, 4 * state.gameScale, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
                 }
 
                 ctx.save();
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+                const hpPercent = player.hp / player.maxHp;
+                if (hpPercent <= 0.25) {
+                    ctx.fillStyle = (state.bossMode.frame % 20 < 10) ? 'rgba(255, 50, 50, 0.9)' : 'rgba(255, 255, 255, 0.65)';
+                    ctx.shadowColor = (state.bossMode.frame % 20 < 10) ? '#ef4444' : '#38bdf8';
+                } else {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+                    ctx.shadowColor = '#38bdf8';
+                }
                 ctx.shadowBlur = 5;
-                ctx.shadowColor = '#38bdf8';
                 ctx.beginPath();
                 ctx.arc(player.x, playerHitY, getPlayerFighterHitRadius(), 0, Math.PI * 2);
                 ctx.fill();
@@ -5194,7 +5262,10 @@ import {
                 const coords = getPointerCoords(e);
                 const now = Date.now();
                 if (now - (state.bossMode.player.lastTapTime || 0) < 300) {
-                    triggerBossShield();
+                    if (!state.bossMode.player.rollTimer) {
+                        state.bossMode.player.rollTimer = 30; // 30 frames of dodge roll
+                        state.bossMode.player.invulnTimer = 30; // i-frames
+                    }
                 }
                 state.bossMode.player.lastTapTime = now;
 
