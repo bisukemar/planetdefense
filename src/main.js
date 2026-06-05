@@ -459,6 +459,159 @@ import {
             economyBounty: { name: 'Bounty Hunter', desc: 'Increase gold bounty from enemies by +2% per level.', branch: 2, row: 1, costBase: 30, costScale: 25, capstone: 'Start each run with a bonus 500 Gold.', parent: 'startSlots', reqLevel: 5, icon: 'fa-sack-dollar' }
         };
 
+        let isDetailPanelBound = false;
+        function initDetailPanelEvents() {
+            if (isDetailPanelBound) return;
+            isDetailPanelBound = true;
+            
+            const upgradeBtn = document.getElementById('detail-upgrade-btn');
+            if (upgradeBtn) {
+                upgradeBtn.addEventListener('click', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    if (state.selectedResearchNodeId) {
+                        upgradeSelectedResearchNode(state.selectedResearchNodeId);
+                    }
+                });
+            }
+            
+            const closeBtn = document.getElementById('detail-close-btn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    closeResearchDetailPanel();
+                });
+            }
+            
+            const viewport = document.getElementById('skill-tree-viewport');
+            if (viewport) {
+                viewport.addEventListener('pointerdown', (e) => {
+                    if (!e.target.closest('.skill-node') && !e.target.closest('#research-detail-panel')) {
+                        closeResearchDetailPanel();
+                    }
+                });
+            }
+        }
+
+        function selectResearchNode(key) {
+            state.selectedResearchNodeId = key;
+            const node = RESEARCH_NODES[key];
+            if (!node) return;
+            
+            const lvl = state.research[key] || 0;
+            const isMax = lvl >= 10;
+            const cost = node.costBase + (lvl * node.costScale);
+            
+            let isLocked = false;
+            if (node.parent) {
+                const parentLvl = state.research[node.parent] || 0;
+                if (parentLvl < node.reqLevel) isLocked = true;
+            }
+            
+            // Highlight selected node
+            document.querySelectorAll('.skill-node').forEach(el => {
+                el.classList.toggle('skill-node-selected', el.getAttribute('data-research') === key);
+            });
+            
+            // Populate panel
+            const nameEl = document.getElementById('detail-skill-name');
+            const lvlEl = document.getElementById('detail-skill-level');
+            const descEl = document.getElementById('detail-skill-desc');
+            const capstoneEl = document.getElementById('detail-skill-capstone');
+            const reqEl = document.getElementById('detail-skill-req');
+            const upgradeBtn = document.getElementById('detail-upgrade-btn');
+            
+            if (nameEl) nameEl.innerText = node.name;
+            if (lvlEl) {
+                lvlEl.innerText = `Lvl ${lvl}/10`;
+                lvlEl.className = `text-[9px] px-2 py-0.5 rounded font-bold tech-font ${isMax ? 'bg-amber-950 border border-amber-500/30 text-amber-300' : 'bg-purple-950 border border-purple-500/30 text-purple-300'}`;
+            }
+            if (descEl) descEl.innerText = node.desc;
+            if (capstoneEl) capstoneEl.innerHTML = `<i class="fa-solid fa-crown mr-1"></i> Capstone: ${node.capstone}`;
+            
+            if (reqEl) {
+                if (isLocked) {
+                    reqEl.innerHTML = `<i class="fa-solid fa-lock mr-1"></i> Requires ${RESEARCH_NODES[node.parent].name} Lvl ${node.reqLevel}`;
+                    reqEl.classList.remove('hidden');
+                } else {
+                    reqEl.classList.add('hidden');
+                }
+            }
+            
+            if (upgradeBtn) {
+                if (isLocked) {
+                    upgradeBtn.disabled = true;
+                    upgradeBtn.innerText = 'LOCKED';
+                } else if (isMax) {
+                    upgradeBtn.disabled = true;
+                    upgradeBtn.innerText = 'MAX LEVEL';
+                } else {
+                    upgradeBtn.disabled = state.cosmicData < cost;
+                    upgradeBtn.innerText = `Upgrade (Cost: ${cost} CD)`;
+                }
+            }
+            
+            const panel = document.getElementById('research-detail-panel');
+            if (panel) {
+                panel.classList.remove('hidden');
+                panel.offsetHeight; // trigger reflow
+                panel.classList.add('translate-y-0');
+            }
+            
+            initDetailPanelEvents();
+        }
+
+        function closeResearchDetailPanel() {
+            state.selectedResearchNodeId = null;
+            document.querySelectorAll('.skill-node').forEach(el => {
+                el.classList.remove('skill-node-selected');
+            });
+            const panel = document.getElementById('research-detail-panel');
+            if (panel) {
+                panel.classList.remove('translate-y-0');
+                setTimeout(() => {
+                    if (!state.selectedResearchNodeId) {
+                        panel.classList.add('hidden');
+                    }
+                }, 300);
+            }
+        }
+
+        function upgradeSelectedResearchNode(key) {
+            const node = RESEARCH_NODES[key];
+            if (!node) return;
+            const lvl = state.research[key] || 0;
+            const cost = node.costBase + (lvl * node.costScale);
+            
+            let isLocked = false;
+            if (node.parent) {
+                const parentLvl = state.research[node.parent] || 0;
+                if (parentLvl < node.reqLevel) isLocked = true;
+            }
+            
+            if (isLocked || lvl >= 10 || state.cosmicData < cost) {
+                playSynthSound('error');
+                if (!isLocked && lvl < 10 && state.cosmicData < cost) {
+                    showGameNotice('<i class="fa-solid fa-triangle-exclamation mr-1"></i> Not enough Cosmic Data', 2000);
+                }
+                return;
+            }
+            
+            state.cosmicData -= cost;
+            state.research[key]++;
+            saveSettings();
+            playSynthSound('upgrade');
+            
+            const nodeEl = document.getElementById(`node-${key}`);
+            if (nodeEl) {
+                nodeEl.classList.add('animate-node-upgrade');
+            }
+            
+            setTimeout(() => {
+                updateResearchUI();
+                selectResearchNode(key);
+            }, 400);
+        }
+
         function refundResearch() {
             let refunded = 0;
             if (!state.research) return;
@@ -473,6 +626,7 @@ import {
             }
             state.cosmicData += refunded;
             saveSettings();
+            closeResearchDetailPanel();
             updateResearchUI();
             playSynthSound('upgrade');
         }
@@ -522,6 +676,9 @@ import {
                             else if (lvl > 0) stateClass = 'skill-node-active';
                             else stateClass = '';
                         }
+                        if (state.selectedResearchNodeId === node.id) {
+                            stateClass += ' skill-node-selected';
+                        }
 
                         // We pass tooltip data as attributes to be read by JS
                         const tooltipData = encodeURIComponent(JSON.stringify({
@@ -557,9 +714,13 @@ import {
                     refundBtn.parentNode.replaceChild(newBtn, refundBtn);
                     newBtn.addEventListener('click', (e) => {
                         e.preventDefault(); e.stopPropagation();
-                        if (confirm('Are you sure you want to refund all research upgrades? 100% of your Cosmic Data will be returned.')) {
-                            refundResearch();
-                        }
+                        showConfirmModal(
+                            'WIPE MEMORY BANKS',
+                            'Are you sure you want to refund all research upgrades? 100% of your Cosmic Data will be returned.',
+                            () => {
+                                refundResearch();
+                            }
+                        );
                     });
                 }
 
@@ -606,29 +767,12 @@ import {
 
                     nodeEl.addEventListener('pointerdown', (e) => {
                         e.preventDefault(); e.stopPropagation();
-                        if (nodeEl.getAttribute('data-locked') === 'true') {
-                            playSynthSound('error');
-                            return;
-                        }
-                        
                         const key = nodeEl.getAttribute('data-research');
-                        const cost = parseInt(nodeEl.getAttribute('data-cost'), 10);
-                        const currentLvl = state.research[key] || 0;
-                        
-                        if (state.cosmicData >= cost && currentLvl < 10) {
-                            state.cosmicData -= cost;
-                            state.research[key]++;
-                            saveSettings();
-                            playSynthSound('upgrade');
-                            nodeEl.classList.add('animate-node-upgrade');
-                            setTimeout(() => {
-                                updateResearchUI();
-                            }, 400); // Wait for animation before re-rendering
+                        if (state.selectedResearchNodeId === key) {
+                            upgradeSelectedResearchNode(key);
                         } else {
-                            playSynthSound('error');
-                            if (currentLvl < 10) {
-                                showGameNotice('<i class="fa-solid fa-triangle-exclamation mr-1"></i> Not enough Cosmic Data', 2000);
-                            }
+                            selectResearchNode(key);
+                            playSynthSound('hit');
                         }
                     });
                 });
@@ -4656,8 +4800,8 @@ import {
         bindButton('back-install-options-btn', () => { const installPanel = document.getElementById('inline-install-options'); if (installPanel) installPanel.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('close-boss-attack-btn', () => { const panel = document.getElementById('inline-boss-attack-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('back-boss-attack-btn', () => { const panel = document.getElementById('inline-boss-attack-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
-        bindButton('close-research-btn', () => { const panel = document.getElementById('inline-research-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
-        bindButton('back-research-btn', () => { const panel = document.getElementById('inline-research-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
+        bindButton('close-research-btn', () => { closeResearchDetailPanel(); const panel = document.getElementById('inline-research-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
+        bindButton('back-research-btn', () => { closeResearchDetailPanel(); const panel = document.getElementById('inline-research-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('android-install-btn', triggerAndroidInstall);
         bindButton('check-update-btn', triggerCheckUpdate);
 

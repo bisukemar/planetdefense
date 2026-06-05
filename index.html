@@ -1059,6 +1059,27 @@
                         <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(#4f46e5 1px, transparent 1px); background-size: 20px 20px;"></div>
                         <svg id="skill-tree-lines" class="absolute inset-0 w-full h-full pointer-events-none z-0"></svg>
                         <div id="research-upgrades-list" class="relative z-10 w-full h-full overflow-auto p-8 flex justify-center gap-12 sm:gap-24"></div>
+                        
+                        <!-- Selected Skill Detail Panel -->
+                        <div id="research-detail-panel" class="absolute bottom-0 left-0 right-0 bg-slate-900/95 border-t border-purple-500/40 p-4 z-20 flex flex-col md:flex-row md:items-center justify-between gap-3 transform translate-y-full transition-transform duration-300 pointer-events-auto hidden">
+                            <div class="flex-1 text-left">
+                                <div class="flex items-center gap-2">
+                                    <h4 id="detail-skill-name" class="text-xs md:text-sm font-black text-white uppercase tracking-widest">Skill Name</h4>
+                                    <span id="detail-skill-level" class="text-[9px] px-2 py-0.5 rounded bg-purple-950 border border-purple-500/30 text-purple-300 font-bold tech-font">Lvl 0/10</span>
+                                </div>
+                                <p id="detail-skill-desc" class="text-[10px] text-slate-400 mt-1 leading-tight font-semibold">Skill description goes here.</p>
+                                <p id="detail-skill-capstone" class="text-[9px] font-bold text-emerald-400 mt-1.5"><i class="fa-solid fa-crown mr-1"></i> Capstone bonus details.</p>
+                                <p id="detail-skill-req" class="text-[9px] text-red-400 font-bold mt-1 hidden"><i class="fa-solid fa-lock mr-1"></i> Requirement info.</p>
+                            </div>
+                            <div class="flex items-center gap-2 self-stretch md:self-auto justify-end">
+                                <button id="detail-upgrade-btn" class="flex-1 md:flex-initial bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-800 disabled:text-slate-500 active:scale-95 text-slate-950 font-black px-4 py-2 rounded-xl text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-arrow-up-from-bracket"></i> Upgrade
+                                </button>
+                                <button id="detail-close-btn" class="p-2 text-slate-400 hover:text-white text-xs">
+                                    <i class="fa-solid fa-xmark font-bold"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     
                     <button id="btn-wipe-memory" class="mt-auto shrink-0 w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-[10px] uppercase tracking-widest font-bold text-slate-400 hover:text-red-400 transition-colors">
