@@ -2093,8 +2093,10 @@ import {
         function updateGoldUI() {
             const mobileGold = document.getElementById('mobile-gold');
             const bottomGold = document.getElementById('bottom-gold');
+            const topGold = document.getElementById('top-gold');
             if (mobileGold) mobileGold.innerText = state.game.gold;
             if (bottomGold) bottomGold.innerText = state.game.gold;
+            if (topGold) topGold.innerText = state.game.gold;
             updateShopAvailability(); updateOrbitInspectorUI();
         }
 

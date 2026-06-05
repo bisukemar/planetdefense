@@ -194,11 +194,11 @@ body.boss-mode-active .notice-safe-top {
 
 @media (min-width: 768px) {
     .notice-safe-top {
-        top: 10.75rem;
+        top: 6.2rem;
     }
 
     body.boss-mode-active .notice-safe-top {
-        top: 6.75rem;
+        top: 5.5rem;
     }
 
     #inline-encyclopedia-options {

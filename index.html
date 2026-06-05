@@ -206,89 +206,118 @@
     </div>
 
     <!-- DESKTOP COMPACT HUD HEADER -->
-    <div id="desktop-hud" class="hidden md:flex absolute top-4 left-4 right-4 z-10 flex-col gap-2 pointer-events-auto">
-        <!-- SYSTEM UTILITIES CONTROL BAR -->
-        <div
-            class="w-full flex justify-between items-center bg-slate-950/85 backdrop-blur-md p-2 rounded-xl border border-slate-800/80 shadow-lg font-bold">
-            <div class="w-8"></div>
-
-            <div
-                class="flex items-center gap-2 bg-slate-900 border border-emerald-500/30 px-3 py-1 rounded-full text-xs animate-pulse">
-                <span class="text-[9px] text-slate-400 tracking-widest hidden sm:inline font-bold">STATUS</span>
-                <span class="font-extrabold text-emerald-400 tracking-wider">WAVE <span id="wave-display"
-                        class="text-white font-bold">1</span></span>
-            </div>
-
-            <div class="flex items-center gap-2">
-                <button id="fast-forward-btn"
-                    class="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700/60 flex items-center justify-center text-slate-400 hover:text-emerald-400 hover:border-emerald-500/50 transition-all select-none">
-                    <i class="fa-solid fa-forward"></i>
-                </button>
-                <button id="settings-toggle-btn"
-                    class="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700/60 flex items-center justify-center text-slate-300 hover:text-white hover:border-emerald-500/50 transition-all select-none">
-                    <i class="fa-solid fa-cog animate-spin-slow"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- STATUS PANELS ROW -->
-        <div class="flex flex-row justify-between items-start gap-1.5 w-full">
-            <!-- Planet Status Panel -->
-            <div
-                class="bg-slate-900/95 backdrop-blur-md border border-sky-500/30 p-4 rounded-xl flex flex-col gap-2 w-72 glow-blue">
-                <div class="flex justify-between items-center border-b border-sky-500/20 pb-2">
-                    <span class="text-sky-400 font-bold text-sm tracking-wider uppercase"><i
-                            class="fa-solid fa-earth-asia animate-pulse mr-1"></i> <span
-                            class="planet-name-label font-bold">EARTH</span> STATUS</span>
-                    <span class="text-[10px] text-sky-300 tech-font font-bold">SHIELD INTEGRITY</span>
+    <div id="desktop-hud" class="hidden md:flex absolute top-4 left-4 right-4 z-10 pointer-events-auto">
+        <div class="w-full flex items-center justify-between bg-slate-900/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-slate-800/80 shadow-2xl gap-4 font-bold select-none glow-blue">
+            
+            <!-- LEFT SECTION: Planet Health & Shield -->
+            <div class="flex items-center gap-4">
+                <!-- Sleek title -->
+                <div class="flex flex-col">
+                    <span class="text-sky-400 text-[10px] tracking-widest uppercase flex items-center gap-1 font-bold">
+                        <i class="fa-solid fa-earth-asia animate-pulse"></i> 
+                        <span class="planet-name-label">EARTH</span>
+                    </span>
+                    <span class="text-[8px] text-sky-500 uppercase tracking-wider font-extrabold">STATUS</span>
                 </div>
 
-                <div class="space-y-2 w-full">
-                    <!-- Shield Health Bar -->
-                    <div>
-                        <div class="flex justify-between text-xs mb-0.5 tech-font text-cyan-300">
-                            <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved text-[9px]"></i>
-                                <span class="planet-name-label">EARTH</span> SHIELD</span>
-                            <span id="shield-text">100 / 100</span>
+                <!-- Divider -->
+                <div class="h-8 w-px bg-slate-800/60"></div>
+
+                <!-- Stats Container (Shield & Core Side-by-Side) -->
+                <div class="flex items-center gap-4">
+                    <!-- Shield -->
+                    <div class="w-36 flex flex-col gap-0.5">
+                        <div class="flex justify-between text-[10px] tech-font text-cyan-300">
+                            <span class="flex items-center gap-1 font-bold">
+                                <i class="fa-solid fa-shield-halved text-[9px]"></i> SHIELD
+                            </span>
+                            <span id="shield-text" class="font-bold">100 / 100</span>
                         </div>
                         <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-cyan-500/20">
-                            <div id="shield-bar"
-                                class="bg-gradient-to-r from-cyan-500 to-blue-400 h-full w-full transition-all duration-150">
-                            </div>
+                            <div id="shield-bar" class="bg-gradient-to-r from-cyan-500 to-blue-400 h-full w-full transition-all duration-150"></div>
                         </div>
                     </div>
-                    <!-- Planet Health Bar -->
-                    <div>
-                        <div class="flex justify-between text-xs mb-0.5 tech-font text-emerald-300">
-                            <span class="flex items-center gap-1"><i class="fa-solid fa-heart text-[9px]"></i> CORE
-                                INTEGRITY</span>
-                            <span id="health-text">200 / 200</span>
+
+                    <!-- Core Integrity -->
+                    <div class="w-36 flex flex-col gap-0.5">
+                        <div class="flex justify-between text-[10px] tech-font text-emerald-300">
+                            <span class="flex items-center gap-1 font-bold">
+                                <i class="fa-solid fa-heart text-[9px]"></i> CORE
+                            </span>
+                            <span id="health-text" class="font-bold">200 / 200</span>
                         </div>
-                        <div
-                            class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-emerald-500/20">
-                            <div id="health-bar"
-                                class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-full transition-all duration-150">
-                            </div>
+                        <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-emerald-500/20">
+                            <div id="health-bar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-full transition-all duration-150"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Threat Matrix Panel -->
-            <div
-                class="bg-slate-900/95 backdrop-blur-md border border-purple-500/30 p-4 rounded-xl flex flex-col justify-between items-end w-64 gap-1">
-                <div class="flex flex-col items-end w-full">
-                    <span class="text-[10px] text-purple-400 uppercase tracking-widest font-bold">Threat Matrix</span>
-                    <div class="text-2xl font-black text-purple-300 tech-font font-bold" id="enemies-count">0 ACTIVE
+            <!-- CENTER SECTION: Wave Status & Threat Matrix -->
+            <div class="flex items-center gap-4">
+                <!-- Wave Badge -->
+                <div class="flex items-center gap-2 bg-slate-950 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-xs shadow-inner animate-pulse">
+                    <span class="text-[9px] text-slate-500 tracking-widest font-extrabold uppercase">STATUS</span>
+                    <span class="font-black text-emerald-400 tracking-wider text-sm">
+                        WAVE <span id="wave-display" class="text-white font-black">1</span>
+                    </span>
+                </div>
+
+                <!-- Divider -->
+                <div class="h-8 w-px bg-slate-800/60"></div>
+
+                <!-- Threat Stats -->
+                <div class="flex items-center gap-4 text-[10px]">
+                    <div class="flex flex-col">
+                        <span class="text-[8px] text-purple-400 uppercase tracking-widest font-bold">Threat level</span>
+                        <span class="text-purple-300 font-extrabold" id="enemies-count">0 ACTIVE</span>
                     </div>
-                    <div class="text-sm text-purple-400/80 tech-font mt-0.5" id="enemies-wave-threat">ROUND TOTAL: 10
+                    <div class="flex flex-col">
+                        <span class="text-[8px] text-slate-400 uppercase tracking-widest font-bold">Round Total</span>
+                        <span class="text-slate-300 font-bold" id="enemies-wave-threat">ROUND TOTAL: 10</span>
                     </div>
-                    <div class="text-sm text-pink-400/90 tech-font mt-0.5 font-bold" id="enemies-remaining">REMAINING:
-                        10</div>
-                    <div class="text-xs text-slate-400 tech-font mt-0.5 font-bold">Score: <span id="score-display"
-                            class="text-purple-400 font-bold">0</span></div>
+                    <div class="flex flex-col">
+                        <span class="text-[8px] text-pink-400/90 uppercase tracking-widest font-bold">Remaining</span>
+                        <span class="text-pink-300 font-bold" id="enemies-remaining">REMAINING: 10</span>
+                    </div>
                 </div>
             </div>
+
+            <!-- RIGHT SECTION: Credits, Score, & Controls -->
+            <div class="flex items-center gap-4">
+                <!-- Credits Display -->
+                <div class="flex items-center gap-2 bg-slate-950 border border-amber-500/30 px-3 py-1.5 rounded-lg text-xs shadow-inner">
+                    <i class="fa-solid fa-coins text-amber-400 text-[10px] animate-pulse"></i>
+                    <span class="text-[9px] text-slate-400 uppercase tracking-widest font-extrabold">Credits</span>
+                    <span id="top-gold" class="tech-font text-amber-300 font-black">500</span>
+                </div>
+
+                <!-- Score Display -->
+                <div class="flex flex-col text-right">
+                    <span class="text-[8px] text-slate-400 uppercase tracking-widest font-bold">Score</span>
+                    <span class="text-purple-400 font-extrabold text-xs">
+                        <span id="score-display" class="font-bold">0</span>
+                    </span>
+                </div>
+
+                <!-- Divider -->
+                <div class="h-8 w-px bg-slate-800/60"></div>
+
+                <!-- Utilities Buttons -->
+                <div class="flex items-center gap-2">
+                    <button id="fast-forward-btn"
+                        class="w-8 h-8 rounded-lg bg-slate-950 border border-slate-700/60 flex items-center justify-center text-slate-400 hover:text-emerald-400 hover:border-emerald-500/50 hover:bg-slate-900 transition-all select-none shadow-md"
+                        title="Fast Forward Wave">
+                        <i class="fa-solid fa-forward text-xs"></i>
+                    </button>
+                    <button id="settings-toggle-btn"
+                        class="w-8 h-8 rounded-lg bg-slate-950 border border-slate-700/60 flex items-center justify-center text-slate-300 hover:text-white hover:border-emerald-500/50 hover:bg-slate-900 transition-all select-none shadow-md"
+                        title="Settings">
+                        <i class="fa-solid fa-cog animate-spin-slow text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 
