@@ -4432,17 +4432,6 @@ import {
             const satelliteAugmentMultiplier = 1 + satelliteCount * 0.15;
             baseBudget = Math.ceil(baseBudget * satelliteAugmentMultiplier);
             state.game.satelliteAugmentMultiplier = satelliteAugmentMultiplier;
-
-            if (satelliteCount >= 3) {
-                setTimeout(() => {
-                    showGameNotice(
-                        `<i class="fa-solid fa-satellite text-emerald-400"></i> ` +
-                        `<span class="text-emerald-300 font-black">SATELLITE AUGMENT ×${satelliteAugmentMultiplier.toFixed(2)}</span>` +
-                        ` — ${satelliteCount} satellites detected. Threat scaled up!`,
-                        3500
-                    );
-                }, waveAffix ? 10500 : (state.game.wave % 5 === 0 ? 5000 : 800));
-            }
             // ───────────────────────────────────────────────────────────────────
 
             let pool = [];
@@ -4515,8 +4504,7 @@ import {
                 }
             }
 
-            const augStr = satelliteCount >= 1 ? ` [×${satelliteAugmentMultiplier.toFixed(2)} SAT]` : '';
-            const wThreat = document.getElementById('enemies-wave-threat'); if (wThreat) wThreat.innerText = `ROUND TOTAL: ${state.game.totalWaveEnemies}${augStr}`;
+            const wThreat = document.getElementById('enemies-wave-threat'); if (wThreat) wThreat.innerText = `ROUND TOTAL: ${state.game.totalWaveEnemies}`;
             const remThreat = document.getElementById('enemies-remaining'); if (remThreat) remThreat.innerText = `REMAINING: ${state.game.totalWaveEnemies}`;
             const mRemThreat = document.getElementById('mobile-rem'); if (mRemThreat) mRemThreat.innerText = state.game.totalWaveEnemies;
 
