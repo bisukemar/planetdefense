@@ -17,6 +17,23 @@ export class Enemy {
                 this.damage = profile.damage + Math.floor(difficultyWave * 1.15);
                 this.goldReward = Math.floor(profile.goldReward * Math.pow(1.04, difficultyWave));
 
+                // ── TIER SURGE: every 5 waves, a tier upgrade is applied ──────────
+                // Tier 1 = wave 5, Tier 2 = wave 10, Tier 3 = wave 15, ...
+                // Each tier adds stacking multipliers on top of per-wave scaling.
+                this.tierLevel = Math.floor(wave / 5);
+                if (this.tierLevel > 0) {
+                    const tierHpBonus    = 1 + this.tierLevel * 0.12;  // +12% HP per tier
+                    const tierDmgBonus   = 1 + this.tierLevel * 0.10;  // +10% damage per tier
+                    const tierSpeedBonus = 1 + this.tierLevel * 0.04;  // +4% speed per tier
+                    const tierGoldBonus  = 1 + this.tierLevel * 0.10;  // +10% gold per tier (reward balance)
+                    this.maxHp        = Math.floor(this.maxHp * tierHpBonus);
+                    this.damage       = Math.floor(this.damage * tierDmgBonus);
+                    this.baseDamage   = Math.floor(this.baseDamage * tierDmgBonus);
+                    this.baseSpeed   *= tierSpeedBonus;
+                    this.goldReward   = Math.floor(this.goldReward * tierGoldBonus);
+                }
+                // ─────────────────────────────────────────────────────────────────
+
                 this.isVeteran = wave >= 10 && Math.random() < 0.15;
                 if (this.isVeteran) {
                     this.maxHp = Math.floor(this.maxHp * 1.5);

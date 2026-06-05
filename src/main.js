@@ -4333,6 +4333,23 @@ import {
             const waveAffix = getWaveAffix(state.game.wave);
             state.game.waveAffix = waveAffix;
 
+            // --- TIER SURGE: every 5 waves enemies get a stat boost ---
+            const tierLevel = Math.floor(state.game.wave / 5);
+            if (state.game.wave % 5 === 0 && tierLevel > 0) {
+                const tierColors = ['', '#34d399', '#38bdf8', '#a78bfa', '#f97316', '#f43f5e', '#facc15'];
+                const tierColor = tierColors[Math.min(tierLevel, tierColors.length - 1)] || '#facc15';
+                // Don't double-stack notices on affix waves — show after the affix banner
+                const noticeDelay = waveAffix ? 6200 : 600;
+                setTimeout(() => {
+                    showGameNotice(
+                        `<i class="fa-solid fa-arrow-trend-up" style="color:${tierColor}"></i> ` +
+                        `<span style="color:${tierColor};font-weight:900">TIER ${tierLevel} SURGE</span> ` +
+                        `— Enemies are now ${Math.round(tierLevel * 12)}% tougher!`,
+                        4000
+                    );
+                }, noticeDelay);
+            }
+
             let isMiniBossWave = state.game.wave >= 3 && state.game.wave % 3 === 0;
             let isThematic = state.game.wave > 5 && Math.random() < 0.2 && !isMiniBossWave;
 
@@ -4407,6 +4424,27 @@ import {
             if (riskContract) baseBudget = Math.ceil(baseBudget * (1 + riskContract.enemy));
             if (warBudget) baseBudget = Math.ceil(baseBudget * (1 + warBudget.enemy));
 
+            // ── SATELLITE AUGMENTATION SYSTEM ──────────────────────────────────
+            // Each deployed satellite adds +15% to the spawn budget, making waves
+            // dynamically harder the more fortified the player is.
+            // This keeps waves from feeling trivial in well-built runs.
+            const satelliteCount = state.game.towers.length;
+            const satelliteAugmentMultiplier = 1 + satelliteCount * 0.15;
+            baseBudget = Math.ceil(baseBudget * satelliteAugmentMultiplier);
+            state.game.satelliteAugmentMultiplier = satelliteAugmentMultiplier;
+
+            if (satelliteCount >= 3) {
+                setTimeout(() => {
+                    showGameNotice(
+                        `<i class="fa-solid fa-satellite text-emerald-400"></i> ` +
+                        `<span class="text-emerald-300 font-black">SATELLITE AUGMENT ×${satelliteAugmentMultiplier.toFixed(2)}</span>` +
+                        ` — ${satelliteCount} satellites detected. Threat scaled up!`,
+                        3500
+                    );
+                }, waveAffix ? 10500 : (state.game.wave % 5 === 0 ? 5000 : 800));
+            }
+            // ───────────────────────────────────────────────────────────────────
+
             let pool = [];
             if (theme === 'Asteroid Belt') {
                 pool = [0, 1, 2, 3];
@@ -4477,7 +4515,8 @@ import {
                 }
             }
 
-            const wThreat = document.getElementById('enemies-wave-threat'); if (wThreat) wThreat.innerText = `ROUND TOTAL: ${state.game.totalWaveEnemies}`;
+            const augStr = satelliteCount >= 1 ? ` [×${satelliteAugmentMultiplier.toFixed(2)} SAT]` : '';
+            const wThreat = document.getElementById('enemies-wave-threat'); if (wThreat) wThreat.innerText = `ROUND TOTAL: ${state.game.totalWaveEnemies}${augStr}`;
             const remThreat = document.getElementById('enemies-remaining'); if (remThreat) remThreat.innerText = `REMAINING: ${state.game.totalWaveEnemies}`;
             const mRemThreat = document.getElementById('mobile-rem'); if (mRemThreat) mRemThreat.innerText = state.game.totalWaveEnemies;
 
