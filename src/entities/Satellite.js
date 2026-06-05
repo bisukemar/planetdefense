@@ -124,6 +124,11 @@ export class Satellite {
                 }
 
                 if (this.cooldown > 0) this.cooldown -= speedMultiplier;
+                // --- AFFIX: disableTimer (from Jammer or Glacial freeze) ---
+                if (this.disableTimer > 0) {
+                    this.disableTimer -= speedMultiplier;
+                    return; // Cannot fire while disabled
+                }
                 if (this.cooldown === 0) {
                     if (this.target && state.game.enemies.includes(this.target)) {
                         this.fire(this.target);
@@ -133,18 +138,40 @@ export class Satellite {
             }
             fire(enemy) {
                 state.playSynthSound(this.type);
+
+                // Shared helper: applies shielded absorption + mirror reflect + reactive stacking
+                const applyAffixDamage = (e, dmg) => {
+                    if (e.affix && e.affix.id === 'shielded' && e.shield > 0) {
+                        const overflow = Math.max(0, dmg - e.shield);
+                        e.shield = Math.max(0, e.shield - dmg);
+                        if (e.shield <= 0) { state.playSynthSound('explosion'); state.createExplosion(e.x, e.y, '#38bdf8', 12); }
+                        if (overflow > 0) e.hp -= overflow;
+                    } else { e.hp -= dmg; }
+                    if (e.affix && e.affix.id === 'mirror' && dmg > 0) {
+                        const reflectDmg = Math.max(1, Math.floor(dmg * (e.mirrorPercent || 0.15)));
+                        if (state.game.towers.includes(this)) {
+                            this.hp = Math.max(0, this.hp - reflectDmg);
+                            state.shipAttackBeamsToDraw.push({ x1: e.x, y1: e.y, x2: this.x, y2: this.y, color: '#e2e8f0', alpha: 1, width: 1.2 });
+                            if (this.hp <= 0) {
+                                state.createExplosion(this.x, this.y, '#ef4444', 18);
+                                state.game.towers = state.game.towers.filter(t => t.id !== this.id);
+                            }
+                        }
+                    }
+                };
+
                 if (this.type === 'lasersentry') {
                     const rampBoost = 1 + state.getDirectiveEffectValue('laserRamp', 0) + (state.getDirectiveEffectValue('laserOverfocus') ? state.getDirectiveEffectValue('laserOverfocus').ramp : 0);
                     const focusBoost = this.beamTicks >= 120 ? state.getDirectiveEffectValue('laserFocus', 0) : 0;
                     const rampMultiplier = 1 + Math.min(120, this.beamTicks) * 0.05 * rampBoost + focusBoost;
                     const rampedDmg = Math.floor(this.effectiveDamage * rampMultiplier * getTargetedDamageMultiplier(enemy, this.type));
-                    enemy.hp -= rampedDmg;
+                    applyAffixDamage(enemy, rampedDmg);
 
                     if (Math.random() < 0.3) {
                         state.createExplosion(enemy.x, enemy.y, '#22d3ee', 1);
                     }
                 } else if (this.type === 'lightningsentry') {
-                    enemy.hp -= Math.floor(this.effectiveDamage * getTargetedDamageMultiplier(enemy, this.type));
+                    applyAffixDamage(enemy, Math.floor(this.effectiveDamage * getTargetedDamageMultiplier(enemy, this.type)));
                     state.createExplosion(enemy.x, enemy.y, '#fbbf24', 5);
 
                     state.lightningArcsToDraw.push({
@@ -173,7 +200,7 @@ export class Satellite {
                         if (nextTarget) {
                             chainTargets.push(nextTarget);
                             const cascadeDamage = Math.floor(this.effectiveDamage * Math.pow(0.75, b + 1) * getTargetedDamageMultiplier(nextTarget, this.type));
-                            nextTarget.hp -= cascadeDamage;
+                            applyAffixDamage(nextTarget, cascadeDamage);
                             state.createExplosion(nextTarget.x, nextTarget.y, '#fbbf24', 3);
 
                             state.lightningArcsToDraw.push({
@@ -188,7 +215,7 @@ export class Satellite {
                     }
                 } else {
                     const bulletSpeed = config.SATELLITE_CONFIGS[this.type].projSpeed * state.gameScale;
-                    state.game.projectiles.push(new Projectile(this.x, this.y, enemy, this.type, this.effectiveDamage, bulletSpeed, this.range));
+                    state.game.projectiles.push(new Projectile(this.x, this.y, enemy, this.type, this.effectiveDamage, bulletSpeed, this.range, this));
                 }
             }
             draw() {
@@ -275,6 +302,22 @@ export class Satellite {
                     state.ctx.fillRect(this.x - barW / 2, this.y - 24 * state.gameScale, barW, barH);
                     state.ctx.fillStyle = '#f97316';
                     state.ctx.fillRect(this.x - barW / 2, this.y - 24 * state.gameScale, barW * (this.hp / this.maxHp), barH);
+                    state.ctx.restore();
+                }
+                // --- Disabled indicator from Jammer/Glacial ---
+                if (this.disableTimer > 0) {
+                    state.ctx.save();
+                    state.ctx.globalAlpha = 0.75;
+                    state.ctx.fillStyle = 'rgba(125,211,252,0.25)';
+                    state.ctx.strokeStyle = '#7dd3fc';
+                    state.ctx.lineWidth = 2;
+                    state.ctx.shadowBlur = 12;
+                    state.ctx.shadowColor = '#7dd3fc';
+                    state.ctx.beginPath();
+                    state.ctx.arc(this.x, this.y, 16 * state.gameScale, 0, Math.PI * 2);
+                    state.ctx.fill();
+                    state.ctx.stroke();
+                    state.ctx.globalAlpha = 1;
                     state.ctx.restore();
                 }
                 if (isSelected) {

@@ -9,7 +9,8 @@ import {
     PLANET_TEXTURE_FILES, SATELLITE_SPRITE_FILES, ORBIT_COLORS, ORBIT_HOVER_COLORS,
     SATELLITE_CONFIGS, ENEMY_SPRITE_FILES, ENEMY_PROFILES, BOSS_SHIPS,
     BOSS_WEAPON_ENHANCEMENTS, BOSS_FIRST_WAVE, BOSS_ROUND_INTERVAL,
-    DIRECTIVE_RARITY_COLORS, DIRECTIVE_RARITY_WEIGHTS, COMMAND_DIRECTIVES
+    DIRECTIVE_RARITY_COLORS, DIRECTIVE_RARITY_WEIGHTS, COMMAND_DIRECTIVES,
+    ENEMY_AFFIXES, getWaveAffix
 } from './config.js';
 
         // ----------------------------------------------------------------------
@@ -367,6 +368,7 @@ import {
             const rocksContainer = document.getElementById('encyclopedia-rocks');
             const shipsContainer = document.getElementById('encyclopedia-ships');
             const directivesContainer = document.getElementById('encyclopedia-directives');
+            const affixesContainer = document.getElementById('encyclopedia-affixes');
             if (!satelliteContainer || !rocksContainer || !shipsContainer || !directivesContainer) return;
 
             satelliteContainer.innerHTML = Object.entries(SATELLITE_CONFIGS).map(([type, cfg]) => {
@@ -444,6 +446,29 @@ import {
                 .sort((a, b) => (rarityRank[a.rarity] ?? 9) - (rarityRank[b.rarity] ?? 9) || a.name.localeCompare(b.name))
                 .map(renderDirectiveEncyclopediaCard)
                 .join('');
+
+            // Affixes section
+            if (affixesContainer) {
+                const categoryLabel = { rock: 'Rock', ship: 'Ship', both: 'All Enemies' };
+                const categoryColor = { rock: '#fb923c', ship: '#38bdf8', both: '#fde68a' };
+                affixesContainer.innerHTML = ENEMY_AFFIXES.map(affix => {
+                    const waveIndex = ['reactive','shielded','glacial','jammer','volatile','berserk','ironclad','mirror','commander','gilded','fissured'].indexOf(affix.id);
+                    const firstWave = waveIndex >= 0 ? (waveIndex + 1) * 10 : '?';
+                    return `
+                        <div class="bg-slate-900 border rounded-lg p-3 flex flex-col gap-2" style="border-color:${affix.color}40">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <i class="${affix.icon} text-sm" style="color:${affix.color}"></i>
+                                    <span class="font-black text-xs tracking-widest uppercase" style="color:${affix.color}">${affix.name}</span>
+                                </div>
+                                <span class="text-[9px] px-2 py-0.5 rounded-full font-bold uppercase" style="background:${affix.color}20;color:${affix.color}">${categoryLabel[affix.category] || 'All'}</span>
+                            </div>
+                            <p class="text-[10px] text-amber-300 font-bold italic">${affix.subtitle}</p>
+                            <p class="text-[10px] text-slate-300 leading-relaxed">${affix.desc}</p>
+                            <div class="text-[9px] text-slate-500 font-bold mt-1">First appears: Wave ${firstWave}</div>
+                        </div>`;
+                }).join('');
+            }
         }
 
         const RESEARCH_NODES = {
@@ -2551,7 +2576,7 @@ import {
             for (let i = 0; i < count; i++) state.game.particles.push(new Particle(x, y, color));
         }
 
-        export function damageSatellite(tower, amount, enemyCategory = null) {
+        export function damageSatellite(tower, amount, enemyCategory = null, sourceEnemy = null) {
             if (!tower || !state.game.towers.includes(tower)) return;
 
             let multiplier = 1;
@@ -4158,6 +4183,56 @@ import {
             if (enemy.hp <= 0) {
                 createExplosion(enemy.x, enemy.y, enemy.color, 16);
                 playSynthSound(enemy.category === 'normal' ? 'rock_destroy' : 'ship_destroy');
+
+                // --- AFFIX DEATH EFFECTS ---
+                if (enemy.affix) {
+                    // Fissured: split into 2-3 small Meteoroids
+                    if (enemy.isFissured && enemy.category === 'normal') {
+                        const fragCount = Math.floor(Math.random() * 2) + 2;
+                        for (let f = 0; f < fragCount; f++) {
+                            const frag = new Enemy(state.game.wave, 0, null, false, 0, 1, null);
+                            frag.x = enemy.x + (Math.random() - 0.5) * enemy.size * 3;
+                            frag.y = enemy.y + (Math.random() - 0.5) * enemy.size * 3;
+                            frag.maxHp = Math.max(4, Math.floor(enemy.maxHp * 0.25));
+                            frag.hp = frag.maxHp;
+                            state.game.enemies.push(frag);
+                        }
+                        showGameNotice('<i class="fa-solid fa-circle-nodes text-orange-400"></i> FISSURED — Rock shattered into fragments!', 2500);
+                    }
+
+                    // Volatile: AoE damage to nearby satellites
+                    if (enemy.isVolatile) {
+                        const blastRadius = enemy.size * 7;
+                        const blastDamage = Math.floor(enemy.baseDamage * 2.5);
+                        let hit = 0;
+                        for (const tower of state.game.towers) {
+                            if (Math.hypot(tower.x - enemy.x, tower.y - enemy.y) <= blastRadius) {
+                                damageSatellite(tower, blastDamage, 'normal');
+                                createExplosion(tower.x, tower.y, '#f97316', 10);
+                                hit++;
+                            }
+                        }
+                        createExplosion(enemy.x, enemy.y, '#f97316', 28);
+                        state.game.cameraShake = Math.min(20, (state.game.cameraShake || 0) + 8 * state.screenShakeIntensity);
+                        if (hit > 0) showGameNotice(`<i class="fa-solid fa-fire text-orange-400"></i> VOLATILE — Explosion damaged ${hit} satellite(s)!`, 3000);
+                    }
+
+                    // Glacial: freeze nearby satellites
+                    if (enemy.isGlacial) {
+                        const freezeRadius = enemy.size * 8;
+                        let frozen = 0;
+                        for (const tower of state.game.towers) {
+                            if (Math.hypot(tower.x - enemy.x, tower.y - enemy.y) <= freezeRadius) {
+                                tower.disableTimer = 180; // 3 seconds at 60fps
+                                createExplosion(tower.x, tower.y, '#7dd3fc', 6);
+                                frozen++;
+                            }
+                        }
+                        if (frozen > 0) showGameNotice(`<i class="fa-solid fa-snowflake text-sky-300"></i> GLACIAL — ${frozen} satellite(s) frozen for 3s!`, 3000);
+                    }
+                }
+                // ---------------------------
+
                 let rewardMultiplier = 1;
                 if (state.research && state.research.economyBounty) {
                     rewardMultiplier += state.research.economyBounty * 0.02;
@@ -4167,6 +4242,8 @@ import {
                 const rockRewardSpeed = getDirectiveEffectValue('rockRewardSpeed'); if (enemy.category === 'normal' && rockRewardSpeed) rewardMultiplier += rockRewardSpeed.reward;
                 const shipReward = getDirectiveEffectValue('shipReward'); if ((enemy.category === 'ship' || enemy.category === 'miniboss') && shipReward) rewardMultiplier += shipReward;
                 const eliteIncentive = getDirectiveEffectValue('eliteIncentive'); if (enemy.category === 'miniboss' && eliteIncentive) rewardMultiplier *= eliteIncentive.reward;
+                // Gilded: 3x gold reward
+                if (enemy.isGilded) rewardMultiplier *= 3;
                 const reward = Math.floor(enemy.goldReward * rewardMultiplier);
                 addGold(reward); state.game.score += reward * 2;
                 const shieldPerKill = getDirectiveEffectValue('shieldPerKill', 0);
@@ -4188,6 +4265,13 @@ import {
                 if (state.research && state.research.cosmicScavenger) {
                     cosmicDropMultiplier += state.research.cosmicScavenger * 0.05;
                     if (state.research.cosmicScavenger >= 10) cosmicDropMultiplier *= 2;
+                }
+
+                // Gilded: +2 Cosmic Data per kill
+                if (enemy.isGilded) {
+                    state.cosmicData += 2;
+                    showGameNotice('<i class="fa-solid fa-coins text-yellow-300"></i> GILDED — +2 Cosmic Data recovered!', 2000);
+                    saveSettings();
                 }
 
                 if (enemy.type === 'Rogue Comet') {
@@ -4245,6 +4329,10 @@ import {
             if (state.game.selectedTower) selectTower(state.game.selectedTower);
             updateOrbitInspectorUI();
 
+            // --- AFFIX: milestone every 10 waves ---
+            const waveAffix = getWaveAffix(state.game.wave);
+            state.game.waveAffix = waveAffix;
+
             let isMiniBossWave = state.game.wave >= 3 && state.game.wave % 3 === 0;
             let isThematic = state.game.wave > 5 && Math.random() < 0.2 && !isMiniBossWave;
 
@@ -4291,6 +4379,27 @@ import {
 
             showWaveEvent(themeTitle, themeSubtitle, isThematic || state.game.hazard ? 'red' : (isMiniBossWave ? 'fuchsia' : 'amber'));
             playSynthSound(isMiniBossWave || isThematic || state.game.hazard ? 'warning' : 'wave_start');
+
+            // --- AFFIX milestone announcement ---
+            if (waveAffix) {
+                setTimeout(() => {
+                    showGameNotice(
+                        `<i class="${waveAffix.icon}" style="color:${waveAffix.color}"></i> ` +
+                        `<span style="color:${waveAffix.color};font-weight:900">${waveAffix.name.toUpperCase()} WAVE</span> — ` +
+                        `${waveAffix.subtitle}`,
+                        5000
+                    );
+                    const warn = document.getElementById('warning-banner');
+                    const warnContent = document.getElementById('warning-banner-content');
+                    if (warn && warnContent) {
+                        warnContent.innerHTML = `<i class="${waveAffix.icon} mr-1" style="color:${waveAffix.color}"></i> AFFIX WAVE ${state.game.wave}: ${waveAffix.name.toUpperCase()} — ${waveAffix.subtitle}`;
+                        warn.style.borderColor = waveAffix.color + '80';
+                        warn.classList.remove('hidden');
+                        setTimeout(() => { warn.classList.add('hidden'); warn.style.borderColor = ''; }, 6000);
+                    }
+                }, 800);
+                playSynthSound('warning');
+            }
 
             let baseBudget = 15 + Math.floor(state.game.wave * 12);
             const riskContract = getDirectiveEffectValue('riskContract');
@@ -4796,6 +4905,7 @@ import {
         bindButton('encyclopedia-menu-rocks', () => { scrollEncyclopediaTo('rocks'); });
         bindButton('encyclopedia-menu-ships', () => { scrollEncyclopediaTo('ships'); });
         bindButton('encyclopedia-menu-directives', () => { scrollEncyclopediaTo('directives'); });
+        bindButton('encyclopedia-menu-affixes', () => { scrollEncyclopediaTo('affixes'); });
         bindButton('close-install-options-btn', () => { const installPanel = document.getElementById('inline-install-options'); if (installPanel) installPanel.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('back-install-options-btn', () => { const installPanel = document.getElementById('inline-install-options'); if (installPanel) installPanel.classList.add('hidden'); playSynthSound('upgrade'); });
         bindButton('close-boss-attack-btn', () => { const panel = document.getElementById('inline-boss-attack-options'); if (panel) panel.classList.add('hidden'); playSynthSound('upgrade'); });
@@ -5173,7 +5283,7 @@ import {
                             state.spawnTimer++;
                             if (state.spawnTimer >= state.spawnQueue[0].delay) {
                                 const spawnData = state.spawnQueue.shift();
-                                state.game.enemies.push(new Enemy(spawnData.waveNum, spawnData.profileIndex, spawnData.theme, spawnData.isEscort, spawnData.escortIndex, spawnData.escortTotal));
+                                state.game.enemies.push(new Enemy(spawnData.waveNum, spawnData.profileIndex, spawnData.theme, spawnData.isEscort, spawnData.escortIndex, spawnData.escortTotal, state.game.waveAffix || null));
                                 state.game.enemiesSpawnedThisWave++; state.spawnTimer = 0;
                             }
                         }

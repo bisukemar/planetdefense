@@ -1,11 +1,12 @@
 import { state } from '../state.js';
 import * as config from '../config.js';
-import { getTargetedDamageMultiplier } from '../main.js';
+import { getTargetedDamageMultiplier, damageSatellite } from '../main.js';
 
 export class Projectile {
-            constructor(startX, startY, target, type, damage, speed, range) {
+            constructor(startX, startY, target, type, damage, speed, range, sourceTower = null) {
                 this.x = startX; this.y = startY; this.target = target; this.type = type; this.damage = damage; this.speed = speed;
                 this.range = range;
+                this.sourceTower = sourceTower;
                 const angle = Math.atan2(target.y - startY, target.x - startX);
                 this.dx = Math.cos(angle) * speed; this.dy = Math.sin(angle) * speed;
                 this.dead = false; this.trail = [];
@@ -32,26 +33,58 @@ export class Projectile {
             }
             impact(enemy) {
                 this.dead = true;
+
+                // --- AFFIX: Shielded — absorb into shield first ---
+                const applyDamageToEnemy = (e, dmg) => {
+                    if (e.affix && e.affix.id === 'shielded' && e.shield > 0) {
+                        const overflow = Math.max(0, dmg - e.shield);
+                        e.shield = Math.max(0, e.shield - dmg);
+                        if (e.shield <= 0) {
+                            state.playSynthSound('explosion');
+                            state.createExplosion(e.x, e.y, '#38bdf8', 12);
+                        }
+                        if (overflow > 0) e.hp -= overflow;
+                    } else {
+                        e.hp -= dmg;
+                    }
+
+                    // --- AFFIX: Reactive — increment stack on hit ---
+                    if (e.affix && e.affix.id === 'reactive') {
+                        e._lastHpForReactive = e.hp; // will be caught by update()
+                    }
+
+                    // --- AFFIX: Mirror — reflect 15% back to source tower ---
+                    if (e.affix && e.affix.id === 'mirror' && this.sourceTower && dmg > 0) {
+                        const reflectDmg = Math.max(1, Math.floor(dmg * e.mirrorPercent));
+                        damageSatellite(this.sourceTower, reflectDmg, null);
+                        state.shipAttackBeamsToDraw.push({
+                            x1: e.x, y1: e.y,
+                            x2: this.sourceTower.x, y2: this.sourceTower.y,
+                            color: '#e2e8f0', alpha: 1, width: 1.2
+                        });
+                    }
+                };
+
                 if (this.type === 'plasma') {
                     state.playSynthSound('explosion'); state.createExplosion(this.x, this.y, '#10b981', 25);
                     const blastRadius = 60 * state.rangeScale;
                     for (let e of state.game.enemies) {
                         const distance = Math.hypot(e.x - this.x, e.y - this.y);
-                        if (distance < blastRadius) e.hp -= Math.floor(this.damage * getTargetedDamageMultiplier(e, this.type));
+                        if (distance < blastRadius) applyDamageToEnemy(e, Math.floor(this.damage * getTargetedDamageMultiplier(e, this.type)));
                     }
                 } else if (this.type === 'railgun') {
                     state.playSynthSound('hit'); state.createExplosion(this.x, this.y, '#a855f7', 15);
-                    enemy.hp -= Math.floor(this.damage * getTargetedDamageMultiplier(enemy, this.type)); enemy.speed *= 0.5;
+                    applyDamageToEnemy(enemy, Math.floor(this.damage * getTargetedDamageMultiplier(enemy, this.type))); enemy.speed *= 0.5;
                 } else if (this.type === 'magnetsentry') {
                     state.playSynthSound('hit');
                     state.createExplosion(this.x, this.y, '#3b82f6', 10);
-                    enemy.hp -= Math.floor(this.damage * getTargetedDamageMultiplier(enemy, this.type));
+                    applyDamageToEnemy(enemy, Math.floor(this.damage * getTargetedDamageMultiplier(enemy, this.type)));
                     enemy.slowMultiplier = Math.min(enemy.slowMultiplier, 0.4);
                     enemy.slowTimer = Math.max(enemy.slowTimer, 240);
                 } else {
                     state.playSynthSound('hit');
                     state.createExplosion(this.x, this.y, this.type === 'missile' ? '#ef4444' : '#38bdf8', 10);
-                    enemy.hp -= Math.floor(this.damage * getTargetedDamageMultiplier(enemy, this.type));
+                    applyDamageToEnemy(enemy, Math.floor(this.damage * getTargetedDamageMultiplier(enemy, this.type)));
                     if (this.type === 'missile') {
                         const clusters = state.getDirectiveEffectValue('missileBlast', 0);
                         const missileTradeoff = state.getDirectiveEffectValue('missileTradeoff');
@@ -60,7 +93,7 @@ export class Projectile {
                             for (let e of state.game.enemies) {
                                 if (e.id === enemy.id) continue;
                                 const distance = Math.hypot(e.x - this.x, e.y - this.y);
-                                if (distance < blastRadius) e.hp -= Math.floor(this.damage * (0.18 + clusters * 0.04) * getTargetedDamageMultiplier(e, this.type));
+                                if (distance < blastRadius) applyDamageToEnemy(e, Math.floor(this.damage * (0.18 + clusters * 0.04) * getTargetedDamageMultiplier(e, this.type)));
                             }
                         }
                     }

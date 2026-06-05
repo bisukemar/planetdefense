@@ -1,7 +1,8 @@
-export const APP_VERSION = 'Alpha 0.9.73.150';
+export const APP_VERSION = 'Alpha 0.9.74.151';
 export const TARGET_FRAME_MS = 1000 / 60;
 
 export const PATCH_NOTES = [
+    { version: 'Alpha 0.9.74.151', notes: ['Introduced the Enemy Affix System: Every 10 waves, a milestone wave triggers, applying a wave-wide universal affix to all spawned enemies (e.g. Shielded, Reactive, Glacial, Volatile).', 'Added 11 unique enemy affixes with bespoke behavioral modifiers, stat scaling, and custom visual overlays/VFX.', 'Added the Affixes catalog to the Space Encyclopedia to provide details on each wave modifier.'] },
     { version: 'Alpha 0.9.73.150', notes: ['Enhanced Boss Intercept Mode mechanics: Pre-boss Gatekeepers now drift horizontally at the boss orbital altitude instead of flying offscreen.', 'Added a dramatic cinematic entrance sequence and kill explosions for boss encounters.', 'Increased weapon drop size and pickup collision radius for easier collection.', 'Removed the bottom movement restriction in Boss Mode, allowing full use of the screen.'] },
     { version: 'Alpha 0.9.73.149', notes: ['Fixed a critical freeze that occurred when the Boss Gatekeeper spawned while the player had a weapon upgrade.', 'Improved "Check for Update" button to force an immediate reload upon finding an update.'] },
     { version: 'Alpha 0.9.73.148', notes: ['Added "Check for Update" button in the Install panel.'] },
@@ -365,3 +366,129 @@ export const COMMAND_DIRECTIVE_TIERS = {
     'A': { name: 'A-Tier', color: '#38bdf8' },
     'B': { name: 'B-Tier', color: '#34d399' }
 };
+
+// ---------------------------------------------------------------------------
+// ENEMY AFFIX SYSTEM
+// Every 10 waves a milestone wave fires — all enemies in that wave share
+// the same affix, creating a themed wave-wide challenge.
+// ---------------------------------------------------------------------------
+export const ENEMY_AFFIXES = [
+    {
+        id: 'reactive',
+        name: 'Reactive',
+        subtitle: 'Each impact accelerates them!',
+        category: 'rock',
+        color: '#facc15',
+        icon: 'fa-solid fa-bolt',
+        desc: 'Rocks gain +5% speed for every hit they take, stacking up to +60%. These fragments seem to feed on kinetic impacts — the more you shoot them, the faster they become. Prioritize one-shot kills.'
+    },
+    {
+        id: 'glacial',
+        name: 'Glacial',
+        subtitle: 'Death freezes your satellites!',
+        category: 'rock',
+        color: '#7dd3fc',
+        icon: 'fa-solid fa-snowflake',
+        desc: 'When a Glacial rock is destroyed, it releases a cryogenic shockwave that disables all nearby Satellites for 3 seconds. Plan your fire patterns carefully — letting too many burst near your defenses can leave you unprotected.'
+    },
+    {
+        id: 'volatile',
+        name: 'Volatile',
+        subtitle: 'Death triggers an AoE explosion!',
+        category: 'rock',
+        color: '#f97316',
+        icon: 'fa-solid fa-fire',
+        desc: 'Volatile rocks detonate on destruction, dealing area damage to any Satellites caught in the blast radius. Position matters — satellites close to impact zones will take heavy structural damage. Lure rocks away before firing.'
+    },
+    {
+        id: 'fissured',
+        name: 'Fissured',
+        subtitle: 'Splits into fragments on death!',
+        category: 'rock',
+        color: '#fb923c',
+        icon: 'fa-solid fa-circle-nodes',
+        desc: 'Destroying a Fissured rock causes it to fracture into 2–3 smaller Meteoroids that continue the attack. The fragments inherit the wave\'s threat level. Avoid letting large Fissured rocks break near your defenses.'
+    },
+    {
+        id: 'ironclad',
+        name: 'Ironclad',
+        subtitle: 'Cannot be slowed or magnetized!',
+        category: 'rock',
+        color: '#94a3b8',
+        icon: 'fa-solid fa-shield-halved',
+        desc: 'Ironclad rocks are completely immune to slowing effects. Gravitational Magnet Fields cannot slow them, and temporal disruptions have no effect. Rely on raw firepower — utility satellites are useless against this threat.'
+    },
+    {
+        id: 'shielded',
+        name: 'Shielded',
+        subtitle: 'Absorbs damage before HP is touched!',
+        category: 'ship',
+        color: '#38bdf8',
+        icon: 'fa-solid fa-shield',
+        desc: 'Shielded ships arrive wrapped in a barrier equal to 30% of their total HP. The barrier absorbs all incoming damage completely until it breaks. Heavy burst weapons like Railguns and Missiles are ideal for punching through quickly.'
+    },
+    {
+        id: 'jammer',
+        name: 'Jammer',
+        subtitle: 'Periodically disables nearby satellites!',
+        category: 'ship',
+        color: '#a78bfa',
+        icon: 'fa-solid fa-wifi',
+        desc: 'Jammer ships emit electronic disruption pulses every 8 seconds, knocking the nearest Satellite offline for 2.5 seconds. Prioritize killing Jammers quickly — multiple Jammers can rotate your defenses into near-permanent silence.'
+    },
+    {
+        id: 'berserk',
+        name: 'Berserk',
+        subtitle: 'Gets faster and attacks faster at low HP!',
+        category: 'ship',
+        color: '#f43f5e',
+        icon: 'fa-solid fa-skull-crossbones',
+        desc: 'Berserk ships enter a frenzy state as they take damage, increasing both their movement speed and attack rate up to +60% at critical HP. Do not leave them to bleed — finish them off quickly before they reach full rampage speed.'
+    },
+    {
+        id: 'commander',
+        name: 'Commander',
+        subtitle: 'Buffs all nearby enemies!',
+        category: 'ship',
+        color: '#fbbf24',
+        icon: 'fa-solid fa-star',
+        desc: 'Commander ships radiate a command aura that grants all nearby enemies +20% HP and +15% movement speed. The aura pulses visibly — prioritize destroying the Commander first to strip buffs from the entire group.'
+    },
+    {
+        id: 'mirror',
+        name: 'Mirror Shield',
+        subtitle: 'Reflects 15% of incoming damage!',
+        category: 'ship',
+        color: '#e2e8f0',
+        icon: 'fa-solid fa-gem',
+        desc: 'Mirror Shield ships reflect 15% of all damage back onto the attacking satellite. High-rate-of-fire satellites can suffer significant self-damage against a cluster of Mirror enemies. Use slow, heavy-hitting weapons to minimize blowback.'
+    },
+    {
+        id: 'gilded',
+        name: 'Gilded',
+        subtitle: 'Tanky, fast under fire — but drops 3× loot!',
+        category: 'both',
+        color: '#fde68a',
+        icon: 'fa-solid fa-coins',
+        desc: 'Gilded enemies arrive with double HP and gain +5% speed whenever they are hit — but destroying them rewards 3× Gold and +2 Cosmic Data each. They are extremely valuable targets. Bring overwhelming firepower and let the riches flow.'
+    }
+];
+
+// Scheduled affix rotation. Index into ENEMY_AFFIXES by position.
+// cycle: 0=reactive, 1=shielded, 2=glacial, 3=jammer, 4=volatile,
+//        5=berserk, 6=ironclad, 7=mirror, 8=commander, 9=gilded, 10=fissured
+const AFFIX_ROTATION = [
+    'reactive', 'shielded', 'glacial', 'jammer', 'volatile',
+    'berserk', 'ironclad', 'mirror', 'commander', 'gilded', 'fissured'
+];
+
+/**
+ * Returns the ENEMY_AFFIX object for a given wave number,
+ * or null if it is not a milestone wave (multiple of 10).
+ */
+export function getWaveAffix(wave) {
+    if (wave % 10 !== 0) return null;
+    const cycleIndex = (Math.floor(wave / 10) - 1) % AFFIX_ROTATION.length;
+    const affixId = AFFIX_ROTATION[cycleIndex];
+    return ENEMY_AFFIXES.find(a => a.id === affixId) || null;
+}
