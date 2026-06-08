@@ -1,7 +1,8 @@
-export const APP_VERSION = 'Alpha 0.9.77.154';
+export const APP_VERSION = 'Alpha 0.9.78.155';
 export const TARGET_FRAME_MS = 1000 / 60;
 
 export const PATCH_NOTES = [
+    { version: 'Alpha 0.9.78.155', notes: ['Overhauled the Boss Intercept ship weapon system into a persistent purchase, upgrade, and equip progression system.', 'Added Ship Tech tab in Research Lab with bespoke skill trees for firing rate, drone damage, shields, and dodge utility.', 'Added Ship Upgrade & Loadout accordion in Master Command Center to buy and equip primary/secondary weapons.', 'Replaced combat weapon drops with four temporary combat buffs (Fire Rate, Double Damage, Proton Shield, Item Magnet).'] },
     { version: 'Alpha 0.9.77.154', notes: ['Redesigned the desktop HUD into a unified, space-efficient command dashboard.', 'Moved resource counters (Credits and Score) to the top header for better tactical awareness.', 'Compact side-by-side health and shield integrity status bars.', 'Optimized vertical play area clearance and notice alert positioning.'] },
     { version: 'Alpha 0.9.76.153', notes: ['Under-the-hood performance optimizations to wave spawning routines.', 'Optimized the cache reload system to resolve intermittent service worker loops.', 'Addressed minor UI layout scaling issues on various viewport sizes.'] },
     { version: 'Alpha 0.9.75.152', notes: ['Added Tier Surge system: every 5 waves all enemies receive a stacking stat boost (+12% HP, +10% damage, +4% speed per tier). Tier 1 activates at Wave 5, Tier 2 at Wave 10, etc.', 'Added in-game Tier Surge notice that appears at the start of each milestone wave, color-coded by tier severity.', 'Gold rewards scale proportionally with tiers (+10% per tier) to keep progression fair.'] },

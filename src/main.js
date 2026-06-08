@@ -23,6 +23,10 @@ import {
         state.playSynthSound = playSynthSound;
         state.createExplosion = createExplosion;
         state.getDirectiveEffectValue = getDirectiveEffectValue;
+        state.damageSatellite = damageSatellite;
+        state.damageEarth = damageEarth;
+        state.showGameNotice = showGameNotice;
+        state.drawEnemySprite = drawEnemySprite;
         
         let lastLoopTimestamp = 0;
 
@@ -87,9 +91,17 @@ import {
                     if (parsed.cosmicData !== undefined) state.cosmicData = parsed.cosmicData;
                     if (parsed.research) {
                         state.research = parsed.research;
-                        state.research.startSlots = state.research.startSlots || 0;
-                        state.research.baseShield = state.research.baseShield || 0;
-                        state.research.baseDamage = state.research.baseDamage || 0;
+                        const defaultNodes = [
+                            'startSlots', 'baseShield', 'baseDamage', 'tacticalCooldown', 'cosmicScavenger', 'economyBounty',
+                            'fighterSpeed', 'fighterHull', 'dodgeRollCooldown', 'primaryFireRate', 'secondaryFireRate', 
+                            'droneDamage', 'shieldDuration', 'repairEfficacy'
+                        ];
+                        defaultNodes.forEach(k => {
+                            if (state.research[k] === undefined) state.research[k] = 0;
+                        });
+                        if (parsed.equippedPrimary !== undefined) state.equippedPrimary = parsed.equippedPrimary;
+                        if (parsed.equippedSecondary !== undefined) state.equippedSecondary = parsed.equippedSecondary;
+                        if (parsed.shipWeapons !== undefined) state.shipWeapons = parsed.shipWeapons;
                     }
                 }
             } catch (e) { console.warn("Failed to load settings", e); }
@@ -117,7 +129,10 @@ import {
                     planetName: state.planetName,
                     planetTheme: state.activeThemeKey,
                     cosmicData: state.cosmicData,
-                    research: state.research
+                    research: state.research,
+                    equippedPrimary: state.equippedPrimary,
+                    equippedSecondary: state.equippedSecondary,
+                    shipWeapons: state.shipWeapons
                 };
                 localStorage.setItem('pd_settings', JSON.stringify(settings));
             } catch (e) { console.warn("Failed to save settings", e); }
@@ -472,16 +487,24 @@ import {
         }
 
         const RESEARCH_NODES = {
-            baseShield: { name: 'Reinforced Shielding', desc: 'Increase base shield by +25 per level.', branch: 0, row: 0, costBase: 10, costScale: 15, capstone: 'Planet slowly regenerates 1 shield per second.', icon: 'fa-shield-halved' },
-            fighterSpeed: { name: 'Interceptor Engines', desc: 'Increase Boss Fighter speed by +2% per level.', branch: 0, row: 1, costBase: 25, costScale: 20, capstone: 'Fighter gains 2s invulnerability when damaged.', parent: 'baseShield', reqLevel: 5, icon: 'fa-gauge-high' },
-            fighterHull: { name: 'Reinforced Hull', desc: 'Increase Boss Fighter Max HP by +5% per level.', branch: 0, row: 2, costBase: 50, costScale: 40, capstone: 'Fighter automatically repairs 1 HP every second.', parent: 'fighterSpeed', reqLevel: 5, icon: 'fa-hammer' },
+            baseShield: { tab: 'global', name: 'Reinforced Shielding', desc: 'Increase base shield by +25 per level.', branch: 0, row: 0, costBase: 10, costScale: 15, capstone: 'Planet slowly regenerates 1 shield per second.', icon: 'fa-shield-halved' },
+            baseDamage: { tab: 'global', name: 'Weapons Calibration', desc: 'Increase Tactical Ability damage by +5% per level.', branch: 1, row: 0, costBase: 20, costScale: 30, capstone: 'Tactical abilities AoE size +15%.', icon: 'fa-crosshairs' },
+            tacticalCooldown: { tab: 'global', name: 'Tactical Efficiency', desc: 'Reduce Tactical Ability cooldowns by -2% per level.', branch: 1, row: 1, costBase: 40, costScale: 35, capstone: 'Tactical abilities start fully charged.', parent: 'baseDamage', reqLevel: 5, icon: 'fa-stopwatch' },
+            cosmicScavenger: { tab: 'global', name: 'Cosmic Scavenger', desc: 'Increase Cosmic Data drops by +5% per level.', branch: 1, row: 2, costBase: 50, costScale: 40, capstone: 'Bosses drop double Cosmic Data.', parent: 'tacticalCooldown', reqLevel: 5, icon: 'fa-meteor' },
+            startSlots: { tab: 'global', name: 'Initial Orbit Slots', desc: 'Start runs with extra random slots.', branch: 2, row: 0, costBase: 15, costScale: 20, capstone: 'Start with Level 2 satellite in slot 1.', icon: 'fa-satellite' },
+            economyBounty: { tab: 'global', name: 'Bounty Hunter', desc: 'Increase gold bounty from enemies by +2% per level.', branch: 2, row: 1, costBase: 30, costScale: 25, capstone: 'Start each run with a bonus 500 Gold.', parent: 'startSlots', reqLevel: 5, icon: 'fa-sack-dollar' },
 
-            baseDamage: { name: 'Weapons Calibration', desc: 'Increase Tactical Ability damage by +5% per level.', branch: 1, row: 0, costBase: 20, costScale: 30, capstone: 'Tactical abilities AoE size +15%.', icon: 'fa-crosshairs' },
-            tacticalCooldown: { name: 'Tactical Efficiency', desc: 'Reduce Tactical Ability cooldowns by -2% per level.', branch: 1, row: 1, costBase: 40, costScale: 35, capstone: 'Tactical abilities start fully charged.', parent: 'baseDamage', reqLevel: 5, icon: 'fa-stopwatch' },
-            cosmicScavenger: { name: 'Cosmic Scavenger', desc: 'Increase Cosmic Data drops by +5% per level.', branch: 1, row: 2, costBase: 50, costScale: 40, capstone: 'Bosses drop double Cosmic Data.', parent: 'tacticalCooldown', reqLevel: 5, icon: 'fa-meteor' },
+            // Ship Tech Tab
+            fighterSpeed: { tab: 'ship', name: 'Interceptor Engines', desc: 'Increase Boss Fighter speed by +2% per level.', branch: 0, row: 0, costBase: 25, costScale: 20, capstone: 'Dodge roll gains +2 invulnerability frames.', icon: 'fa-gauge-high' },
+            fighterHull: { tab: 'ship', name: 'Reinforced Hull', desc: 'Increase Boss Fighter Max HP by +5% per level.', branch: 0, row: 1, costBase: 50, costScale: 40, capstone: 'Fighter automatically repairs 1 HP every 3 seconds.', parent: 'fighterSpeed', reqLevel: 5, icon: 'fa-hammer' },
+            dodgeRollCooldown: { tab: 'ship', name: 'Thruster Overdrive', desc: 'Reduce Dodge Roll cooldown by -0.3s per level.', branch: 0, row: 2, costBase: 45, costScale: 35, capstone: 'Dodge roll grants a brief speed boost afterwards.', parent: 'fighterHull', reqLevel: 5, icon: 'fa-wind' },
 
-            startSlots: { name: 'Initial Orbit Slots', desc: 'Start runs with extra random slots.', branch: 2, row: 0, costBase: 15, costScale: 20, capstone: 'Start with Level 2 satellite in slot 1.', icon: 'fa-satellite' },
-            economyBounty: { name: 'Bounty Hunter', desc: 'Increase gold bounty from enemies by +2% per level.', branch: 2, row: 1, costBase: 30, costScale: 25, capstone: 'Start each run with a bonus 500 Gold.', parent: 'startSlots', reqLevel: 5, icon: 'fa-sack-dollar' }
+            primaryFireRate: { tab: 'ship', name: 'Primary Overcharge', desc: 'Increase primary weapon fire rate by +3% per level.', branch: 1, row: 0, costBase: 20, costScale: 25, capstone: 'Primary weapon fires an extra projectile every 5th shot.', icon: 'fa-bolt-lightning' },
+            secondaryFireRate: { tab: 'ship', name: 'Auxiliary Core', desc: 'Increase secondary weapon fire rate by +3% per level.', branch: 1, row: 1, costBase: 40, costScale: 30, capstone: 'Secondary weapon cooldown is reduced by an extra 10% when stationary.', parent: 'primaryFireRate', reqLevel: 5, icon: 'fa-microchip' },
+            droneDamage: { tab: 'ship', name: 'Drone Tuning', desc: 'Increase companion drone projectile damage by +5% per level.', branch: 1, row: 2, costBase: 50, costScale: 35, capstone: 'Drones fire homing mini-missiles every 4 seconds.', parent: 'secondaryFireRate', reqLevel: 5, icon: 'fa-robot' },
+
+            shieldDuration: { tab: 'ship', name: 'Proton Overcharge', desc: 'Increase Proton Shield duration by +0.3s per level.', branch: 2, row: 0, costBase: 30, costScale: 25, capstone: 'Proton Shield reflects projectiles.', icon: 'fa-arrows-spin' },
+            repairEfficacy: { tab: 'ship', name: 'Repair Nanobots', desc: 'Consuming a repair kit restores +10 HP extra per level.', branch: 2, row: 1, costBase: 35, costScale: 30, capstone: 'Repair kits also grant 1s of invulnerability.', parent: 'shieldDuration', reqLevel: 5, icon: 'fa-wrench' }
         };
 
         let isDetailPanelBound = false;
@@ -672,6 +695,7 @@ import {
                 const branches = [[], [], []];
                 for (const key in RESEARCH_NODES) {
                     const node = RESEARCH_NODES[key];
+                    if (node.tab !== (state.activeResearchTab || 'global')) continue;
                     node.id = key;
                     branches[node.branch].push(node);
                 }
@@ -823,6 +847,7 @@ import {
             
             for (const key in RESEARCH_NODES) {
                 const node = RESEARCH_NODES[key];
+                if (node.tab !== (state.activeResearchTab || 'global')) continue;
                 if (node.parent) {
                     const childEl = document.getElementById(`node-${key}`);
                     const parentEl = document.getElementById(`node-${node.parent}`);
@@ -1587,11 +1612,18 @@ import {
         function toggleOrbitInspector() {
             closeInspector(); closeBlueprintDrawer();
             const p = document.getElementById('orbit-inspector-panel');
-            if (p && p.classList.contains('hidden')) { updateOrbitInspectorUI(); openOrbitInspector(); maybeStartMasterCommandTour(); } else { closeOrbitInspector(); }
+            if (p && p.classList.contains('hidden')) {
+                setMasterAccordion(null);
+                updateOrbitInspectorUI();
+                openOrbitInspector();
+                maybeStartMasterCommandTour();
+            } else {
+                closeOrbitInspector();
+            }
             playSynthSound('upgrade');
         }
 
-        const MASTER_COMMAND_TOUR_STEPS = [
+         const MASTER_COMMAND_TOUR_STEPS = [
             {
                 targetId: 'master-tour-shield',
                 title: 'Shield Engineering',
@@ -1601,6 +1633,11 @@ import {
                 targetId: 'master-tour-orbits',
                 title: 'Orbital Array Control',
                 text: 'Unlock additional orbit paths and expand slot capacity so more satellites can be deployed.'
+            },
+            {
+                targetId: 'master-tour-ship-upgrade',
+                title: 'Ship Upgrade & Loadout',
+                text: 'Purchase, upgrade, and equip custom weapons to your fighter ship for Boss Intercept Mode.'
             },
             {
                 targetId: 'master-tour-directives',
@@ -1628,6 +1665,7 @@ import {
             clearMasterCommandTourFocus();
             const card = document.getElementById('master-command-tour');
             if (card) card.classList.add('hidden');
+            setMasterAccordion(null); // Collapse everything on completion
         }
 
         function renderMasterCommandTour() {
@@ -1642,6 +1680,12 @@ import {
                 finishMasterCommandTour();
                 return;
             }
+
+            // Auto-open accordion section for the active tutorial step
+            if (step.targetId === 'master-tour-shield') setMasterAccordion('shield');
+            else if (step.targetId === 'master-tour-orbits') setMasterAccordion('orbits');
+            else if (step.targetId === 'master-tour-ship-upgrade') setMasterAccordion('ship');
+            else if (step.targetId === 'master-tour-directives') setMasterAccordion('directives');
 
             clearMasterCommandTourFocus();
             target.scrollIntoView({ block: 'nearest', inline: 'nearest' });
@@ -1883,17 +1927,25 @@ import {
 
         function setMasterAccordion(openPanel) {
             const panels = {
+                shield: {
+                    content: document.getElementById('accordion-shield-content'),
+                    icon: document.getElementById('accordion-shield-icon')
+                },
                 orbits: {
                     content: document.getElementById('accordion-orbits-content'),
                     icon: document.getElementById('accordion-orbits-icon')
                 },
-                directives: {
-                    content: document.getElementById('accordion-directives-content'),
-                    icon: document.getElementById('accordion-directives-icon')
+                ship: {
+                    content: document.getElementById('accordion-ship-content'),
+                    icon: document.getElementById('accordion-ship-icon')
                 },
                 tactical: {
                     content: document.getElementById('accordion-tactical-content'),
                     icon: document.getElementById('accordion-tactical-icon')
+                },
+                directives: {
+                    content: document.getElementById('accordion-directives-content'),
+                    icon: document.getElementById('accordion-directives-icon')
                 }
             };
 
@@ -2051,7 +2103,216 @@ import {
                     }
                 }
             });
+            updateShipUpgradesUI();
         }
+
+        const SHIP_WEAPONS_META = {
+            default: { name: 'Default Laser', icon: 'fa-grip-lines-vertical', desc: 'Standard central laser cannon.', cost: 0 },
+            twin: { name: 'Twin Laser', icon: 'fa-grip-lines', desc: 'Dual parallel lasers with double coverage.', cost: 400 },
+            spread: { name: 'Spread Shot', icon: 'fa-arrow-up-right-dots', desc: 'Wide 3-way spread pattern.', cost: 500 },
+            heavy: { name: 'Heavy Cannon', icon: 'fa-circle', desc: 'Slow, massive impact energy sphere.', cost: 600 },
+            rapid: { name: 'Rapid Fire', icon: 'fa-ellipsis-vertical', desc: 'Extremely fast bullet stream at lower damage.', cost: 600 },
+            homing: { name: 'Homing Missile', icon: 'fa-location-crosshairs', desc: 'Self-guided micro missiles.', cost: 700 },
+            explosive: { name: 'Explosive Shell', icon: 'fa-bomb', desc: 'Fires high-damage detonation shells.', cost: 800 },
+            wave: { name: 'Plasma Wave', icon: 'fa-wave-square', desc: 'Wide plasma beams slicing through targets.', cost: 800 },
+            side: { name: 'Side Blasters', icon: 'fa-arrows-left-right', desc: 'Fires forward and horizontally.', cost: 600 },
+            ring: { name: 'Nova Ring', icon: 'fa-ring', desc: 'Expands 8-way fire ring around launcher.', cost: 1000 },
+            rear: { name: 'Rear Guardian', icon: 'fa-arrows-up-down', desc: 'Fires both forward and directly behind.', cost: 600 }
+        };
+
+        function updateShipUpgradesUI() {
+            const content = document.getElementById('accordion-ship-content');
+            if (!content) return;
+
+            if (!state.shipWeapons) {
+                state.shipWeapons = { default: { owned: true, level: 1 } };
+            }
+
+            let html = '';
+
+            // 1. Secondary Slot Unequip card (only if secondary is not none)
+            const isSecondaryNone = state.equippedSecondary === 'none';
+            html += `
+                <div class="bg-slate-950/80 p-2 rounded border border-slate-800/80 flex justify-between items-center text-[10px] gap-2 mt-2">
+                    <div class="text-left">
+                        <span class="text-cyan-400 font-extrabold uppercase tracking-wide">Secondary Slot</span>
+                        <p class="text-slate-400 text-[8px] leading-tight font-semibold mt-0.5">Control secondary weapon mount activity.</p>
+                    </div>
+                    <button onclick="window.equipWeapon('none', 'secondary')" 
+                        class="px-2.5 py-1 rounded text-[9px] uppercase font-black transition-all ${isSecondaryNone ? 'bg-cyan-500 text-slate-950 shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'}">
+                        ${isSecondaryNone ? 'Unequipped' : 'Unequip'}
+                    </button>
+                </div>
+            `;
+
+            // 2. Weapon cards
+            Object.entries(SHIP_WEAPONS_META).forEach(([key, meta]) => {
+                const ownedData = state.shipWeapons[key];
+                const isOwned = ownedData && ownedData.owned;
+                const level = isOwned ? ownedData.level : 0;
+                
+                let actionBtnHTML = '';
+                if (!isOwned) {
+                    const canAfford = state.game.gold >= meta.cost;
+                    if (state.waveActive || state.game.mode === 'boss') {
+                        actionBtnHTML = `
+                            <button disabled class="w-full bg-slate-800 text-slate-500 cursor-not-allowed py-1.5 rounded text-[9px] uppercase font-black">
+                                LOCKED
+                            </button>
+                        `;
+                    } else {
+                        actionBtnHTML = `
+                            <button onclick="window.buyOrUpgradeWeapon('${key}')" 
+                                class="w-full py-1.5 rounded text-[9px] uppercase font-black transition-all ${canAfford ? 'bg-amber-500 hover:bg-amber-400 text-slate-950' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}">
+                                Unlock — <i class="fa-solid fa-coins text-[8px]"></i> ${meta.cost}G
+                            </button>
+                        `;
+                    }
+                } else {
+                    const isMax = level >= 5;
+                    const nextCost = 250 + level * 150;
+                    const canAffordUpgrade = state.game.gold >= nextCost;
+
+                    if (isMax) {
+                        actionBtnHTML = `
+                            <button disabled class="w-full bg-slate-900 border border-slate-800 text-slate-500 cursor-not-allowed py-1.5 rounded text-[9px] uppercase font-black">
+                                MAX LEVEL (Lvl 5)
+                            </button>
+                        `;
+                    } else {
+                        if (state.waveActive || state.game.mode === 'boss') {
+                            actionBtnHTML = `
+                                <button disabled class="w-full bg-slate-800 text-slate-500 cursor-not-allowed py-1.5 rounded text-[9px] uppercase font-black">
+                                    Upgrade — ${nextCost}G
+                                </button>
+                            `;
+                        } else {
+                            actionBtnHTML = `
+                                <button onclick="window.buyOrUpgradeWeapon('${key}')" 
+                                    class="w-full py-1.5 rounded text-[9px] uppercase font-black transition-all ${canAffordUpgrade ? 'bg-sky-500 hover:bg-sky-400 text-slate-950' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}">
+                                    Upgrade — <i class="fa-solid fa-coins text-[8px]"></i> ${nextCost}G
+                                </button>
+                            `;
+                        }
+                    }
+                }
+
+                // Equip buttons
+                let equipHTML = '';
+                if (isOwned) {
+                    const isPrimary = state.equippedPrimary === key;
+                    const isSecondary = state.equippedSecondary === key;
+                    
+                    const primBtnText = isPrimary ? 'Primary Active' : 'Equip Primary';
+                    const primBtnClass = isPrimary 
+                        ? 'bg-cyan-500 text-slate-950 font-black shadow-[0_0_8px_rgba(6,182,212,0.4)]' 
+                        : 'bg-slate-900 text-slate-400 border border-slate-850 hover:text-white';
+                    
+                    equipHTML += `
+                        <div class="flex gap-1.5 mt-1.5">
+                            <button onclick="window.equipWeapon('${key}', 'primary')" class="flex-1 py-1 rounded text-[9px] uppercase font-black transition-all ${primBtnClass}">
+                                ${primBtnText}
+                            </button>
+                    `;
+
+                    if (key !== 'default') {
+                        const secBtnText = isSecondary ? 'Secondary Active' : 'Equip Secondary';
+                        const secBtnClass = isSecondary 
+                            ? 'bg-purple-500 text-slate-950 font-black shadow-[0_0_8px_rgba(168,85,247,0.4)]' 
+                            : 'bg-slate-900 text-slate-400 border border-slate-850 hover:text-white';
+                        equipHTML += `
+                            <button onclick="window.equipWeapon('${key}', 'secondary')" class="flex-1 py-1 rounded text-[9px] uppercase font-black transition-all ${secBtnClass}">
+                                ${secBtnText}
+                            </button>
+                        `;
+                    }
+                    equipHTML += `</div>`;
+                }
+
+                let dmgBoostText = '';
+                if (isOwned) {
+                    dmgBoostText = `<span class="text-emerald-400 ml-1">Lvl ${level} (+${(level - 1) * 25}%)</span>`;
+                }
+
+                html += `
+                    <div class="bg-slate-955 p-2 rounded border border-slate-800 flex flex-col gap-1 text-[10px] text-left">
+                        <div class="flex justify-between items-start gap-2">
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-6 h-6 rounded bg-slate-950 flex items-center justify-center border border-slate-800">
+                                    <i class="fa-solid ${meta.icon} text-cyan-400 text-xs"></i>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="font-extrabold text-slate-200 uppercase tracking-wide">${meta.name}${dmgBoostText}</span>
+                                    <span class="text-slate-500 text-[8px] leading-tight font-semibold mt-0.5">${meta.desc}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-1.5 w-full">
+                            ${actionBtnHTML}
+                        </div>
+                        ${equipHTML}
+                    </div>
+                `;
+            });
+
+            content.innerHTML = html;
+        }
+
+        window.buyOrUpgradeWeapon = function(key) {
+            const meta = SHIP_WEAPONS_META[key];
+            if (!meta) return;
+            
+            if (!state.shipWeapons) state.shipWeapons = { default: { owned: true, level: 1 } };
+            const ownedData = state.shipWeapons[key];
+            const isOwned = ownedData && ownedData.owned;
+            
+            let cost = 0;
+            if (!isOwned) {
+                cost = meta.cost;
+            } else {
+                cost = 250 + ownedData.level * 150;
+            }
+            
+            if (state.game.gold >= cost) {
+                spendGold(cost);
+                if (!isOwned) {
+                    state.shipWeapons[key] = { owned: true, level: 1 };
+                    showGameNotice(`<i class="fa-solid fa-unlock text-cyan-400"></i> ${meta.name} Unlocked!`, 2000);
+                } else {
+                    state.shipWeapons[key].level++;
+                    showGameNotice(`<i class="fa-solid fa-arrow-up text-cyan-400"></i> ${meta.name} Upgraded to Lvl ${state.shipWeapons[key].level}!`, 2000);
+                }
+                saveSettings();
+                updateOrbitInspectorUI();
+                playSynthSound('upgrade');
+            } else {
+                showGameNotice(`<i class="fa-solid fa-triangle-exclamation text-red-400"></i> Insufficient Gold! Need ${cost}G`, 2000);
+            }
+        };
+
+        window.equipWeapon = function(key, slot) {
+            if (slot === 'primary') {
+                if (state.equippedSecondary === key) {
+                    state.equippedSecondary = 'none';
+                }
+                state.equippedPrimary = key;
+                showGameNotice(`<i class="fa-solid fa-jet-fighter text-cyan-400"></i> Equipped ${SHIP_WEAPONS_META[key].name} as Primary!`, 2000);
+            } else if (slot === 'secondary') {
+                if (key === 'none') {
+                    state.equippedSecondary = 'none';
+                    showGameNotice(`<i class="fa-solid fa-ban text-slate-400"></i> Secondary slot unequipped.`, 2000);
+                } else {
+                    if (state.equippedPrimary === key) {
+                        state.equippedPrimary = 'default';
+                    }
+                    state.equippedSecondary = key;
+                    showGameNotice(`<i class="fa-solid fa-jet-fighter text-cyan-400"></i> Equipped ${SHIP_WEAPONS_META[key].name} as Secondary!`, 2000);
+                }
+            }
+            saveSettings();
+            updateOrbitInspectorUI();
+            playSynthSound('upgrade');
+        };
 
         function handleOrbitButtonPress(index) {
             if (state.waveActive || state.game.mode === 'boss') {
@@ -3015,7 +3276,34 @@ import {
                 }
                 const playerMaxHp = Math.floor(100 * playerHpMultiplier);
                 
-                state.bossMode.player = { x: canvas.width / 2, y: canvas.height - 120, hp: playerMaxHp, maxHp: playerMaxHp, primaryCooldown: 0, secondaryCooldown: 0, dragging: false, dragOffsetX: 0, dragOffsetY: 0, targetX: canvas.width / 2, targetY: canvas.height - 120, primaryWeapon: 'default', secondaryWeapon: 'none', repairKits: state.game.bossRepairKits || 0, shieldUsed: false, shieldTimer: 0, invulnTimer: 0, lastTapTime: 0 };
+                state.bossMode.player = { 
+                    x: canvas.width / 2, 
+                    y: canvas.height - 120, 
+                    hp: playerMaxHp, 
+                    maxHp: playerMaxHp, 
+                    primaryCooldown: 0, 
+                    secondaryCooldown: 0, 
+                    dragging: false, 
+                    dragOffsetX: 0, 
+                    dragOffsetY: 0, 
+                    targetX: canvas.width / 2, 
+                    targetY: canvas.height - 120, 
+                    primaryWeapon: state.equippedPrimary || 'default', 
+                    secondaryWeapon: state.equippedSecondary || 'none', 
+                    repairKits: state.game.bossRepairKits || 0, 
+                    shieldUsed: false, 
+                    shieldTimer: 0, 
+                    invulnTimer: 0, 
+                    lastTapTime: 0,
+                    buffFireRateTimer: 0,
+                    buffShieldTimer: 0,
+                    buffDamageTimer: 0,
+                    buffMagnetTimer: 0,
+                    primaryShotsCount: 0,
+                    droneShootTimer: 0,
+                    rollCooldown: 0,
+                    rollSpeedBoostTimer: 0
+                };
                 state.bossMode.player.spriteSize = 58 * state.gameScale;
                 state.bossMode.player.hitRadius = state.bossMode.player.spriteSize * 0.08;
                 state.bossMode.boss = {
@@ -3173,7 +3461,9 @@ import {
             }
 
             if ((enemy.category === 'ship' || enemy.category === 'miniboss' || enemy.category === 'gatekeeper') && Math.random() < (enemy.category === 'gatekeeper' ? 1.0 : 0.25)) {
-                state.bossMode.drops.push({ x: enemy.x, y: enemy.y, type: 'weapon', enhancement: BOSS_WEAPON_ENHANCEMENTS[Math.floor(Math.random() * BOSS_WEAPON_ENHANCEMENTS.length)] });
+                const buffTypes = ['fireRate', 'shield', 'damage', 'magnet'];
+                const selectedBuff = buffTypes[Math.floor(Math.random() * buffTypes.length)];
+                state.bossMode.drops.push({ x: enemy.x, y: enemy.y, type: 'buff', buffType: selectedBuff });
             } else if (enemy.category === 'normal' && Math.random() < 0.10) {
                 state.bossMode.drops.push({ x: enemy.x, y: enemy.y, type: 'repair' });
             }
@@ -3183,18 +3473,21 @@ import {
         }
 
         function collectDrop(drop) {
-            if (drop.type === 'weapon') {
-                if (state.bossMode.player.primaryWeapon === 'default') {
-                    state.bossMode.player.primaryWeapon = drop.enhancement;
-                    showGameNotice(`<i class="fa-solid fa-bolt text-purple-400"></i> Primary Weapon: ${drop.enhancement.toUpperCase()}`, 2000);
-                } else if (state.bossMode.player.secondaryWeapon === 'none') {
-                    state.bossMode.player.secondaryWeapon = drop.enhancement;
-                    showGameNotice(`<i class="fa-solid fa-bolt text-purple-400"></i> Secondary Weapon: ${drop.enhancement.toUpperCase()}`, 2000);
-                } else {
-                    state.bossMode.player.primaryWeapon = drop.enhancement;
-                    showGameNotice(`<i class="fa-solid fa-bolt text-purple-400"></i> Primary Overwritten: ${drop.enhancement.toUpperCase()}`, 2000);
+            if (drop.type === 'buff') {
+                const type = drop.buffType;
+                if (type === 'fireRate') {
+                    state.bossMode.player.buffFireRateTimer = 360;
+                    showGameNotice(`<i class="fa-solid fa-fire text-amber-400"></i> Fire Rate Boost Activated!`, 2000);
+                } else if (type === 'shield') {
+                    state.bossMode.player.buffShieldTimer = 240;
+                    showGameNotice(`<i class="fa-solid fa-shield-halved text-cyan-400"></i> Shield Overload Activated!`, 2000);
+                } else if (type === 'damage') {
+                    state.bossMode.player.buffDamageTimer = 360;
+                    showGameNotice(`<i class="fa-solid fa-circle-radiation text-red-400"></i> Double Damage Activated!`, 2000);
+                } else if (type === 'magnet') {
+                    state.bossMode.player.buffMagnetTimer = 480;
+                    showGameNotice(`<i class="fa-solid fa-magnet text-fuchsia-400"></i> Item Magnet Activated!`, 2000);
                 }
-                updateRepairButton();
                 playSynthSound('upgrade');
             } else if (drop.type === 'repair') {
                 state.bossMode.player.repairKits++;
@@ -3235,8 +3528,18 @@ import {
                 player.rollTimer--;
                 player.rollAngle = (1 - (player.rollTimer / 30)) * Math.PI * 2;
                 dragFollow = 0.6; // Speed burst during dodge roll
+                if (player.rollTimer === 0) {
+                    const rollLvl = (state.research && state.research.dodgeRollCooldown) || 0;
+                    if (rollLvl >= 10) {
+                        player.rollSpeedBoostTimer = 60; // 1 second of speed boost after roll
+                    }
+                }
             } else {
                 player.rollAngle = 0;
+                if (player.rollSpeedBoostTimer > 0) {
+                    player.rollSpeedBoostTimer--;
+                    dragFollow *= 1.5; // 50% speed boost
+                }
             }
 
             const targetDx = player.targetX - player.x;
@@ -3264,6 +3567,15 @@ import {
             player.targetX = Math.max(24, Math.min(canvas.width - 24, player.targetX));
             player.targetY = Math.max(playerTopLimit, Math.min(playerBottomLimit, player.targetY));
 
+            if (player.buffFireRateTimer > 0) player.buffFireRateTimer--;
+            if (player.buffShieldTimer > 0) {
+                player.buffShieldTimer--;
+                player.invulnTimer = Math.max(player.invulnTimer || 0, 2);
+            }
+            if (player.buffDamageTimer > 0) player.buffDamageTimer--;
+            if (player.buffMagnetTimer > 0) player.buffMagnetTimer--;
+            if (player.rollCooldown > 0) player.rollCooldown--;
+
             if (player.invulnTimer > 0) player.invulnTimer--;
 
             const shieldBtn = document.getElementById('btn-boss-shield');
@@ -3283,8 +3595,11 @@ import {
 
             const playerHitY = player.y + 2 * state.gameScale;
 
-            if (player.primaryCooldown > 0) player.primaryCooldown--;
-            if (player.secondaryCooldown > 0) player.secondaryCooldown--;
+            let cdDec = 1;
+            if (player.buffFireRateTimer > 0) cdDec = 2;
+
+            if (player.primaryCooldown > 0) player.primaryCooldown = Math.max(0, player.primaryCooldown - cdDec);
+            if (player.secondaryCooldown > 0) player.secondaryCooldown = Math.max(0, player.secondaryCooldown - cdDec);
 
             const baseDamage = 18 + Math.floor(state.game.wave * 1.5);
             const baseDy = -7.2 * state.gameScale;
@@ -3302,52 +3617,139 @@ import {
                     offsets = [-30 * state.gameScale, 30 * state.gameScale];
                 }
 
+                const lvl = (state.shipWeapons && state.shipWeapons[weapon]) ? state.shipWeapons[weapon].level : 1;
+                const weaponDmgMult = 1 + (lvl - 1) * 0.25;
+                const buffDmgMult = player.buffDamageTimer > 0 ? 2 : 1;
+                const dmgMult = weaponDmgMult * buffDmgMult;
+
                 for (let ox of offsets) {
                     let cx = px + ox;
+                    
+                    if (!isSecondary) {
+                        player.primaryShotsCount = (player.primaryShotsCount || 0) + 1;
+                    }
+
                     switch (weapon) {
                         case 'twin':
                             const twinOffset = 10 * state.gameScale;
-                            state.bossMode.projectiles.push({ x: cx - twinOffset, y: py, dy: baseDy, r: baseR, damage: baseDamage });
-                            state.bossMode.projectiles.push({ x: cx + twinOffset, y: py, dy: baseDy, r: baseR, damage: baseDamage });
+                            state.bossMode.projectiles.push({ x: cx - twinOffset, y: py, dy: baseDy, r: baseR, damage: Math.floor(baseDamage * dmgMult) });
+                            state.bossMode.projectiles.push({ x: cx + twinOffset, y: py, dy: baseDy, r: baseR, damage: Math.floor(baseDamage * dmgMult) });
                             break;
                         case 'spread':
-                            state.bossMode.projectiles.push({ x: cx, y: py, dx: -2 * state.gameScale, dy: baseDy * 0.9, r: baseR, damage: baseDamage });
-                            state.bossMode.projectiles.push({ x: cx, y: py, dx: 0, dy: baseDy, r: baseR, damage: baseDamage });
-                            state.bossMode.projectiles.push({ x: cx, y: py, dx: 2 * state.gameScale, dy: baseDy * 0.9, r: baseR, damage: baseDamage });
+                            state.bossMode.projectiles.push({ x: cx, y: py, dx: -2 * state.gameScale, dy: baseDy * 0.9, r: baseR, damage: Math.floor(baseDamage * dmgMult) });
+                            state.bossMode.projectiles.push({ x: cx, y: py, dx: 0, dy: baseDy, r: baseR, damage: Math.floor(baseDamage * dmgMult) });
+                            state.bossMode.projectiles.push({ x: cx, y: py, dx: 2 * state.gameScale, dy: baseDy * 0.9, r: baseR, damage: Math.floor(baseDamage * dmgMult) });
                             break;
                         case 'heavy':
-                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy * 0.7, r: baseR * 2.5, damage: baseDamage * 3 }); cd = 20; break;
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy * 0.7, r: baseR * 2.5, damage: Math.floor(baseDamage * 3 * dmgMult) }); cd = 20; break;
                         case 'rapid':
-                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy * 1.2, r: baseR, damage: baseDamage * 0.8 }); cd = 4; break;
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy * 1.2, r: baseR, damage: Math.floor(baseDamage * 0.8 * dmgMult) }); cd = 4; break;
                         case 'homing':
-                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR, damage: baseDamage, homing: true }); break;
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR, damage: Math.floor(baseDamage * dmgMult), homing: true }); break;
                         case 'explosive':
-                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR * 1.2, damage: baseDamage, explosive: true }); cd = 15; break;
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR * 1.2, damage: Math.floor(baseDamage * dmgMult), explosive: true }); cd = 15; break;
                         case 'wave':
-                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR, damage: baseDamage, width: 80 * state.gameScale }); cd = 15; break;
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR, damage: Math.floor(baseDamage * dmgMult), width: 80 * state.gameScale }); cd = 15; break;
                         case 'side':
-                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR, damage: baseDamage });
-                            state.bossMode.projectiles.push({ x: cx, y: py, dx: baseDy * 0.8, dy: 0, r: baseR, damage: baseDamage });
-                            state.bossMode.projectiles.push({ x: cx, y: py, dx: -baseDy * 0.8, dy: 0, r: baseR, damage: baseDamage });
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR, damage: Math.floor(baseDamage * dmgMult) });
+                            state.bossMode.projectiles.push({ x: cx, y: py, dx: baseDy * 0.8, dy: 0, r: baseR, damage: Math.floor(baseDamage * dmgMult) });
+                            state.bossMode.projectiles.push({ x: cx, y: py, dx: -baseDy * 0.8, dy: 0, r: baseR, damage: Math.floor(baseDamage * dmgMult) });
                             break;
                         case 'ring':
-                            for (let i = 0; i < 8; i++) { const angle = (i / 8) * Math.PI * 2; state.bossMode.projectiles.push({ x: cx, y: py, dx: Math.cos(angle) * Math.abs(baseDy) * 0.8, dy: Math.sin(angle) * Math.abs(baseDy) * 0.8, r: baseR, damage: baseDamage }); } cd = 30; break;
+                            for (let i = 0; i < 8; i++) { const angle = (i / 8) * Math.PI * 2; state.bossMode.projectiles.push({ x: cx, y: py, dx: Math.cos(angle) * Math.abs(baseDy) * 0.8, dy: Math.sin(angle) * Math.abs(baseDy) * 0.8, r: baseR, damage: Math.floor(baseDamage * dmgMult) }); } cd = 30; break;
                         case 'rear':
-                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR, damage: baseDamage });
-                            state.bossMode.projectiles.push({ x: cx, y: player.y + 28 * state.gameScale, dy: Math.abs(baseDy), r: baseR, damage: baseDamage });
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR, damage: Math.floor(baseDamage * dmgMult) });
+                            state.bossMode.projectiles.push({ x: cx, y: player.y + 28 * state.gameScale, dy: Math.abs(baseDy), r: baseR, damage: Math.floor(baseDamage * dmgMult) });
                             break;
                         default:
-                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR, damage: baseDamage });
+                            state.bossMode.projectiles.push({ x: cx, y: py, dy: baseDy, r: baseR, damage: Math.floor(baseDamage * dmgMult) });
+                    }
+
+                    if (!isSecondary) {
+                        const primLvl = (state.research && state.research.primaryFireRate) || 0;
+                        if (primLvl >= 10 && (player.primaryShotsCount % 5 === 0)) {
+                            state.bossMode.projectiles.push({
+                                x: cx,
+                                y: py,
+                                dx: (Math.random() - 0.5) * 2 * state.gameScale,
+                                dy: baseDy * 1.1,
+                                r: baseR * 1.2,
+                                damage: Math.floor(baseDamage * dmgMult),
+                                color: '#34d399'
+                            });
+                        }
                     }
                 }
                 
-                if (isSecondary) player.secondaryCooldown = cd;
-                else player.primaryCooldown = cd;
+                if (isSecondary) {
+                    const secLvl = (state.research && state.research.secondaryFireRate) || 0;
+                    cd = Math.max(1, Math.round(cd / (1 + secLvl * 0.03)));
+                    if (secLvl >= 10) {
+                        const isStationary = !player.dragging || (Math.hypot(player.targetX - player.x, player.targetY - player.y) < 2);
+                        if (isStationary) {
+                            cd = Math.max(1, Math.round(cd * 0.9));
+                        }
+                    }
+                    player.secondaryCooldown = cd;
+                } else {
+                    const primLvl = (state.research && state.research.primaryFireRate) || 0;
+                    cd = Math.max(1, Math.round(cd / (1 + primLvl * 0.03)));
+                    player.primaryCooldown = cd;
+                }
                 firedSound = true;
             }
 
             if (player.primaryCooldown <= 0) fireSlot(player.primaryWeapon, false);
             if (player.secondaryCooldown <= 0) fireSlot(player.secondaryWeapon, true);
+
+            // Companion Drone Firing Logic
+            if (player.secondaryWeapon !== 'none') {
+                const droneLvl = (state.research && state.research.droneDamage) || 0;
+                player.droneShootTimer = (player.droneShootTimer || 0) + 1;
+                
+                if (droneLvl > 0 && player.droneShootTimer % 90 === 0) {
+                    const droneOffset = 30 * state.gameScale;
+                    const hoverY = Math.sin(state.bossMode.frame * 0.1) * 4 * state.gameScale;
+                    const dy = -8 * state.gameScale;
+                    const r = 3 * state.gameScale;
+                    const dmg = Math.floor(baseDamage * 0.25 * (1 + droneLvl * 0.05));
+                    
+                    state.bossMode.projectiles.push({ x: player.x - droneOffset, y: player.y + hoverY, dy, r, damage: dmg, color: '#38bdf8' });
+                    state.bossMode.projectiles.push({ x: player.x + droneOffset, y: player.y + hoverY, dy, r, damage: dmg, color: '#38bdf8' });
+                    firedSound = true;
+                }
+                
+                if (droneLvl >= 10 && player.droneShootTimer % 240 === 0) {
+                    const droneOffset = 30 * state.gameScale;
+                    const hoverY = Math.sin(state.bossMode.frame * 0.1) * 4 * state.gameScale;
+                    const dy = -6 * state.gameScale;
+                    const r = 4.5 * state.gameScale;
+                    const dmg = Math.floor(baseDamage * 0.6 * (1 + droneLvl * 0.05));
+                    
+                    state.bossMode.projectiles.push({ 
+                        x: player.x - droneOffset, 
+                        y: player.y + hoverY, 
+                        dy, 
+                        r, 
+                        damage: dmg, 
+                        homing: true, 
+                        explosive: true, 
+                        color: '#f43f5e'
+                    });
+                    state.bossMode.projectiles.push({ 
+                        x: player.x + droneOffset, 
+                        y: player.y + hoverY, 
+                        dy, 
+                        r, 
+                        damage: dmg, 
+                        homing: true, 
+                        explosive: true, 
+                        color: '#f43f5e' 
+                    });
+                    firedSound = true;
+                }
+            }
+
             if (firedSound) playSynthSound('laser');
 
             if (state.bossMode.phase === 'minions') {
@@ -3700,6 +4102,30 @@ import {
             for (let i = state.bossMode.enemyProjectiles.length - 1; i >= 0; i--) {
                 const proj = state.bossMode.enemyProjectiles[i];
                 proj.x += proj.dx; proj.y += proj.dy;
+                
+                // Shield check
+                const isShieldActive = (player.shieldTimer > 0 || player.buffShieldTimer > 0);
+                if (isShieldActive && Math.hypot(player.x - proj.x, player.y - proj.y) < (player.spriteSize || 58 * state.gameScale) * 0.6 + proj.r) {
+                    const shieldLvl = (state.research && state.research.shieldDuration) || 0;
+                    if (shieldLvl >= 10) {
+                        state.bossMode.projectiles.push({
+                            x: proj.x,
+                            y: proj.y,
+                            dx: -proj.dx,
+                            dy: -Math.abs(proj.dy || 6 * state.gameScale),
+                            r: proj.r,
+                            damage: Math.floor(proj.damage * 1.5),
+                            color: '#22d3ee'
+                        });
+                        playSynthSound('shield_deflect');
+                    } else {
+                        playSynthSound('hit');
+                    }
+                    createExplosion(proj.x, proj.y, '#22d3ee', 8);
+                    state.bossMode.enemyProjectiles.splice(i, 1);
+                    continue;
+                }
+
                 if (Math.hypot(player.x - proj.x, playerHitY - proj.y) < getPlayerFighterHitRadius() + proj.r) {
                     if (!player.invulnTimer || player.invulnTimer <= 0) {
                         player.hp -= proj.damage;
@@ -3716,7 +4142,22 @@ import {
 
             for (let i = state.bossMode.drops.length - 1; i >= 0; i--) {
                 const drop = state.bossMode.drops[i];
-                drop.y += 2 * state.gameScale;
+                
+                if (player.buffMagnetTimer > 0) {
+                    const dx = player.x - drop.x;
+                    const dy = playerHitY - drop.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist > 5) {
+                        const pullSpeed = 5.5 * state.gameScale;
+                        drop.x += (dx / dist) * pullSpeed;
+                        drop.y += (dy / dist) * pullSpeed;
+                    } else {
+                        drop.x = player.x;
+                        drop.y = playerHitY;
+                    }
+                } else {
+                    drop.y += 2 * state.gameScale;
+                }
 
                 if (Math.hypot(player.x - drop.x, playerHitY - drop.y) < getPlayerFighterHitRadius() + 30 * state.gameScale) {
                     collectDrop(drop);
@@ -4060,7 +4501,48 @@ import {
                 ctx.restore();
             }
 
-            if (player.shieldTimer > 0) {
+            // Buff rings/auras
+            if (player.buffFireRateTimer > 0) {
+                ctx.save();
+                ctx.strokeStyle = 'rgba(245, 158, 11, 0.6)';
+                ctx.lineWidth = 2 * state.gameScale;
+                ctx.setLineDash([6 * state.gameScale, 4 * state.gameScale]);
+                ctx.lineDashOffset = -state.bossMode.frame * 0.5;
+                ctx.shadowBlur = 10 * state.gameScale;
+                ctx.shadowColor = '#f59e0b';
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, playerSpriteSize * 0.45, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+            if (player.buffDamageTimer > 0) {
+                ctx.save();
+                ctx.strokeStyle = 'rgba(239, 68, 68, 0.6)';
+                ctx.lineWidth = 2 * state.gameScale;
+                ctx.setLineDash([8 * state.gameScale, 5 * state.gameScale]);
+                ctx.lineDashOffset = state.bossMode.frame * 0.6;
+                ctx.shadowBlur = 10 * state.gameScale;
+                ctx.shadowColor = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, playerSpriteSize * 0.52, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+            if (player.buffMagnetTimer > 0) {
+                ctx.save();
+                ctx.strokeStyle = 'rgba(217, 70, 239, 0.6)';
+                ctx.lineWidth = 2 * state.gameScale;
+                ctx.setLineDash([10 * state.gameScale, 6 * state.gameScale]);
+                ctx.lineDashOffset = -state.bossMode.frame * 0.4;
+                ctx.shadowBlur = 10 * state.gameScale;
+                ctx.shadowColor = '#d946ef';
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, playerSpriteSize * 0.6, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            if (player.shieldTimer > 0 || player.buffShieldTimer > 0) {
                 ctx.save();
                 ctx.strokeStyle = '#22d3ee';
                 ctx.fillStyle = 'rgba(34, 211, 238, 0.2)';
@@ -4084,16 +4566,31 @@ import {
             }
             for (const drop of state.bossMode.drops) {
                 ctx.save();
-                if (drop.type === 'weapon') {
-                    ctx.fillStyle = '#a855f7';
-                    ctx.shadowColor = '#a855f7';
-                    ctx.shadowBlur = 10;
-                    ctx.beginPath(); ctx.arc(drop.x, drop.y, 16 * state.gameScale, 0, Math.PI * 2); ctx.fill();
+                if (drop.type === 'buff') {
+                    let color = '#38bdf8';
+                    let letter = 'B';
+                    if (drop.buffType === 'fireRate') { color = '#f59e0b'; letter = 'F'; }
+                    else if (drop.buffType === 'shield') { color = '#06b6d4'; letter = 'S'; }
+                    else if (drop.buffType === 'damage') { color = '#ef4444'; letter = 'D'; }
+                    else if (drop.buffType === 'magnet') { color = '#d946ef'; letter = 'M'; }
+                    
+                    ctx.fillStyle = color;
+                    ctx.shadowColor = color;
+                    ctx.shadowBlur = 12 * state.gameScale;
+                    ctx.beginPath();
+                    ctx.arc(drop.x, drop.y, 14 * state.gameScale, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2 * state.gameScale;
+                    ctx.stroke();
+
                     ctx.fillStyle = '#fff';
-                    ctx.font = `bold ${18 * state.gameScale}px sans-serif`;
-                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.font = `bold ${15 * state.gameScale}px sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
                     ctx.shadowBlur = 0;
-                    ctx.fillText('W', drop.x, drop.y);
+                    ctx.fillText(letter, drop.x, drop.y);
                 } else if (drop.type === 'repair') {
                     ctx.fillStyle = '#10b981'; ctx.shadowColor = '#10b981'; ctx.shadowBlur = 10;
                     ctx.fillRect(drop.x - 14 * state.gameScale, drop.y - 14 * state.gameScale, 28 * state.gameScale, 28 * state.gameScale);
@@ -4992,8 +5489,37 @@ import {
             if (panel) panel.classList.remove('hidden');
             playSynthSound('upgrade');
         });
+        function updateResearchTabButtons() {
+            const btnGlobal = document.getElementById('tab-research-global');
+            const btnShip = document.getElementById('tab-research-ship');
+            if (!btnGlobal || !btnShip) return;
+            const activeClass = "bg-purple-900/30 text-purple-400 border border-purple-500/20";
+            const inactiveClass = "text-slate-400 hover:text-slate-200 border border-transparent";
+            if ((state.activeResearchTab || 'global') === 'global') {
+                btnGlobal.className = `flex-1 py-1.5 text-center text-xs tracking-wider uppercase font-black rounded-lg transition-all ${activeClass}`;
+                btnShip.className = `flex-1 py-1.5 text-center text-xs tracking-wider uppercase font-black rounded-lg transition-all ${inactiveClass}`;
+            } else {
+                btnGlobal.className = `flex-1 py-1.5 text-center text-xs tracking-wider uppercase font-black rounded-lg transition-all ${inactiveClass}`;
+                btnShip.className = `flex-1 py-1.5 text-center text-xs tracking-wider uppercase font-black rounded-lg transition-all ${activeClass}`;
+            }
+        }
+
+        bindButton('tab-research-global', () => {
+            state.activeResearchTab = 'global';
+            updateResearchTabButtons();
+            updateResearchUI();
+        });
+
+        bindButton('tab-research-ship', () => {
+            state.activeResearchTab = 'ship';
+            updateResearchTabButtons();
+            updateResearchUI();
+        });
+
         bindButton('open-research-btn', () => {
             hideTitleSubpanels();
+            state.activeResearchTab = 'global';
+            updateResearchTabButtons();
             updateResearchUI();
             const panel = document.getElementById('inline-research-options');
             if (panel) panel.classList.remove('hidden');
@@ -5154,7 +5680,12 @@ import {
         bindButton('btn-boss-repair', () => {
             if (state.bossMode.player.repairKits > 0 && state.bossMode.player.hp < state.bossMode.player.maxHp) {
                 state.bossMode.player.repairKits--;
-                state.bossMode.player.hp = Math.min(state.bossMode.player.maxHp, state.bossMode.player.hp + state.bossMode.player.maxHp * 0.25);
+                const repairLvl = (state.research && state.research.repairEfficacy) || 0;
+                const extraHeal = repairLvl * 10;
+                state.bossMode.player.hp = Math.min(state.bossMode.player.maxHp, state.bossMode.player.hp + state.bossMode.player.maxHp * 0.25 + extraHeal);
+                if (repairLvl >= 10) {
+                    state.bossMode.player.invulnTimer = Math.max(state.bossMode.player.invulnTimer || 0, 60); // 1s invulnerability
+                }
                 updateRepairButton();
                 createExplosion(state.bossMode.player.x, state.bossMode.player.y, '#10b981', 20);
                 playSynthSound('upgrade');
@@ -5182,9 +5713,11 @@ import {
         function triggerBossShield() {
             const player = state.bossMode.player;
             if (!player.shieldUsed) {
+                const shieldLvl = (state.research && state.research.shieldDuration) || 0;
+                const duration = 180 + shieldLvl * 18; // base 3s + 0.3s (18 frames) per level
                 player.shieldUsed = true;
-                player.shieldTimer = 180;
-                player.invulnTimer = Math.max(player.invulnTimer || 0, 180);
+                player.shieldTimer = duration;
+                player.invulnTimer = Math.max(player.invulnTimer || 0, duration);
                 playSynthSound('shield_deflect');
                 showGameNotice(`<i class="fa-solid fa-shield-halved text-cyan-400"></i> Proton Shield Activated!`, 2000);
             }
@@ -5248,9 +5781,11 @@ import {
         for (let i = 0; i < 3; i++) {
             bindButton(`orbit-btn-${i}`, () => { handleOrbitButtonPress(i); });
         }
+        bindButton('accordion-shield-btn', () => { setMasterAccordion('shield'); });
         bindButton('accordion-orbits-btn', () => { setMasterAccordion('orbits'); });
-        bindButton('accordion-directives-btn', () => { setMasterAccordion('directives'); });
+        bindButton('accordion-ship-btn', () => { setMasterAccordion('ship'); });
         bindButton('accordion-tactical-btn', () => { setMasterAccordion('tactical'); });
+        bindButton('accordion-directives-btn', () => { setMasterAccordion('directives'); });
 
         ['laser', 'emp', 'overcharge'].forEach(tac => {
             bindButton(`cmd-unlock-tactical-${tac}`, () => {
@@ -5303,9 +5838,17 @@ import {
                 const coords = getPointerCoords(e);
                 const now = Date.now();
                 if (now - (state.bossMode.player.lastTapTime || 0) < 300) {
-                    if (!state.bossMode.player.rollTimer) {
-                        state.bossMode.player.rollTimer = 30; // 30 frames of dodge roll
-                        state.bossMode.player.invulnTimer = 30; // i-frames
+                    if (!state.bossMode.player.rollTimer && (!state.bossMode.player.rollCooldown || state.bossMode.player.rollCooldown <= 0)) {
+                        const rollLvl = (state.research && state.research.dodgeRollCooldown) || 0;
+                        const speedLvl = (state.research && state.research.fighterSpeed) || 0;
+                        const extraIframes = speedLvl >= 10 ? 2 : 0;
+                        
+                        state.bossMode.player.rollTimer = 30; 
+                        state.bossMode.player.invulnTimer = 30 + extraIframes;
+                        
+                        const maxCd = 180;
+                        const reduction = rollLvl * 18;
+                        state.bossMode.player.rollCooldown = Math.max(30, maxCd - reduction);
                     }
                 }
                 state.bossMode.player.lastTapTime = now;
@@ -5429,6 +5972,9 @@ import {
                             }
                         }
 
+                        for (let e of state.game.enemies) {
+                            e._commanderBoosted = false;
+                        }
                         for (let i = state.game.enemies.length - 1; i >= 0; i--) {
                             state.game.enemies[i].update();
                             handleEnemyCollisions(state.game.enemies[i], i);

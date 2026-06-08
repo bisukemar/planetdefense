@@ -1,6 +1,6 @@
 import { state } from '../state.js';
 import * as config from '../config.js';
-import { damageSatellite, damageEarth, showGameNotice, drawEnemySprite } from '../main.js';
+
 
 export class Enemy {
             constructor(wave, profileIndex, theme, isEscort = false, escortIndex = 0, escortTotal = 1, affix = null) {
@@ -204,7 +204,7 @@ export class Enemy {
                             nearest.disableTimer = 150; // 2.5 seconds
                             state.createExplosion(nearest.x, nearest.y, '#a78bfa', 8);
                             state.shipAttackBeamsToDraw.push({ x1: this.x, y1: this.y, x2: nearest.x, y2: nearest.y, color: '#a78bfa', alpha: 1, width: 2 });
-                            showGameNotice('<i class="fa-solid fa-wifi text-purple-400"></i> JAMMER — Satellite disabled!', 2500);
+                            state.showGameNotice('<i class="fa-solid fa-wifi text-purple-400"></i> JAMMER — Satellite disabled!', 2500);
                         }
                     }
                 }
@@ -216,8 +216,6 @@ export class Enemy {
                         const d = Math.hypot(e.x - this.x, e.y - this.y);
                         if (d <= this.commandAuraRadius) {
                             e._commanderBoosted = true;
-                        } else {
-                            e._commanderBoosted = false;
                         }
                     }
                 }
@@ -254,7 +252,7 @@ export class Enemy {
                             this.angle = Math.atan2(this.targetTower.y - this.y, this.targetTower.x - this.x);
                             if (this.attackCooldown > 0) this.attackCooldown -= speedMultiplier;
                             if (this.attackCooldown <= 0) {
-                                damageSatellite(this.targetTower, this.damage, this.category);
+                                state.damageSatellite(this.targetTower, this.damage, this.category);
                                 state.createExplosion(this.targetTower.x, this.targetTower.y, this.color, 4);
                                 state.shipAttackBeamsToDraw.push({ x1: this.x, y1: this.y, x2: this.targetTower.x, y2: this.targetTower.y, color: this.color, alpha: 1, width: 1.8 });
                                 state.playSynthSound('hit');
@@ -290,7 +288,7 @@ export class Enemy {
                     isAttacking = true;
                     if (this.attackCooldown > 0) this.attackCooldown -= speedMultiplier;
                     if (this.attackCooldown <= 0) {
-                        damageSatellite(this.targetTower, this.damage, this.category);
+                        state.damageSatellite(this.targetTower, this.damage, this.category);
                         state.createExplosion(this.targetTower.x, this.targetTower.y, this.color, 4);
                         state.shipAttackBeamsToDraw.push({ x1: this.x, y1: this.y, x2: this.targetTower.x, y2: this.targetTower.y, color: this.color, alpha: 1, width: 1.8 });
                         state.playSynthSound('hit');
@@ -300,7 +298,7 @@ export class Enemy {
                     isAttacking = true;
                     if (this.attackCooldown > 0) this.attackCooldown -= speedMultiplier;
                     if (this.attackCooldown <= 0) {
-                        damageEarth(this.damage);
+                        state.damageEarth(this.damage);
                         state.createExplosion(centerX, centerY, this.color, 8);
                         state.shipAttackBeamsToDraw.push({ x1: this.x, y1: this.y, x2: centerX, y2: centerY, color: this.color, alpha: 1, width: 2.5 });
                         this.attackCooldown = this.attackCooldownMax;
@@ -312,15 +310,15 @@ export class Enemy {
                     if (this.specialCooldown <= 0) {
                         this.specialCooldown = 300;
                         if (this.targetTower) {
-                            damageSatellite(this.targetTower, this.damage * 2.5, this.category);
+                            state.damageSatellite(this.targetTower, this.damage * 2.5, this.category);
                             state.createExplosion(this.targetTower.x, this.targetTower.y, '#ef4444', 20);
                             state.shipAttackBeamsToDraw.push({ x1: this.x, y1: this.y, x2: this.targetTower.x, y2: this.targetTower.y, color: '#ef4444', alpha: 1, width: 6 });
-                            showGameNotice('<i class="fa-solid fa-radiation mr-1"></i> Mini-Boss unleashed devastating satellite strike!', 3000);
+                            state.showGameNotice('<i class="fa-solid fa-radiation mr-1"></i> Mini-Boss unleashed devastating satellite strike!', 3000);
                         } else {
-                            damageEarth(this.damage * 2.5);
+                            state.damageEarth(this.damage * 2.5);
                             state.createExplosion(centerX, centerY, '#ef4444', 20);
                             state.shipAttackBeamsToDraw.push({ x1: this.x, y1: this.y, x2: centerX, y2: centerY, color: '#ef4444', alpha: 1, width: 6 });
-                            showGameNotice('<i class="fa-solid fa-radiation mr-1"></i> Mini-Boss unleashed devastating core strike!', 3000);
+                            state.showGameNotice('<i class="fa-solid fa-radiation mr-1"></i> Mini-Boss unleashed devastating core strike!', 3000);
                         }
                     }
                 }
@@ -341,7 +339,7 @@ export class Enemy {
 
             draw() {
                 const renderAngle = this.isRockEnemy ? this.spinAngle : this.angle;
-                if (!drawEnemySprite(state.ctx, this.type, this.x, this.y, this.size, renderAngle)) {
+                if (!state.drawEnemySprite(state.ctx, this.type, this.x, this.y, this.size, renderAngle)) {
                     state.ctx.save(); state.ctx.translate(this.x, this.y); state.ctx.rotate(renderAngle);
                     state.ctx.shadowBlur = 8; state.ctx.shadowColor = this.color; state.ctx.fillStyle = this.color;
 

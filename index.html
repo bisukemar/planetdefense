@@ -483,25 +483,31 @@
                 style="touch-action: manipulation;"><i class="fa-solid fa-xmark font-bold"></i></button>
         </div>
 
-        <div id="master-tour-shield" class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80 space-y-2">
-            <h3 class="text-[10px] text-cyan-400 uppercase tracking-widest font-extrabold text-left"><i
-                    class="fa-solid fa-heart-pulse mr-1"></i> Shield Engineering</h3>
-            <div class="grid grid-cols-2 gap-2 font-bold">
-                <button id="cmd-repair-shield"
-                    class="bg-slate-900 hover:bg-slate-800 border border-cyan-500/20 rounded-lg p-2 flex flex-col items-center justify-center transition-all select-none">
-                    <span class="text-[9px] text-slate-400 uppercase font-bold">Heal Shield (+40)</span>
-                    <span class="text-cyan-400 text-xs font-black mt-1"><i
-                            class="fa-solid fa-coins text-[8px] font-bold"></i> 150G</span>
-                </button>
-                <button id="cmd-upgrade-shield"
-                    class="bg-slate-900 hover:bg-slate-800 border border-cyan-500/20 rounded-lg p-2 flex flex-col items-center justify-center transition-all select-none">
-                    <span class="text-[9px] text-slate-400 uppercase font-bold" id="lbl-shield-capacity">Cap +25 (Level
-                        <span id="shield-cap-lvl">0</span>)</span>
-                    <span class="text-amber-300 text-xs font-black mt-1 font-bold" id="cost-upgrade-shield"><i
-                            class="fa-solid fa-coins text-[8px] font-bold"></i> 200G</span>
-                </button>
+        <div id="master-tour-shield"
+            class="bg-slate-950/60 rounded border border-cyan-500/30 overflow-hidden font-bold">
+            <button id="accordion-shield-btn"
+                class="w-full px-2.5 py-2 flex items-center justify-between text-[10px] text-cyan-400 uppercase tracking-widest font-extrabold select-none">
+                <span><i class="fa-solid fa-heart-pulse mr-1"></i> Shield Engineering</span>
+                <i id="accordion-shield-icon" class="fa-solid fa-chevron-down text-[9px]"></i>
+            </button>
+            <div id="accordion-shield-content" class="hidden px-2 pb-2 space-y-2">
+                <div class="grid grid-cols-2 gap-2 font-bold mt-2">
+                    <button id="cmd-repair-shield"
+                        class="bg-slate-900 hover:bg-slate-800 border border-cyan-500/20 rounded-lg p-2 flex flex-col items-center justify-center transition-all select-none">
+                        <span class="text-[9px] text-slate-400 uppercase font-bold">Heal Shield (+40)</span>
+                        <span class="text-cyan-400 text-xs font-black mt-1"><i
+                                class="fa-solid fa-coins text-[8px] font-bold"></i> 150G</span>
+                    </button>
+                    <button id="cmd-upgrade-shield"
+                        class="bg-slate-900 hover:bg-slate-800 border border-cyan-500/20 rounded-lg p-2 flex flex-col items-center justify-center transition-all select-none">
+                        <span class="text-[9px] text-slate-400 uppercase font-bold" id="lbl-shield-capacity">Cap +25 (Level
+                            <span id="shield-cap-lvl">0</span>)</span>
+                        <span class="text-amber-300 text-xs font-black mt-1 font-bold" id="cost-upgrade-shield"><i
+                                class="fa-solid fa-coins text-[8px] font-bold"></i> 200G</span>
+                    </button>
+                </div>
+                <div class="flex gap-0.5 mt-1" id="shield-cap-dots"></div>
             </div>
-            <div class="flex gap-0.5 mt-1" id="shield-cap-dots"></div>
         </div>
 
         <div class="space-y-2">
@@ -510,11 +516,11 @@
                 <button id="accordion-orbits-btn"
                     class="w-full px-2.5 py-2 flex items-center justify-between text-[10px] text-purple-300 uppercase tracking-widest font-extrabold select-none">
                     <span><i class="fa-solid fa-circle-dot mr-1"></i> Orbital Array Control</span>
-                    <i id="accordion-orbits-icon" class="fa-solid fa-chevron-up text-[9px]"></i>
+                    <i id="accordion-orbits-icon" class="fa-solid fa-chevron-down text-[9px]"></i>
                 </button>
-                <div id="accordion-orbits-content" class="space-y-2 max-h-[30vh] overflow-y-auto px-2 pb-2">
+                <div id="accordion-orbits-content" class="hidden space-y-2 max-h-[30vh] overflow-y-auto px-2 pb-2">
                     <div id="orbit-card-0"
-                        class="bg-slate-950/60 p-2 rounded border border-slate-800/80 flex flex-col gap-1.5 font-bold">
+                        class="bg-slate-950/60 p-2 rounded border border-slate-800/80 flex flex-col gap-1.5 font-bold mt-2">
                         <div class="flex justify-between items-center text-[9px] font-bold">
                             <span class="text-sky-400 uppercase tracking-wide font-bold">Inner Path #1</span>
                             <span class="text-slate-400 font-normal"><span id="orbit-slots-0">4</span>/10 Slots</span>
@@ -543,6 +549,18 @@
                         <button id="orbit-btn-2"
                             class="w-full text-slate-950 font-black py-1.5 rounded text-[9px] uppercase transition-all select-none"></button>
                     </div>
+                </div>
+            </div>
+
+            <div id="master-tour-ship-upgrade"
+                class="bg-slate-950/60 rounded border border-cyan-500/30 overflow-hidden font-bold">
+                <button id="accordion-ship-btn"
+                    class="w-full px-2.5 py-2 flex items-center justify-between text-[10px] text-cyan-300 uppercase tracking-widest font-extrabold select-none">
+                    <span><i class="fa-solid fa-jet-fighter mr-1"></i> Ship Upgrade & Loadout</span>
+                    <i id="accordion-ship-icon" class="fa-solid fa-chevron-down text-[9px]"></i>
+                </button>
+                <div id="accordion-ship-content" class="hidden max-h-[35vh] overflow-y-auto px-2 pb-2 space-y-2">
+                    <!-- Loaded dynamically via JS -->
                 </div>
             </div>
             <div id="master-tour-tactical"
@@ -574,9 +592,9 @@
                     <span><i class="fa-solid fa-layer-group mr-1"></i> Command Directives</span>
                     <span class="flex items-center gap-2"><span id="boss-card-count"
                             class="text-slate-400 font-normal normal-case tracking-normal">0 Active</span><i
-                            id="accordion-directives-icon" class="fa-solid fa-chevron-up text-[9px]"></i></span>
+                            id="accordion-directives-icon" class="fa-solid fa-chevron-down text-[9px]"></i></span>
                 </button>
-                <div id="accordion-directives-content" class="max-h-[30vh] overflow-y-auto px-2 pb-2">
+                <div id="accordion-directives-content" class="hidden max-h-[30vh] overflow-y-auto px-2 pb-2">
                     <div id="boss-card-list" class="space-y-1 text-[9px] text-slate-400">No command directives acquired.
                     </div>
                 </div>
@@ -1087,6 +1105,18 @@
                         <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-900/20 via-slate-900/0 to-transparent"></div>
                         <div class="text-slate-400 text-[10px] uppercase tracking-widest relative z-10">Available Cosmic Data</div>
                         <div class="text-purple-300 text-xl font-black mt-1 relative z-10"><span id="lbl-cosmic-data">0</span> <i class="fa-solid fa-star text-sm"></i></div>
+                    </div>
+                    
+                    <!-- Research Lab Tabs -->
+                    <div class="flex bg-slate-900 border border-slate-800 rounded-xl p-1 shrink-0 mb-2 gap-1.5">
+                        <button id="tab-research-global"
+                            class="flex-1 py-1.5 text-center text-xs tracking-wider uppercase font-black rounded-lg transition-all bg-purple-900/30 text-purple-400 border border-purple-500/20">
+                            Command Tech
+                        </button>
+                        <button id="tab-research-ship"
+                            class="flex-1 py-1.5 text-center text-xs tracking-wider uppercase font-black rounded-lg transition-all text-slate-400 hover:text-slate-200 border border-transparent">
+                            Ship Tech
+                        </button>
                     </div>
                     
                     <div class="flex-1 relative bg-slate-950 border border-slate-800 rounded-xl overflow-hidden" id="skill-tree-viewport">

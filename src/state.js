@@ -39,6 +39,10 @@ export const state = {
     modeTransitionActive: false,
     gameLoopStarted: false,
     cosmicData: 0,
+    activeResearchTab: 'global',
+    equippedPrimary: 'default',
+    equippedSecondary: 'none',
+    shipWeapons: { default: { owned: true, level: 1 } },
     research: { startSlots: 0, baseShield: 0, baseDamage: 0 },
     game: {
         running: false, paused: false, score: 0, gold: 500, wave: 1, nextWaveTimer: 0,
@@ -71,6 +75,10 @@ export const state = {
     getDirectiveEffectValue: () => null,
     spawnReward: () => {},
     updateStatsUI: () => {},
+    damageSatellite: () => {},
+    damageEarth: () => {},
+    showGameNotice: () => {},
+    drawEnemySprite: () => false,
     canvas: null,
     ctx: null
 };
